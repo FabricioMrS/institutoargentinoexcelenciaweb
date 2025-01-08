@@ -1,15 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface CourseCardProps {
   title: string;
   category: string;
   image: string;
   price: string;
+  slug: string;
 }
 
-export const CourseCard = ({ title, category, image, price }: CourseCardProps) => {
+export const CourseCard = ({ title, category, image, price, slug }: CourseCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card className="overflow-hidden transition-transform hover:scale-105">
       <div className="h-48 overflow-hidden">
@@ -18,12 +22,19 @@ export const CourseCard = ({ title, category, image, price }: CourseCardProps) =
       <CardHeader>
         <div className="flex justify-between items-start">
           <Badge variant="secondary">{category}</Badge>
-          <span className="font-bold text-lg">{price}</span>
+          <div className="text-right">
+            <span className="font-bold text-lg block">{price}</span>
+            <span className="text-xs text-muted-foreground">Financiación disponible</span>
+          </div>
         </div>
         <CardTitle className="text-lg mt-2">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Button variant="outline" className="w-full">
+        <Button 
+          variant="outline" 
+          className="w-full"
+          onClick={() => navigate(`/curso/${slug}`)}
+        >
           Ver Detalles
         </Button>
       </CardContent>

@@ -33,19 +33,22 @@ const courses = [
     title: "Inglés Universitario",
     category: "Idiomas",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
-    price: "89.999 ARS",
+    price: "94.999 ARS",
+    slug: "ingles-universitario"
   },
   {
     title: "Cursos de medicina UNC",
     category: "Medicina",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    price: "75.999 ARS",
+    price: "129.999 ARS",
+    slug: "medicina-unc"
   },
   {
     title: "Curso de edición de videos",
     category: "Multimedia",
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
-    price: "79.999 ARS",
+    price: "129.999 ARS",
+    slug: "edicion-videos"
   },
 ];
 
