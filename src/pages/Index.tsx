@@ -12,7 +12,7 @@ const features = [
     Icon: Monitor,
   },
   {
-    title: "Instructores Expertos",
+    title: "Profesores Expertos",
     description: "Aprende de profesionales con amplia experiencia en la industria",
     Icon: Users,
   },
@@ -30,20 +30,20 @@ const features = [
 
 const courses = [
   {
-    title: "Desarrollo Web Fullstack",
-    category: "Programación",
+    title: "Inglés Universitario",
+    category: "Idiomas",
     image: "/placeholder.svg",
     price: "199€",
   },
   {
-    title: "Marketing Digital",
-    category: "Marketing",
+    title: "Cursos de medicina UNC",
+    category: "Medicina",
     image: "/placeholder.svg",
     price: "149€",
   },
   {
-    title: "Diseño UX/UI",
-    category: "Diseño",
+    title: "Curso de edición de videos",
+    category: "Multimedia",
     image: "/placeholder.svg",
     price: "179€",
   },

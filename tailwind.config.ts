@@ -25,14 +25,14 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#243949",
+          DEFAULT: "#30416e",
           foreground: "#ffffff",
-          hover: "#517fa4",
+          hover: "#e2cb81",
         },
         secondary: {
-          DEFAULT: "#4CAF50",
-          foreground: "#ffffff",
-          hover: "#45a049",
+          DEFAULT: "#e2cb81",
+          foreground: "#30416e",
+          hover: "#d4bd73",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
