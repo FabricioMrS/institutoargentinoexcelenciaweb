@@ -32,20 +32,20 @@ const courses = [
   {
     title: "Inglés Universitario",
     category: "Idiomas",
-    image: "/placeholder.svg",
-    price: "199€",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
+    price: "89.999 ARS",
   },
   {
     title: "Cursos de medicina UNC",
     category: "Medicina",
-    image: "/placeholder.svg",
-    price: "149€",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
+    price: "75.999 ARS",
   },
   {
     title: "Curso de edición de videos",
     category: "Multimedia",
-    image: "/placeholder.svg",
-    price: "179€",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
+    price: "79.999 ARS",
   },
 ];
 
@@ -78,7 +78,9 @@ const Index = () => {
       {/* Características */}
       <section className="py-20 bg-gray-50">
         <div className="container">
-          <h2 className="text-4xl font-bold text-center mb-12">¿Por qué elegirnos?</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">¿Por qué elegir {" "}
+            <span className="text-primary">Instituto Argentino Excelencia</span>?
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
               <FeatureCard key={feature.title} {...feature} />
