@@ -4,6 +4,7 @@ import { CourseCard } from "@/components/CourseCard";
 import { FeatureCard } from "@/components/FeatureCard";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { Footer } from "@/components/Footer";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const features = [
   {
@@ -50,26 +51,47 @@ const courses = [
     price: "129.999 ARS",
     slug: "edicion-videos"
   },
+  {
+    title: "Desarrollo Web",
+    category: "Programación",
+    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    slug: "desarrollo-web"
+  },
+  {
+    title: "Diseño Gráfico",
+    category: "Diseño",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    slug: "diseno-grafico"
+  },
+  {
+    title: "Marketing Digital",
+    category: "Marketing",
+    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    slug: "marketing-digital"
+  },
 ];
 
 const testimonials = [
   {
     name: "María García",
     role: "Estudiante de Marketing Digital",
-    content: "Los cursos son excelentes y los profesores muy profesionales. He aprendido muchísimo.",
-    avatar: "/placeholder.svg",
+    content: "Los cursos son excelentes y los profesores muy profesionales. La flexibilidad de horarios me permitió estudiar mientras trabajaba. Recomiendo totalmente la experiencia.",
+    avatar: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
   },
   {
     name: "Juan Pérez",
     role: "Desarrollador Web",
-    content: "La flexibilidad de las clases online me permitió estudiar mientras trabajaba.",
-    avatar: "/placeholder.svg",
+    content: "La calidad del contenido y el soporte del equipo docente son excepcionales. El formato virtual me permitió organizar mejor mis tiempos.",
+    avatar: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=800&q=80",
   },
   {
     name: "Ana Martínez",
     role: "Diseñadora UX",
-    content: "La calidad del contenido y el soporte del equipo docente son excepcionales.",
-    avatar: "/placeholder.svg",
+    content: "Excelente experiencia de aprendizaje. Los profesores están siempre disponibles para resolver dudas y el material es muy completo.",
+    avatar: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
@@ -117,6 +139,7 @@ const Index = () => {
       </section>
 
       <Footer />
+      <WhatsAppButton floating={true} />
     </div>
   );
 };

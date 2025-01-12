@@ -12,7 +12,7 @@ const courses = {
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
     price: "94.999 ARS",
     startDate: "15 de Mayo 2024",
-    schedule: "18:00 - 20:00 hs",
+    schedule: "A convenir",
     modality: "Virtual",
     duration: 3
   },
@@ -22,9 +22,9 @@ const courses = {
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "1 de Junio 2024",
-    schedule: "08:00 - 12:00 hs",
-    modality: "Presencial",
-    duration: 6
+    schedule: "A convenir",
+    modality: "Virtual",
+    duration: 2
   },
   "edicion-videos": {
     title: "Curso de edición de videos",
@@ -32,9 +32,39 @@ const courses = {
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "20 de Mayo 2024",
-    schedule: "19:00 - 21:00 hs",
+    schedule: "A convenir",
     modality: "Virtual",
     duration: 4
+  },
+  "desarrollo-web": {
+    title: "Desarrollo Web",
+    category: "Programación",
+    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    startDate: "1 de Junio 2024",
+    schedule: "A convenir",
+    modality: "Virtual",
+    duration: 4
+  },
+  "diseno-grafico": {
+    title: "Diseño Gráfico",
+    category: "Diseño",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    startDate: "15 de Mayo 2024",
+    schedule: "A convenir",
+    modality: "Virtual",
+    duration: 3
+  },
+  "marketing-digital": {
+    title: "Marketing Digital",
+    category: "Marketing",
+    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    startDate: "1 de Junio 2024",
+    schedule: "A convenir",
+    modality: "Virtual",
+    duration: 3
   }
 };
 

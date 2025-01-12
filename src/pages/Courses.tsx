@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const courses = [
   {
@@ -18,19 +19,19 @@ const courses = [
     slug: "edicion-videos"
   },
   {
-    title: "Marketing Digital",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-    slug: "marketing-digital"
-  },
-  {
     title: "Desarrollo Web",
-    image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
     slug: "desarrollo-web"
   },
   {
     title: "Diseño Gráfico",
-    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
     slug: "diseno-grafico"
+  },
+  {
+    title: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
+    slug: "marketing-digital"
   }
 ];
 
@@ -60,6 +61,7 @@ const Courses = () => {
           </Card>
         ))}
       </div>
+      <WhatsAppButton floating={true} />
     </div>
   );
 };
