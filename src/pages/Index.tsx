@@ -5,6 +5,13 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const features = [
   {
@@ -38,66 +45,58 @@ const courses = [
     slug: "ingles-universitario"
   },
   {
-    title: "Cursos de medicina UNC",
+    title: "Cursos de medicina UNC - UCC",
     category: "Medicina",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     slug: "medicina-unc"
-  },
-  {
-    title: "Curso de edición de videos",
-    category: "Multimedia",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
-    price: "129.999 ARS",
-    slug: "edicion-videos"
-  },
-  {
-    title: "Desarrollo Web",
-    category: "Programación",
-    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
-    price: "129.999 ARS",
-    slug: "desarrollo-web"
-  },
-  {
-    title: "Diseño Gráfico",
-    category: "Diseño",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
-    price: "129.999 ARS",
-    slug: "diseno-grafico"
-  },
-  {
-    title: "Marketing Digital",
-    category: "Marketing",
-    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
-    price: "129.999 ARS",
-    slug: "marketing-digital"
-  },
+  }
 ];
 
 const testimonials = [
   {
     name: "María García",
-    role: "Estudiante de Marketing Digital",
-    content: "Los cursos son excelentes y los profesores muy profesionales. La flexibilidad de horarios me permitió estudiar mientras trabajaba. Recomiendo totalmente la experiencia.",
+    role: "Estudiante de Medicina",
+    content: "Los cursos son excelentes y los profesores muy profesionales. La flexibilidad de horarios me permitió estudiar mientras trabajaba.",
     avatar: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
   },
   {
     name: "Juan Pérez",
-    role: "Desarrollador Web",
+    role: "Estudiante de Inglés",
     content: "La calidad del contenido y el soporte del equipo docente son excepcionales. El formato virtual me permitió organizar mejor mis tiempos.",
     avatar: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=800&q=80",
   },
   {
     name: "Ana Martínez",
-    role: "Diseñadora UX",
-    content: "Excelente experiencia de aprendizaje. Los profesores están siempre disponibles para resolver dudas y el material es muy completo.",
+    role: "Estudiante de Medicina",
+    content: "Excelente experiencia de aprendizaje. Los profesores están siempre disponibles para resolver dudas.",
     avatar: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
   },
+  {
+    name: "Carlos Rodriguez",
+    role: "Estudiante de Medicina UNC",
+    content: "La metodología de enseñanza es muy efectiva. Me ayudó mucho en mi preparación académica.",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    name: "Laura Sánchez",
+    role: "Estudiante de Inglés Universitario",
+    content: "Los profesores son excelentes y el material de estudio es muy completo. Totalmente recomendado.",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=800&q=80",
+  }
 ];
 
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <div className="flex items-center justify-center py-4 bg-white">
+        <img 
+          src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
+          alt="Instituto Argentino Excelencia" 
+          className="h-24 object-contain"
+        />
+      </div>
+      
       <HeroSection />
       
       {/* Características */}
@@ -118,7 +117,7 @@ const Index = () => {
       <section className="py-20">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {courses.map((course) => (
               <CourseCard key={course.title} {...course} />
             ))}
@@ -126,15 +125,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonios */}
+      {/* Testimonios Carrusel */}
       <section className="py-20 bg-gray-50">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Lo que dicen nuestros estudiantes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <TestimonialCard key={testimonial.name} {...testimonial} />
-            ))}
-          </div>
+          <Carousel className="w-full max-w-4xl mx-auto" opts={{ loop: true, align: "start", duration: 20 }}>
+            <CarouselContent>
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/2">
+                  <TestimonialCard {...testimonial} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       </section>
 

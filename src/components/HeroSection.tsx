@@ -8,8 +8,8 @@ export const HeroSection = () => {
   return (
     <div className="relative min-h-[600px] flex items-center justify-center bg-primary">
       <div className="container mx-auto px-6 py-20 text-center text-white">
-        <h1 className="text-5xl md:text-6xl font-bold mb-8 animate-fadeIn">
-          Aprende y Crece con Nosotros
+        <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-fadeIn">
+          Instituto Argentino Excelencia
         </h1>
         <p className="text-xl md:text-2xl mb-12 animate-fadeIn" style={{ animationDelay: "0.2s" }}>
           Descubre cursos de calidad que transformarán tu futuro profesional
