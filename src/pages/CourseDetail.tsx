@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Monitor } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const courses = {
   "ingles-universitario": {
@@ -11,7 +13,8 @@ const courses = {
     price: "94.999 ARS",
     startDate: "15 de Mayo 2024",
     schedule: "18:00 - 20:00 hs",
-    modality: "Virtual"
+    modality: "Virtual",
+    duration: 3
   },
   "medicina-unc": {
     title: "Cursos de medicina UNC",
@@ -20,7 +23,8 @@ const courses = {
     price: "129.999 ARS",
     startDate: "1 de Junio 2024",
     schedule: "08:00 - 12:00 hs",
-    modality: "Presencial"
+    modality: "Presencial",
+    duration: 6
   },
   "edicion-videos": {
     title: "Curso de edición de videos",
@@ -29,7 +33,8 @@ const courses = {
     price: "129.999 ARS",
     startDate: "20 de Mayo 2024",
     schedule: "19:00 - 21:00 hs",
-    modality: "Virtual"
+    modality: "Virtual",
+    duration: 4
   }
 };
 
@@ -38,6 +43,24 @@ const CourseDetail = () => {
   const course = courses[courseId as keyof typeof courses];
 
   if (!course) return <div>Curso no encontrado</div>;
+
+  const basePrice = parseInt(course.price.replace(/[^0-9]/g, ''));
+  const installments = Array.from({ length: course.duration }, (_, i) => i + 1);
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const handleInstallmentClick = (installments: number) => {
+    const monthlyPayment = formatPrice(Math.round(basePrice / installments));
+    const message = `Hola! Estoy interesado en el curso ${course.title} y la forma de financiación de ${installments} cuota${installments > 1 ? 's' : ''} de ${monthlyPayment}`;
+    window.open(`https://wa.me/543518118268?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
   return (
     <div className="container py-12">
@@ -78,6 +101,29 @@ const CourseDetail = () => {
                 <p className="text-sm text-muted-foreground">{course.modality}</p>
               </div>
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Opciones de financiación:</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {installments.map((number) => {
+                const monthlyPayment = Math.round(basePrice / number);
+                return (
+                  <Button
+                    key={number}
+                    variant="outline"
+                    onClick={() => handleInstallmentClick(number)}
+                    className="w-full"
+                  >
+                    {number} cuota{number > 1 ? 's' : ''} de {formatPrice(monthlyPayment)}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <WhatsAppButton message={`Hola! Estoy interesado en el curso ${course.title}`} />
           </div>
         </CardContent>
       </Card>

@@ -32,7 +32,7 @@ export const CourseCard = ({ title, category, image, price, slug }: CourseCardPr
       <CardContent>
         <Button 
           variant="outline" 
-          className="w-full"
+          className="w-full mb-4"
           onClick={() => navigate(`/curso/${slug}`)}
         >
           Ver Detalles
