@@ -151,12 +151,9 @@ const CourseDetail = () => {
               })}
             </div>
           </div>
-
-          <div className="pt-4">
-            <WhatsAppButton message={`Hola! Estoy interesado en el curso ${course.title}`} />
-          </div>
         </CardContent>
       </Card>
+      <WhatsAppButton floating={true} message={`Hola! Estoy interesado en el curso ${course.title}`} />
     </div>
   );
 };
