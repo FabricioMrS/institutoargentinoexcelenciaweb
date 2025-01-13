@@ -4,6 +4,8 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   Carousel,
   CarouselContent,
@@ -114,6 +116,8 @@ const testimonials = [
 ];
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="bg-primary text-primary-foreground py-20">
       <div className="container">
@@ -128,7 +132,17 @@ export const HeroSection = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">Bienvenido a Instituto Argentino Excelencia</h1>
           <p className="text-lg mb-8">Ofrecemos una variedad de cursos para ayudarte a alcanzar tus metas educativas y profesionales.</p>
-          <WhatsAppButton floating={true} />
+          <div className="flex justify-center gap-4">
+            <Button 
+              variant="secondary"
+              size="lg"
+              onClick={() => navigate('/cursos')}
+              className="font-semibold"
+            >
+              Explorar Cursos
+            </Button>
+            <WhatsAppButton floating={true} />
+          </div>
         </div>
       </div>
     </section>
