@@ -17,7 +17,7 @@ const courses = {
     duration: 3
   },
   "medicina-unc": {
-    title: "Cursos de medicina UNC",
+    title: "Cursos de medicina UNC - UCC",
     category: "Medicina",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
@@ -27,9 +27,9 @@ const courses = {
     duration: 2
   },
   "edicion-videos": {
-    title: "Curso de edición de videos",
+    title: "Creación y edición audiovisual",
     category: "Multimedia",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "20 de Mayo 2024",
     schedule: "A convenir",

@@ -71,6 +71,13 @@ const courses = [
     image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     slug: "marketing-digital"
+  },
+  {
+    title: "Creación y edición audiovisual",
+    category: "Multimedia",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    slug: "edicion-videos"
   }
 ];
 

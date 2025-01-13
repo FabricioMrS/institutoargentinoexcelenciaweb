@@ -12,7 +12,7 @@ export const HeroSection = () => {
           <img 
             src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
             alt="Instituto Argentino Excelencia" 
-            className="h-32 object-contain mx-auto mb-4"
+            className="h-48 object-contain mx-auto mb-4"
           />
           <div className="w-full max-w-3xl mx-auto h-px bg-secondary mb-8"></div>
         </div>
