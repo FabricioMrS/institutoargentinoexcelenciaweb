@@ -110,15 +110,6 @@ const testimonials = [
 const Index = () => {
   return (
     <div className="min-h-screen">
-      <div className="flex flex-col items-center justify-center py-4 bg-white">
-        <img 
-          src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
-          alt="Instituto Argentino Excelencia" 
-          className="h-32 object-contain mb-4"
-        />
-        <div className="w-full max-w-3xl mx-auto h-px bg-secondary"></div>
-      </div>
-      
       <HeroSection />
       
       {/* Características */}
@@ -139,7 +130,7 @@ const Index = () => {
       <section className="py-20">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course) => (
               <CourseCard key={course.title} {...course} />
             ))}
@@ -151,10 +142,10 @@ const Index = () => {
       <section className="py-20 bg-gray-50">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Lo que dicen nuestros estudiantes</h2>
-          <Carousel className="w-full max-w-4xl mx-auto" opts={{ loop: true, align: "start", duration: 20 }}>
+          <Carousel className="w-full max-w-6xl mx-auto" opts={{ loop: true, align: "start", duration: 20, slidesToScroll: 3 }}>
             <CarouselContent>
               {testimonials.map((testimonial, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/2">
+                <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/3">
                   <TestimonialCard {...testimonial} />
                 </CarouselItem>
               ))}

@@ -8,6 +8,14 @@ export const HeroSection = () => {
   return (
     <div className="relative min-h-[600px] flex items-center justify-center bg-primary">
       <div className="container mx-auto px-6 py-20 text-center text-white">
+        <div className="mb-8">
+          <img 
+            src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
+            alt="Instituto Argentino Excelencia" 
+            className="h-32 object-contain mx-auto mb-4"
+          />
+          <div className="w-full max-w-3xl mx-auto h-px bg-secondary mb-8"></div>
+        </div>
         <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-fadeIn">
           Instituto Argentino Excelencia
         </h1>
