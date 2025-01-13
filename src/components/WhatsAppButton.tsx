@@ -14,9 +14,9 @@ export const WhatsAppButton = ({
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-  const baseClasses = "bg-green-500 hover:bg-green-600 text-white transition-all duration-300 ease-in-out";
+  const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
   const floatingClasses = floating ? 
-    "fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg hover:shadow-xl z-50" : 
+    "fixed bottom-4 right-4 rounded-full w-16 h-16 shadow-lg z-50" : 
     "w-full";
 
   return (
