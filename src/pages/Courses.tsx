@@ -32,6 +32,21 @@ const courses = [
     title: "Creación y edición audiovisual",
     image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
     slug: "edicion-videos"
+  },
+  {
+    title: "Introducción a la programación",
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80",
+    slug: "intro-programacion"
+  },
+  {
+    title: "Inglés para viajeros",
+    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
+    slug: "ingles-viajeros"
+  },
+  {
+    title: "Nutrición y suplementación deportiva",
+    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80",
+    slug: "nutricion-deportiva"
   }
 ];
 

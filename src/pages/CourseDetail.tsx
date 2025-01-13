@@ -1,19 +1,27 @@
 import { useParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Monitor } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-const courses = {
+interface CourseDetails {
+  title: string;
+  category: string;
+  image: string;
+  price: string;
+  startDate: string;
+  schedule: string;
+  description: string;
+  duration: number;
+}
+
+const courseDetails: Record<string, CourseDetails> = {
   "ingles-universitario": {
     title: "Inglés Universitario",
     category: "Idiomas",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
     price: "94.999 ARS",
     startDate: "15 de Mayo 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
+    schedule: "Martes y Jueves 18:00-20:00",
+    description: "Curso de inglés orientado a estudiantes universitarios, con enfoque en vocabulario técnico y académico.",
     duration: 3
   },
   "medicina-unc": {
@@ -22,18 +30,8 @@ const courses = {
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "1 de Junio 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
-    duration: 2
-  },
-  "edicion-videos": {
-    title: "Creación y edición audiovisual",
-    category: "Multimedia",
-    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
-    price: "129.999 ARS",
-    startDate: "20 de Mayo 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
+    schedule: "Lunes y Miércoles 19:00-21:00",
+    description: "Cursos de medicina con enfoque práctico y teórico, dictados por profesionales del área.",
     duration: 4
   },
   "desarrollo-web": {
@@ -41,10 +39,10 @@ const courses = {
     category: "Programación",
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
-    startDate: "1 de Junio 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
-    duration: 4
+    startDate: "10 de Mayo 2024",
+    schedule: "Martes y Jueves 18:00-20:00",
+    description: "Aprende a crear sitios web desde cero, utilizando HTML, CSS y JavaScript.",
+    duration: 3
   },
   "diseno-grafico": {
     title: "Diseño Gráfico",
@@ -52,8 +50,8 @@ const courses = {
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "15 de Mayo 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
+    schedule: "Lunes y Miércoles 19:00-21:00",
+    description: "Curso de diseño gráfico que abarca herramientas y técnicas para la creación visual.",
     duration: 3
   },
   "marketing-digital": {
@@ -62,98 +60,77 @@ const courses = {
     image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
     price: "129.999 ARS",
     startDate: "1 de Junio 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
+    schedule: "Martes y Jueves 18:00-20:00",
+    description: "Aprende estrategias de marketing digital para potenciar tu negocio en línea.",
     duration: 3
+  },
+  "edicion-videos": {
+    title: "Creación y edición audiovisual",
+    category: "Multimedia",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
+    price: "129.999 ARS",
+    startDate: "10 de Mayo 2024",
+    schedule: "Miércoles y Viernes 17:00-19:00",
+    description: "Curso de edición de video que te enseñará a crear contenido audiovisual atractivo.",
+    duration: 2
+  },
+  "intro-programacion": {
+    title: "Introducción a la programación",
+    category: "Programación",
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80",
+    price: "94.999 ARS",
+    startDate: "15 de Mayo 2024",
+    schedule: "Martes y Jueves 18:00-20:00",
+    description: "Curso introductorio al mundo de la programación. Aprenderás los fundamentos de la lógica de programación y los conceptos básicos de desarrollo de software.",
+    duration: 3
+  },
+  "ingles-viajeros": {
+    title: "Inglés para viajeros",
+    category: "Idiomas",
+    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
+    price: "79.999 ARS",
+    startDate: "1 de Junio 2024",
+    schedule: "Lunes y Miércoles 19:00-21:00",
+    description: "Curso práctico de inglés enfocado en situaciones de viaje. Aprenderás vocabulario y expresiones útiles para desenvolverte en el extranjero.",
+    duration: 2
+  },
+  "nutricion-deportiva": {
+    title: "Nutrición y suplementación deportiva",
+    category: "Salud",
+    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80",
+    price: "89.999 ARS",
+    startDate: "10 de Mayo 2024",
+    schedule: "Miércoles y Viernes 17:00-19:00",
+    description: "Aprende sobre nutrición deportiva y suplementación para optimizar tu rendimiento físico y alcanzar tus objetivos deportivos.",
+    duration: 2
   }
 };
 
 const CourseDetail = () => {
-  const { courseId } = useParams();
-  const course = courses[courseId as keyof typeof courses];
+  const { courseId } = useParams<{ courseId: string }>();
+  const course = courseDetails[courseId!];
 
-  if (!course) return <div>Curso no encontrado</div>;
-
-  const basePrice = parseInt(course.price.replace(/[^0-9]/g, ''));
-  const installments = Array.from({ length: course.duration }, (_, i) => i + 1);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const handleInstallmentClick = (installments: number) => {
-    const monthlyPayment = formatPrice(Math.round(basePrice / installments));
-    const message = `Hola! Estoy interesado en el curso ${course.title} y la forma de financiación de ${installments} cuota${installments > 1 ? 's' : ''} de ${monthlyPayment}`;
-    window.open(`https://wa.me/543518118268?text=${encodeURIComponent(message)}`, '_blank');
-  };
+  if (!course) {
+    return <div>Curso no encontrado</div>;
+  }
 
   return (
     <div className="container py-12">
-      <Card className="max-w-3xl mx-auto">
-        <div className="h-64 overflow-hidden">
-          <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
-        </div>
+      <Card>
+        <img src={course.image} alt={course.title} className="w-full h-64 object-cover" />
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <Badge variant="secondary">{course.category}</Badge>
-            <div className="text-right">
-              <span className="font-bold text-2xl block">{course.price}</span>
-              <span className="text-sm text-muted-foreground">Financiación disponible</span>
-            </div>
-          </div>
-          <CardTitle className="text-3xl">{course.title}</CardTitle>
+          <CardTitle className="text-2xl">{course.title}</CardTitle>
+          <CardDescription>{course.description}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="text-primary" />
-              <div>
-                <p className="font-medium">Inicio</p>
-                <p className="text-sm text-muted-foreground">{course.startDate}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="text-primary" />
-              <div>
-                <p className="font-medium">Horario</p>
-                <p className="text-sm text-muted-foreground">{course.schedule}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Monitor className="text-primary" />
-              <div>
-                <p className="font-medium">Modalidad</p>
-                <p className="text-sm text-muted-foreground">{course.modality}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Opciones de financiación:</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {installments.map((number) => {
-                const monthlyPayment = Math.round(basePrice / number);
-                return (
-                  <Button
-                    key={number}
-                    variant="outline"
-                    onClick={() => handleInstallmentClick(number)}
-                    className="w-full"
-                  >
-                    {number} cuota{number > 1 ? 's' : ''} de {formatPrice(monthlyPayment)}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
+        <CardContent>
+          <p><strong>Categoría:</strong> {course.category}</p>
+          <p><strong>Precio:</strong> {course.price}</p>
+          <p><strong>Fecha de inicio:</strong> {course.startDate}</p>
+          <p><strong>Horario:</strong> {course.schedule}</p>
+          <p><strong>Duración:</strong> {course.duration} semanas</p>
         </CardContent>
       </Card>
-      <WhatsAppButton floating={true} message={`Hola! Estoy interesado en el curso ${course.title}`} />
+      <WhatsAppButton floating={true} />
     </div>
   );
 };
