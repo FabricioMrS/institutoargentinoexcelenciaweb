@@ -16,7 +16,7 @@ export const WhatsAppButton = ({
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white transition-all duration-300 ease-in-out";
   const floatingClasses = floating ? 
-    "fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg hover:shadow-xl z-50 animate-bounce hover:animate-none transform hover:scale-110" : 
+    "fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg hover:shadow-xl z-50" : 
     "w-full";
 
   return (
