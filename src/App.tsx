@@ -7,6 +7,7 @@ import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
 import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
+import Professionals from "./pages/Professionals";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/cursos" element={<Courses />} />
             <Route path="/curso/:courseId" element={<CourseDetail />} />
+            <Route path="/profesionales" element={<Professionals />} />
           </Routes>
         </div>
       </BrowserRouter>
