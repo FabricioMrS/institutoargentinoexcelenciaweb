@@ -23,9 +23,8 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contacto</h3>
             <ul className="space-y-2 text-sm">
-              <li>Email: info@tueducacion.com</li>
-              <li>Teléfono: (123) 456-7890</li>
-              <li>Dirección: Calle Principal 123</li>
+              <li>Email: institutoargentinoexcelencia@gmail.com</li>
+              <li>Teléfono: (351) 8118268</li>
             </ul>
           </div>
           <div>
