@@ -4,17 +4,33 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { useState } from "react";
 
 const courses = {
   "ingles-universitario": {
     title: "Inglés Universitario",
     category: "Idiomas",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
-    price: "94.999 ARS",
-    startDate: "15 de Mayo 2024",
-    schedule: "A convenir",
-    modality: "Virtual",
-    duration: 3
+    subcourses: [
+      {
+        id: "ingles-medico",
+        title: "Inglés médico, niveles I, II y III",
+        price: "120.000 ARS",
+        startDate: "15 de Mayo 2024",
+        schedule: "A convenir",
+        modality: "Virtual",
+        duration: 4
+      },
+      {
+        id: "ingles-general",
+        title: "Inglés universitario general",
+        price: "94.999 ARS",
+        startDate: "15 de Mayo 2024",
+        schedule: "A convenir",
+        modality: "Virtual",
+        duration: 3
+      }
+    ]
   },
   "medicina-unc": {
     title: "Cursos de medicina UNC - UCC",
@@ -71,11 +87,12 @@ const courses = {
 const CourseDetail = () => {
   const { courseId } = useParams();
   const course = courses[courseId as keyof typeof courses];
+  const [selectedSubcourse, setSelectedSubcourse] = useState(course?.subcourses?.[0]);
 
   if (!course) return <div>Curso no encontrado</div>;
 
-  const basePrice = parseInt(course.price.replace(/[^0-9]/g, ''));
-  const installments = Array.from({ length: course.duration }, (_, i) => i + 1);
+  const basePrice = parseInt(selectedSubcourse?.price.replace(/[^0-9]/g, ''));
+  const installments = Array.from({ length: selectedSubcourse?.duration || 0 }, (_, i) => i + 1);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -88,7 +105,7 @@ const CourseDetail = () => {
 
   const handleInstallmentClick = (installments: number) => {
     const monthlyPayment = formatPrice(Math.round(basePrice / installments));
-    const message = `Hola! Estoy interesado en el curso ${course.title} y la forma de financiación de ${installments} cuota${installments > 1 ? 's' : ''} de ${monthlyPayment}`;
+    const message = `Hola! Estoy interesado en el curso ${selectedSubcourse?.title} y la forma de financiación de ${installments} cuota${installments > 1 ? 's' : ''} de ${monthlyPayment}`;
     window.open(`https://wa.me/543518118268?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -101,59 +118,76 @@ const CourseDetail = () => {
         <CardHeader>
           <div className="flex justify-between items-start">
             <Badge variant="secondary">{course.category}</Badge>
+          </div>
+          <CardTitle className="text-3xl mb-6">{course.title}</CardTitle>
+          <div className="space-y-4">
+            {course.subcourses?.map((subcourse) => (
+              <Button
+                key={subcourse.id}
+                variant={selectedSubcourse?.id === subcourse.id ? "default" : "outline"}
+                className="w-full text-left justify-start"
+                onClick={() => setSelectedSubcourse(subcourse)}
+              >
+                {subcourse.title}
+              </Button>
+            ))}
+          </div>
+        </CardHeader>
+        {selectedSubcourse && (
+          <CardContent className="space-y-6">
             <div className="text-right">
-              <span className="font-bold text-2xl block">{course.price}</span>
+              <span className="font-bold text-2xl block">{selectedSubcourse.price}</span>
               <span className="text-sm text-muted-foreground">Financiación disponible</span>
             </div>
-          </div>
-          <CardTitle className="text-3xl">{course.title}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="text-primary" />
-              <div>
-                <p className="font-medium">Inicio</p>
-                <p className="text-sm text-muted-foreground">{course.startDate}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="text-primary" />
+                <div>
+                  <p className="font-medium">Inicio</p>
+                  <p className="text-sm text-muted-foreground">{selectedSubcourse.startDate}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="text-primary" />
+                <div>
+                  <p className="font-medium">Horario</p>
+                  <p className="text-sm text-muted-foreground">{selectedSubcourse.schedule}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Monitor className="text-primary" />
+                <div>
+                  <p className="font-medium">Modalidad</p>
+                  <p className="text-sm text-muted-foreground">{selectedSubcourse.modality}</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="text-primary" />
-              <div>
-                <p className="font-medium">Horario</p>
-                <p className="text-sm text-muted-foreground">{course.schedule}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Monitor className="text-primary" />
-              <div>
-                <p className="font-medium">Modalidad</p>
-                <p className="text-sm text-muted-foreground">{course.modality}</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Opciones de financiación:</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {installments.map((number) => {
-                const monthlyPayment = Math.round(basePrice / number);
-                return (
-                  <Button
-                    key={number}
-                    variant="outline"
-                    onClick={() => handleInstallmentClick(number)}
-                    className="w-full"
-                  >
-                    {number} cuota{number > 1 ? 's' : ''} de {formatPrice(monthlyPayment)}
-                  </Button>
-                );
-              })}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Opciones de financiación:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {installments.map((number) => {
+                  const monthlyPayment = Math.round(basePrice / number);
+                  return (
+                    <Button
+                      key={number}
+                      variant="outline"
+                      onClick={() => handleInstallmentClick(number)}
+                      className="w-full"
+                    >
+                      {number} cuota{number > 1 ? 's' : ''} de {formatPrice(monthlyPayment)}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
-      <WhatsAppButton floating={true} message={`Hola! Estoy interesado en el curso ${course.title}`} />
+      <WhatsAppButton 
+        floating={true} 
+        message={`Hola! Estoy interesado en el curso ${selectedSubcourse?.title}`} 
+      />
     </div>
   );
 };
