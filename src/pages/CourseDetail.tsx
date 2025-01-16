@@ -1,36 +1,64 @@
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Monitor } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { useState } from "react";
 
-const courses = {
+interface Subcourse {
+  id: string;
+  title: string;
+  price: string;
+  startDate: string;
+  schedule: string;
+  modality: string;
+  duration: number;
+}
+
+interface Course {
+  title: string;
+  category: string;
+  image: string;
+  subcourses?: Subcourse[];
+  price?: string;
+  startDate?: string;
+  schedule?: string;
+  modality?: string;
+  duration?: number;
+}
+
+const courses: Record<string, Course> = {
   "ingles-universitario": {
     title: "Inglés Universitario",
     category: "Idiomas",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
+    image: "/placeholder.svg",
     subcourses: [
       {
-        id: "ingles-medico",
+        id: "medico",
         title: "Inglés médico, niveles I, II y III",
-        price: "120.000 ARS",
-        startDate: "15 de Mayo 2024",
-        schedule: "A convenir",
+        price: "120000",
+        startDate: "Abril 2024",
+        schedule: "Martes y Jueves 18:00-20:00",
         modality: "Virtual",
-        duration: 4
+        duration: 6,
       },
       {
-        id: "ingles-general",
+        id: "general",
         title: "Inglés universitario general",
-        price: "94.999 ARS",
-        startDate: "15 de Mayo 2024",
-        schedule: "A convenir",
+        price: "80000",
+        startDate: "Marzo 2024",
+        schedule: "Lunes y Miércoles 18:00-20:00",
         modality: "Virtual",
-        duration: 3
-      }
-    ]
+        duration: 4,
+      },
+    ],
+  },
+  "curso-2": {
+    title: "Curso 2",
+    category: "Categoría 2",
+    image: "/placeholder.svg",
+    price: "50000",
+    startDate: "Marzo 2024",
+    schedule: "Lunes y Miércoles 18:00-20:00",
+    modality: "Virtual",
+    duration: 3,
   },
   "medicina-unc": {
     title: "Cursos de medicina UNC - UCC",
@@ -86,108 +114,95 @@ const courses = {
 
 const CourseDetail = () => {
   const { courseId } = useParams();
-  const course = courses[courseId as keyof typeof courses];
-  const [selectedSubcourse, setSelectedSubcourse] = useState(course?.subcourses?.[0]);
+  const course = courseId ? courses[courseId] : null;
 
-  if (!course) return <div>Curso no encontrado</div>;
-
-  const basePrice = parseInt(selectedSubcourse?.price.replace(/[^0-9]/g, ''));
-  const installments = Array.from({ length: selectedSubcourse?.duration || 0 }, (_, i) => i + 1);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const handleInstallmentClick = (installments: number) => {
-    const monthlyPayment = formatPrice(Math.round(basePrice / installments));
-    const message = `Hola! Estoy interesado en el curso ${selectedSubcourse?.title} y la forma de financiación de ${installments} cuota${installments > 1 ? 's' : ''} de ${monthlyPayment}`;
-    window.open(`https://wa.me/543518118268?text=${encodeURIComponent(message)}`, '_blank');
-  };
+  if (!course) {
+    return <div>Curso no encontrado</div>;
+  }
 
   return (
     <div className="container py-12">
-      <Card className="max-w-3xl mx-auto">
-        <div className="h-64 overflow-hidden">
-          <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
+          <p className="text-lg text-muted-foreground">{course.category}</p>
         </div>
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <Badge variant="secondary">{course.category}</Badge>
-          </div>
-          <CardTitle className="text-3xl mb-6">{course.title}</CardTitle>
-          <div className="space-y-4">
-            {course.subcourses?.map((subcourse) => (
-              <Button
-                key={subcourse.id}
-                variant={selectedSubcourse?.id === subcourse.id ? "default" : "outline"}
-                className="w-full text-left justify-start"
-                onClick={() => setSelectedSubcourse(subcourse)}
-              >
-                {subcourse.title}
-              </Button>
+
+        {course.subcourses ? (
+          // Render subcourses if they exist
+          <div className="space-y-8">
+            {course.subcourses.map((subcourse) => (
+              <Card key={subcourse.id}>
+                <CardHeader>
+                  <CardTitle>{subcourse.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="font-semibold mb-1">Precio</h3>
+                        <p>${Number(subcourse.price).toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Inicio</h3>
+                        <p>{subcourse.startDate}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Horario</h3>
+                        <p>{subcourse.schedule}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Modalidad</h3>
+                        <p>{subcourse.modality}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Duración</h3>
+                        <p>{subcourse.duration} meses</p>
+                      </div>
+                    </div>
+                    <WhatsAppButton
+                      message={`¡Hola! Estoy interesado en el curso de ${course.title} - ${subcourse.title}`}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </CardHeader>
-        {selectedSubcourse && (
-          <CardContent className="space-y-6">
-            <div className="text-right">
-              <span className="font-bold text-2xl block">{selectedSubcourse.price}</span>
-              <span className="text-sm text-muted-foreground">Financiación disponible</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="text-primary" />
-                <div>
-                  <p className="font-medium">Inicio</p>
-                  <p className="text-sm text-muted-foreground">{selectedSubcourse.startDate}</p>
+        ) : (
+          // Render single course details if no subcourses
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="font-semibold mb-1">Precio</h3>
+                    <p>${Number(course.price).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Inicio</h3>
+                    <p>{course.startDate}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Horario</h3>
+                    <p>{course.schedule}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Modalidad</h3>
+                    <p>{course.modality}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">Duración</h3>
+                    <p>{course.duration} meses</p>
+                  </div>
                 </div>
+                <WhatsAppButton
+                  message={`¡Hola! Estoy interesado en el curso de ${course.title}`}
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="text-primary" />
-                <div>
-                  <p className="font-medium">Horario</p>
-                  <p className="text-sm text-muted-foreground">{selectedSubcourse.schedule}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Monitor className="text-primary" />
-                <div>
-                  <p className="font-medium">Modalidad</p>
-                  <p className="text-sm text-muted-foreground">{selectedSubcourse.modality}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Opciones de financiación:</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {installments.map((number) => {
-                  const monthlyPayment = Math.round(basePrice / number);
-                  return (
-                    <Button
-                      key={number}
-                      variant="outline"
-                      onClick={() => handleInstallmentClick(number)}
-                      className="w-full"
-                    >
-                      {number} cuota{number > 1 ? 's' : ''} de {formatPrice(monthlyPayment)}
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Card>
         )}
-      </Card>
-      <WhatsAppButton 
-        floating={true} 
-        message={`Hola! Estoy interesado en el curso ${selectedSubcourse?.title}`} 
-      />
+      </div>
     </div>
   );
 };
