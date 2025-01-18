@@ -41,7 +41,7 @@ const courses = [
     title: "Inglés Universitario",
     category: "Idiomas",
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
-    price: "94.999 ARS",
+    price: "",
     slug: "ingles-universitario"
   },
   {
