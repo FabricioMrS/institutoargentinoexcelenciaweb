@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface Subcourse {
   id: string;
@@ -115,10 +117,42 @@ const courses: Record<string, Course> = {
 const CourseDetail = () => {
   const { courseId } = useParams();
   const course = courseId ? courses[courseId] : null;
+  const [selectedInstallments, setSelectedInstallments] = useState(1);
 
   if (!course) {
     return <div>Curso no encontrado</div>;
   }
+
+  const calculateInstallments = (price: string) => {
+    const numericPrice = Number(price.replace(/[^0-9]/g, ''));
+    const installmentOptions = [
+      { months: 1, interest: 0 },
+      { months: 3, interest: 0.15 },
+      { months: 6, interest: 0.30 },
+    ];
+
+    return installmentOptions.map(option => {
+      const totalAmount = numericPrice * (1 + option.interest);
+      const monthlyAmount = totalAmount / option.months;
+      return {
+        months: option.months,
+        monthlyAmount: monthlyAmount.toFixed(2),
+        totalAmount: totalAmount.toFixed(2),
+      };
+    });
+  };
+
+  const handleInstallmentChange = (months: number, price: string) => {
+    setSelectedInstallments(months);
+    const installments = calculateInstallments(price);
+    const selected = installments.find(i => i.months === months);
+    
+    if (selected) {
+      toast.success(
+        `Financiación seleccionada: ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount}`
+      );
+    }
+  };
 
   return (
     <div className="container py-12">
@@ -129,7 +163,6 @@ const CourseDetail = () => {
         </div>
 
         {course.subcourses ? (
-          // Render subcourses if they exist
           <div className="space-y-8">
             {course.subcourses.map((subcourse) => (
               <Card key={subcourse.id}>
@@ -160,23 +193,33 @@ const CourseDetail = () => {
                         <p>{subcourse.duration} meses</p>
                       </div>
                     </div>
-                    <WhatsAppButton
-                      message={`¡Hola! Estoy interesado en el curso de ${course.title} - ${subcourse.title}`}
-                    />
+                    <div className="mt-4">
+                      <h3 className="font-semibold mb-2">Opciones de financiación</h3>
+                      <div className="flex gap-2">
+                        {calculateInstallments(subcourse.price).map(({ months, monthlyAmount }) => (
+                          <Button
+                            key={months}
+                            variant={selectedInstallments === months ? "default" : "outline"}
+                            onClick={() => handleInstallmentChange(months, subcourse.price)}
+                          >
+                            {months} {months === 1 ? 'pago' : 'cuotas'}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          // Render single course details if no subcourses
           <Card>
             <CardContent className="pt-6">
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="font-semibold mb-1">Precio</h3>
-                    <p>${Number(course.price).toLocaleString()}</p>
+                    <p>{course.price}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Inicio</h3>
@@ -195,9 +238,22 @@ const CourseDetail = () => {
                     <p>{course.duration} meses</p>
                   </div>
                 </div>
-                <WhatsAppButton
-                  message={`¡Hola! Estoy interesado en el curso de ${course.title}`}
-                />
+                {course.price && (
+                  <div className="mt-4">
+                    <h3 className="font-semibold mb-2">Opciones de financiación</h3>
+                    <div className="flex gap-2">
+                      {calculateInstallments(course.price).map(({ months, monthlyAmount }) => (
+                        <Button
+                          key={months}
+                          variant={selectedInstallments === months ? "default" : "outline"}
+                          onClick={() => handleInstallmentChange(months, course.price!)}
+                        >
+                          {months} {months === 1 ? 'pago' : 'cuotas'}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
