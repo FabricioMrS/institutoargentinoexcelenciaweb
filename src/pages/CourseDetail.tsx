@@ -149,7 +149,7 @@ const CourseDetail = () => {
     
     if (selected) {
       toast.success(
-        `Financiación seleccionada: ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount}`
+        `Has seleccionado ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount} para el curso "${course.title}"`
       );
     }
   };
