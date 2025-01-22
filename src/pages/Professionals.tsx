@@ -53,7 +53,16 @@ const Professionals = () => {
 
   return (
     <div className="container py-12">
-      <h1 className="text-4xl font-bold text-center mb-12">Nuestros Profesionales</h1>
+      <div className="max-w-3xl mx-auto mb-12 text-center">
+        <h1 className="text-4xl font-bold mb-6">Nosotros</h1>
+        <p className="text-lg leading-relaxed text-muted-foreground">
+          En Instituto Argentino Excelencia ofrecemos servicios educativos especializados para la preparación 
+          de estudiantes universitarios en instancias evaluativas y de cursado. Además brindamos cursos de 
+          formación profesional dirigidos a personas que buscan adquirir herramientas prácticas y competencias 
+          claves para el mercado actual, en distintos niveles educativos.
+        </p>
+      </div>
+      <h2 className="text-3xl font-bold text-center mb-12">Nuestros Profesionales</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {professionals.map((professional) => (
           <Card key={professional.id} className="hover:shadow-lg transition-shadow">
