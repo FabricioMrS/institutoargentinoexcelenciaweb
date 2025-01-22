@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Subcourse {
   id: string;
@@ -118,6 +120,7 @@ const CourseDetail = () => {
   const { courseId } = useParams();
   const course = courseId ? courses[courseId] : null;
   const [selectedInstallments, setSelectedInstallments] = useState(1);
+  const [sendViaWhatsApp, setSendViaWhatsApp] = useState(false);
 
   if (!course) {
     return <div>Curso no encontrado</div>;
@@ -152,6 +155,14 @@ const CourseDetail = () => {
         `Has seleccionado ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount} para el curso "${course.title}"`
       );
     }
+  };
+
+  const generateWhatsAppMessage = (price: string) => {
+    const installments = calculateInstallments(price);
+    const selected = installments.find(i => i.months === selectedInstallments);
+    if (!selected) return "";
+
+    return `Hola! Estoy interesado en el curso "${course.title}" con la financiación de ${selectedInstallments} cuota${selectedInstallments > 1 ? 's' : ''} de $${selected.monthlyAmount}`;
   };
 
   return (
@@ -206,6 +217,26 @@ const CourseDetail = () => {
                           </Button>
                         ))}
                       </div>
+                      {selectedInstallments > 0 && (
+                        <div className="mt-4 flex items-center space-x-2">
+                          <Checkbox
+                            id="whatsapp"
+                            checked={sendViaWhatsApp}
+                            onCheckedChange={(checked) => setSendViaWhatsApp(checked as boolean)}
+                          />
+                          <label
+                            htmlFor="whatsapp"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Enviar vía WhatsApp
+                          </label>
+                        </div>
+                      )}
+                      {sendViaWhatsApp && (
+                        <div className="mt-4">
+                          <WhatsAppButton message={generateWhatsAppMessage(subcourse.price)} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -252,6 +283,26 @@ const CourseDetail = () => {
                         </Button>
                       ))}
                     </div>
+                    {selectedInstallments > 0 && (
+                      <div className="mt-4 flex items-center space-x-2">
+                        <Checkbox
+                          id="whatsapp"
+                          checked={sendViaWhatsApp}
+                          onCheckedChange={(checked) => setSendViaWhatsApp(checked as boolean)}
+                        />
+                        <label
+                          htmlFor="whatsapp"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Enviar vía WhatsApp
+                        </label>
+                      </div>
+                    )}
+                    {sendViaWhatsApp && (
+                      <div className="mt-4">
+                        <WhatsAppButton message={generateWhatsAppMessage(course.price)} />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
