@@ -120,10 +120,10 @@ const Index = () => {
       <HeroSection />
       
       {/* Características */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container">
-          <h2 className="text-4xl font-bold text-center mb-12">¿Por qué elegir {" "}
-            <span className="text-primary">Instituto Argentino Excelencia</span>?
+          <h2 className="text-4xl font-bold text-center mb-12 text-primary dark:text-white">¿Por qué elegir {" "}
+            <span className="text-primary dark:text-secondary">Instituto Argentino Excelencia</span>?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (

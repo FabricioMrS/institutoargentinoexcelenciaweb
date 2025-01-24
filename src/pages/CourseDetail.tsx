@@ -1,10 +1,8 @@
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { toast } from "sonner";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CourseInfo } from "@/components/CourseInfo";
+import { CourseFinancing } from "@/components/CourseFinancing";
 
 interface Subcourse {
   id: string;
@@ -126,37 +124,6 @@ const CourseDetail = () => {
     return <div>Curso no encontrado</div>;
   }
 
-  const calculateInstallments = (price: string) => {
-    const numericPrice = Number(price.replace(/[^0-9]/g, ''));
-    const installmentOptions = [
-      { months: 1, interest: 0 },
-      { months: 3, interest: 0.15 },
-      { months: 6, interest: 0.30 },
-    ];
-
-    return installmentOptions.map(option => {
-      const totalAmount = numericPrice * (1 + option.interest);
-      const monthlyAmount = totalAmount / option.months;
-      return {
-        months: option.months,
-        monthlyAmount: monthlyAmount.toFixed(2),
-        totalAmount: totalAmount.toFixed(2),
-      };
-    });
-  };
-
-  const handleInstallmentChange = (months: number, price: string) => {
-    setSelectedInstallments(months);
-    const installments = calculateInstallments(price);
-    const selected = installments.find(i => i.months === months);
-    
-    if (selected) {
-      toast.success(
-        `Has seleccionado ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount} para el curso "${course.title}"`
-      );
-    }
-  };
-
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto">
@@ -175,65 +142,20 @@ const CourseDetail = () => {
                 <CardContent>
                   <div className="grid gap-4">
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h3 className="font-semibold mb-1">Precio</h3>
-                        <p>${Number(subcourse.price).toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Inicio</h3>
-                        <p>{subcourse.startDate}</p>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Horario</h3>
-                        <p>{subcourse.schedule}</p>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Modalidad</h3>
-                        <p>{subcourse.modality}</p>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Duración</h3>
-                        <p>{subcourse.duration} meses</p>
-                      </div>
+                      <CourseInfo label="Precio" value={`$${Number(subcourse.price).toLocaleString()}`} />
+                      <CourseInfo label="Inicio" value={subcourse.startDate} />
+                      <CourseInfo label="Horario" value={subcourse.schedule} />
+                      <CourseInfo label="Modalidad" value={subcourse.modality} />
+                      <CourseInfo label="Duración" value={`${subcourse.duration} meses`} />
                     </div>
-                    <div className="mt-4">
-                      <h3 className="font-semibold mb-2">Opciones de financiación</h3>
-                      <div className="flex gap-2">
-                        {calculateInstallments(subcourse.price).map(({ months, monthlyAmount }) => (
-                          <Button
-                            key={months}
-                            variant={selectedInstallments === months ? "default" : "outline"}
-                            onClick={() => handleInstallmentChange(months, subcourse.price)}
-                          >
-                            {months} {months === 1 ? 'pago' : 'cuotas'}
-                          </Button>
-                        ))}
-                      </div>
-                      {selectedInstallments > 0 && (
-                        <div className="mt-4 flex items-center space-x-2">
-                          <Checkbox
-                            id="whatsapp"
-                            checked={sendViaWhatsApp}
-                            onCheckedChange={(checked) => setSendViaWhatsApp(checked as boolean)}
-                          />
-                          <label
-                            htmlFor="whatsapp"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Enviar vía WhatsApp
-                          </label>
-                        </div>
-                      )}
-                      {sendViaWhatsApp && (
-                        <div className="mt-4">
-                          <WhatsAppButton 
-                            courseTitle={subcourse.title}
-                            selectedInstallments={selectedInstallments}
-                            price={subcourse.price}
-                          />
-                        </div>
-                      )}
-                    </div>
+                    <CourseFinancing
+                      courseTitle={subcourse.title}
+                      price={subcourse.price}
+                      selectedInstallments={selectedInstallments}
+                      setSelectedInstallments={setSelectedInstallments}
+                      sendViaWhatsApp={sendViaWhatsApp}
+                      setSendViaWhatsApp={setSendViaWhatsApp}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -244,66 +166,21 @@ const CourseDetail = () => {
             <CardContent className="pt-6">
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold mb-1">Precio</h3>
-                    <p>{course.price}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Inicio</h3>
-                    <p>{course.startDate}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Horario</h3>
-                    <p>{course.schedule}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Modalidad</h3>
-                    <p>{course.modality}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Duración</h3>
-                    <p>{course.duration} meses</p>
-                  </div>
+                  <CourseInfo label="Precio" value={course.price || ''} />
+                  <CourseInfo label="Inicio" value={course.startDate || ''} />
+                  <CourseInfo label="Horario" value={course.schedule || ''} />
+                  <CourseInfo label="Modalidad" value={course.modality || ''} />
+                  <CourseInfo label="Duración" value={`${course.duration || 0} meses`} />
                 </div>
                 {course.price && (
-                  <div className="mt-4">
-                    <h3 className="font-semibold mb-2">Opciones de financiación</h3>
-                    <div className="flex gap-2">
-                      {calculateInstallments(course.price).map(({ months, monthlyAmount }) => (
-                        <Button
-                          key={months}
-                          variant={selectedInstallments === months ? "default" : "outline"}
-                          onClick={() => handleInstallmentChange(months, course.price!)}
-                        >
-                          {months} {months === 1 ? 'pago' : 'cuotas'}
-                        </Button>
-                      ))}
-                    </div>
-                    {selectedInstallments > 0 && (
-                      <div className="mt-4 flex items-center space-x-2">
-                        <Checkbox
-                          id="whatsapp"
-                          checked={sendViaWhatsApp}
-                          onCheckedChange={(checked) => setSendViaWhatsApp(checked as boolean)}
-                        />
-                        <label
-                          htmlFor="whatsapp"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Enviar vía WhatsApp
-                        </label>
-                      </div>
-                    )}
-                    {sendViaWhatsApp && (
-                      <div className="mt-4">
-                        <WhatsAppButton 
-                          courseTitle={course.title}
-                          selectedInstallments={selectedInstallments}
-                          price={course.price}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  <CourseFinancing
+                    courseTitle={course.title}
+                    price={course.price}
+                    selectedInstallments={selectedInstallments}
+                    setSelectedInstallments={setSelectedInstallments}
+                    sendViaWhatsApp={sendViaWhatsApp}
+                    setSendViaWhatsApp={setSendViaWhatsApp}
+                  />
                 )}
               </div>
             </CardContent>
