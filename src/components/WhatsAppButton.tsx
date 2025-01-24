@@ -37,8 +37,14 @@ export const WhatsAppButton = ({
     return defaultMessage;
   };
 
-  const encodedMessage = encodeURIComponent(generateMessage());
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  const handleWhatsAppClick = () => {
+    const encodedMessage = encodeURIComponent(generateMessage());
+    // Using web.whatsapp.com for desktop and api.whatsapp.com for mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const baseUrl = isMobile ? 'https://api.whatsapp.com' : 'https://web.whatsapp.com';
+    const whatsappUrl = `${baseUrl}/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
   const floatingClasses = floating ? 
@@ -48,7 +54,7 @@ export const WhatsAppButton = ({
   return (
     <Button 
       className={`${baseClasses} ${floatingClasses}`}
-      onClick={() => window.open(whatsappUrl, '_blank')}
+      onClick={handleWhatsAppClick}
     >
       <MessageCircle className={floating ? "w-8 h-8" : "mr-2"} />
       {!floating && "Consultar por WhatsApp"}
