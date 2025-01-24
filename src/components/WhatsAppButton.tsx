@@ -39,11 +39,15 @@ export const WhatsAppButton = ({
 
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(generateMessage());
-    // Using web.whatsapp.com for desktop and api.whatsapp.com for mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const baseUrl = isMobile ? 'https://api.whatsapp.com' : 'https://web.whatsapp.com';
-    const whatsappUrl = `${baseUrl}/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    
+    // For mobile devices, use wa.me format which works better with the WhatsApp app
+    if (isMobile) {
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+    } else {
+      // For desktop, use web.whatsapp.com which works better for browser-based chat
+      window.open(`https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`, '_blank');
+    }
   };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
