@@ -4,14 +4,40 @@ import { MessageCircle } from "lucide-react";
 interface WhatsAppButtonProps {
   message?: string;
   floating?: boolean;
+  courseTitle?: string;
+  selectedInstallments?: number;
+  price?: string;
 }
 
 export const WhatsAppButton = ({ 
-  message = "¡Hola! Estoy interesado en conocer más sobre los cursos.",
-  floating = false 
+  message,
+  floating = false,
+  courseTitle,
+  selectedInstallments,
+  price
 }: WhatsAppButtonProps) => {
   const whatsappNumber = "543518118268";
-  const encodedMessage = encodeURIComponent(message);
+  
+  const generateMessage = () => {
+    if (message) return message;
+    
+    let defaultMessage = "¡Hola! Estoy interesado en conocer más sobre";
+    
+    if (courseTitle) {
+      defaultMessage += ` el curso "${courseTitle}"`;
+      if (selectedInstallments && price) {
+        const numericPrice = Number(price.replace(/[^0-9]/g, ''));
+        const monthlyAmount = (numericPrice * (selectedInstallments > 1 ? 1.15 : 1)) / selectedInstallments;
+        defaultMessage += ` con la financiación de ${selectedInstallments} ${selectedInstallments === 1 ? 'pago' : 'cuotas'} de $${monthlyAmount.toFixed(2)}`;
+      }
+    } else {
+      defaultMessage += " los cursos";
+    }
+    
+    return defaultMessage;
+  };
+
+  const encodedMessage = encodeURIComponent(generateMessage());
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";

@@ -157,14 +157,6 @@ const CourseDetail = () => {
     }
   };
 
-  const generateWhatsAppMessage = (price: string) => {
-    const installments = calculateInstallments(price);
-    const selected = installments.find(i => i.months === selectedInstallments);
-    if (!selected) return "";
-
-    return `Hola! Estoy interesado en el curso "${course.title}" con la financiación de ${selectedInstallments} cuota${selectedInstallments > 1 ? 's' : ''} de $${selected.monthlyAmount}`;
-  };
-
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto">
@@ -234,7 +226,11 @@ const CourseDetail = () => {
                       )}
                       {sendViaWhatsApp && (
                         <div className="mt-4">
-                          <WhatsAppButton message={generateWhatsAppMessage(subcourse.price)} />
+                          <WhatsAppButton 
+                            courseTitle={subcourse.title}
+                            selectedInstallments={selectedInstallments}
+                            price={subcourse.price}
+                          />
                         </div>
                       )}
                     </div>
@@ -300,7 +296,11 @@ const CourseDetail = () => {
                     )}
                     {sendViaWhatsApp && (
                       <div className="mt-4">
-                        <WhatsAppButton message={generateWhatsAppMessage(course.price)} />
+                        <WhatsAppButton 
+                          courseTitle={course.title}
+                          selectedInstallments={selectedInstallments}
+                          price={course.price}
+                        />
                       </div>
                     )}
                   </div>
