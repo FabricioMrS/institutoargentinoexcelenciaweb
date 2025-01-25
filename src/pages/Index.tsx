@@ -146,7 +146,7 @@ const Index = () => {
       </section>
 
       {/* Testimonios Carrusel */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Lo que dicen nuestros estudiantes</h2>
           <Carousel className="w-full max-w-6xl mx-auto" opts={{ loop: true, align: "start", duration: 20, slidesToScroll: 3 }}>

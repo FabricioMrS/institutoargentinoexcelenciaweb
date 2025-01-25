@@ -79,12 +79,12 @@ export const CourseFinancing = ({
       {selectedInstallments > 0 && (
         <div className="mt-4 flex items-center space-x-2">
           <Checkbox
-            id="whatsapp"
+            id={`whatsapp-${courseTitle}`}
             checked={sendViaWhatsApp}
             onCheckedChange={(checked) => setSendViaWhatsApp(checked as boolean)}
           />
           <label
-            htmlFor="whatsapp"
+            htmlFor={`whatsapp-${courseTitle}`}
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Enviar vía WhatsApp
