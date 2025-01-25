@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { toast } from "sonner";
+import { useState } from "react";
 
 interface CourseFinancingProps {
   courseTitle: string;
@@ -20,6 +20,8 @@ export const CourseFinancing = ({
   sendViaWhatsApp,
   setSendViaWhatsApp
 }: CourseFinancingProps) => {
+  const [selectedFinancing, setSelectedFinancing] = useState<string>("");
+
   const calculateInstallments = (price: string) => {
     const numericPrice = Number(price.replace(/[^0-9]/g, ''));
     const installmentOptions = [
@@ -45,8 +47,8 @@ export const CourseFinancing = ({
     const selected = installments.find(i => i.months === months);
     
     if (selected) {
-      toast.success(
-        `Has seleccionado ${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount} para el curso "${courseTitle}"`
+      setSelectedFinancing(
+        `${months} cuota${months > 1 ? 's' : ''} de $${selected.monthlyAmount}`
       );
     }
   };
@@ -65,6 +67,15 @@ export const CourseFinancing = ({
           </Button>
         ))}
       </div>
+      
+      {selectedFinancing && (
+        <div className="mt-4 p-3 bg-comment-light dark:bg-comment-dark rounded-md">
+          <p className="text-sm">
+            Has seleccionado: {selectedFinancing} para el curso "{courseTitle}"
+          </p>
+        </div>
+      )}
+
       {selectedInstallments > 0 && (
         <div className="mt-4 flex items-center space-x-2">
           <Checkbox
@@ -80,6 +91,7 @@ export const CourseFinancing = ({
           </label>
         </div>
       )}
+      
       {sendViaWhatsApp && (
         <div className="mt-4">
           <WhatsAppButton 
