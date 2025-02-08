@@ -1,11 +1,21 @@
-import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User } from "lucide-react";
+
+import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/useTheme";
 import { useNavigate } from "react-router-dom";
+import { AuthDialog } from "./AuthDialog";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const { user, signOut, isAdmin } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -42,6 +52,29 @@ export const Navbar = () => {
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  {user.email}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {isAdmin && (
+                  <DropdownMenuItem className="text-green-600">
+                    Admin
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <AuthDialog />
+          )}
         </div>
       </div>
     </nav>
