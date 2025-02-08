@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -6,20 +7,14 @@ import { useState } from "react";
 interface CourseFinancingProps {
   courseTitle: string;
   price: string;
-  selectedInstallments: number;
-  setSelectedInstallments: (value: number) => void;
-  sendViaWhatsApp: boolean;
-  setSendViaWhatsApp: (value: boolean) => void;
 }
 
 export const CourseFinancing = ({
   courseTitle,
   price,
-  selectedInstallments,
-  setSelectedInstallments,
-  sendViaWhatsApp,
-  setSendViaWhatsApp
 }: CourseFinancingProps) => {
+  const [selectedInstallments, setSelectedInstallments] = useState(1);
+  const [sendViaWhatsApp, setSendViaWhatsApp] = useState(false);
   const [selectedFinancing, setSelectedFinancing] = useState<string>("");
 
   const calculateInstallments = (price: string) => {

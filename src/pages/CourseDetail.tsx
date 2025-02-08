@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
 import { CourseInfo } from "@/components/CourseInfo";
 import { CourseFinancing } from "@/components/CourseFinancing";
 
@@ -117,8 +116,6 @@ const courses: Record<string, Course> = {
 const CourseDetail = () => {
   const { courseId } = useParams();
   const course = courseId ? courses[courseId] : null;
-  const [selectedInstallments, setSelectedInstallments] = useState(1);
-  const [sendViaWhatsApp, setSendViaWhatsApp] = useState(false);
 
   if (!course) {
     return <div>Curso no encontrado</div>;
@@ -151,10 +148,6 @@ const CourseDetail = () => {
                     <CourseFinancing
                       courseTitle={subcourse.title}
                       price={subcourse.price}
-                      selectedInstallments={selectedInstallments}
-                      setSelectedInstallments={setSelectedInstallments}
-                      sendViaWhatsApp={sendViaWhatsApp}
-                      setSendViaWhatsApp={setSendViaWhatsApp}
                     />
                   </div>
                 </CardContent>
@@ -176,10 +169,6 @@ const CourseDetail = () => {
                   <CourseFinancing
                     courseTitle={course.title}
                     price={course.price}
-                    selectedInstallments={selectedInstallments}
-                    setSelectedInstallments={setSelectedInstallments}
-                    sendViaWhatsApp={sendViaWhatsApp}
-                    setSendViaWhatsApp={setSendViaWhatsApp}
                   />
                 )}
               </div>
