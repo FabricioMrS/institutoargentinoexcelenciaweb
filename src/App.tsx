@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,27 +15,31 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/cursos" element={<Courses />} />
-              <Route path="/curso/:courseId" element={<CourseDetail />} />
-              <Route path="/profesionales" element={<Professionals />} />
-              <Route path="/contacto" element={<Contact />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App: React.FC = () => {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/cursos" element={<Courses />} />
+                  <Route path="/curso/:courseId" element={<CourseDetail />} />
+                  <Route path="/profesionales" element={<Professionals />} />
+                  <Route path="/contacto" element={<Contact />} />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+};
 
 export default App;
