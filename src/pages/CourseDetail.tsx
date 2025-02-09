@@ -8,15 +8,18 @@ import { useQuery } from "@tanstack/react-query";
 
 const CourseDetail = () => {
   const { courseId } = useParams();
+  
+  // Clean up the courseId by removing any duplicate /curso/ patterns
+  const cleanCourseId = courseId?.replace(/^\/curso\//, '');
 
   const { data: course, isLoading } = useQuery({
-    queryKey: ['course', courseId],
+    queryKey: ['course', cleanCourseId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .eq('slug', courseId)
-        .single();
+        .eq('slug', cleanCourseId)
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -37,6 +40,14 @@ const CourseDetail = () => {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
           <p className="text-lg text-muted-foreground">{course.category}</p>
+        </div>
+
+        <div className="mb-8">
+          <img 
+            src={course.image} 
+            alt={course.title} 
+            className="w-full h-64 object-cover rounded-lg"
+          />
         </div>
 
         <Card>
