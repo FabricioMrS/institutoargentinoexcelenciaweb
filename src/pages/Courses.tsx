@@ -1,42 +1,25 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-
-const courses = [
-  {
-    title: "Inglés Universitario",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800&q=80",
-    slug: "ingles-universitario"
-  },
-  {
-    title: "Cursos de medicina UNC - UCC",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    slug: "medicina-unc"
-  },
-  {
-    title: "Desarrollo Web",
-    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80",
-    slug: "desarrollo-web"
-  },
-  {
-    title: "Diseño Gráfico",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80",
-    slug: "diseno-grafico"
-  },
-  {
-    title: "Marketing Digital",
-    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=800&q=80",
-    slug: "marketing-digital"
-  },
-  {
-    title: "Creación y edición audiovisual",
-    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
-    slug: "edicion-videos"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Courses = () => {
   const navigate = useNavigate();
+
+  const { data: courses, isLoading } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <div className="container py-12">
@@ -49,24 +32,30 @@ const Courses = () => {
       </div>
       <h1 className="text-4xl font-bold text-center mb-12">Nuestros Cursos</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {courses.map((course) => (
-          <Card 
-            key={course.slug}
-            className="cursor-pointer overflow-hidden transition-transform hover:scale-105"
-            onClick={() => navigate(`/curso/${course.slug}`)}
-          >
-            <div className="h-48 overflow-hidden">
-              <img 
-                src={course.image} 
-                alt={course.title} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-lg">{course.title}</CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
+        {isLoading ? (
+          <p className="text-center col-span-3">Cargando cursos...</p>
+        ) : courses && courses.length > 0 ? (
+          courses.map((course) => (
+            <Card 
+              key={course.id}
+              className="cursor-pointer overflow-hidden transition-transform hover:scale-105"
+              onClick={() => navigate(`/curso/${course.slug}`)}
+            >
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src={course.image} 
+                  alt={course.title} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold">{course.title}</h3>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <p className="text-center col-span-3">No hay cursos disponibles en este momento.</p>
+        )}
       </div>
       <WhatsAppButton floating={true} />
     </div>
