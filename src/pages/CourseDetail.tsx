@@ -1,13 +1,16 @@
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { CourseInfo } from "@/components/CourseInfo";
 import { CourseFinancing } from "@/components/CourseFinancing";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 const CourseDetail = () => {
   const { courseId } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   // Clean up the courseId by removing any duplicate /curso/ patterns
   const cleanCourseId = courseId?.replace(/^\/curso\//, '');
@@ -19,10 +22,19 @@ const CourseDetail = () => {
         .from('courses')
         .select('*')
         .eq('slug', cleanCourseId)
+        .eq('enabled', true)
         .maybeSingle();
 
       if (error) throw error;
       return data;
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo cargar el curso",
+      });
+      navigate('/cursos');
     },
   });
 
@@ -31,7 +43,8 @@ const CourseDetail = () => {
   }
 
   if (!course) {
-    return <div className="container py-12">Curso no encontrado</div>;
+    navigate('/cursos');
+    return null;
   }
 
   return (

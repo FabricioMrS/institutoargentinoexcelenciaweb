@@ -3,15 +3,18 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { Pencil } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isAdmin) {
@@ -40,6 +43,20 @@ const Admin = () => {
 
     if (error) {
       console.error('Error toggling course status:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo actualizar el estado del curso",
+      });
+    } else {
+      // Invalidate both admin and public course queries
+      queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      
+      toast({
+        title: "Éxito",
+        description: `Curso ${!currentStatus ? 'habilitado' : 'deshabilitado'} correctamente`,
+      });
     }
   };
 

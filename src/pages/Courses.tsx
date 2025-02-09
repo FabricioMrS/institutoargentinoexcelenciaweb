@@ -14,6 +14,7 @@ const Courses = () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
+        .eq('enabled', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
