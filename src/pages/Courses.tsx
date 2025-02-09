@@ -50,6 +50,8 @@ const Courses = () => {
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{course.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{course.category}</p>
+                <p className="text-lg font-bold mt-2">${Number(course.price).toLocaleString()}</p>
               </div>
             </Card>
           ))
