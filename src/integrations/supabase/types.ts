@@ -9,6 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      course_financing_options: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          id: string
+          installments: number
+          interest_rate: number
+          updated_at: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          installments: number
+          interest_rate: number
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          installments?: number
+          interest_rate?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_financing_options_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          category: string
+          created_at: string
+          duration: number
+          enabled: boolean | null
+          id: string
+          image: string
+          modality: string
+          price: number
+          schedule: string
+          slug: string
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          duration: number
+          enabled?: boolean | null
+          id?: string
+          image: string
+          modality: string
+          price: number
+          schedule: string
+          slug: string
+          start_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          duration?: number
+          enabled?: boolean | null
+          id?: string
+          image?: string
+          modality?: string
+          price?: number
+          schedule?: string
+          slug?: string
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

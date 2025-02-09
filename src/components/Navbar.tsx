@@ -62,7 +62,7 @@ export const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {isAdmin && (
-                  <DropdownMenuItem className="text-green-600">
+                  <DropdownMenuItem onClick={() => navigate('/admin')} className="text-green-600">
                     Admin
                   </DropdownMenuItem>
                 )}
