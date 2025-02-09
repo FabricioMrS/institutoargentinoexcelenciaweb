@@ -12,6 +12,7 @@ import Courses from "./pages/Courses";
 import Professionals from "./pages/Professionals";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import NewCourse from "./pages/NewCourse";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,8 @@ const App: React.FC = () => {
                   <Route path="/profesionales" element={<Professionals />} />
                   <Route path="/contacto" element={<Contact />} />
                   <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin/curso/nuevo" element={<NewCourse />} />
+                  <Route path="/admin/curso/:courseId" element={<NewCourse />} />
                 </Routes>
               </div>
             </BrowserRouter>
