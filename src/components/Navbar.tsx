@@ -19,44 +19,44 @@ export const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="w-full px-2 sm:px-4 md:container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-6">
           <img
             src="/lovable-uploads/a56f0a36-7efa-4917-b6e5-a1064f93db33.png"
             alt="Logo"
-            className="h-12 cursor-pointer"
+            className="h-10 sm:h-12 cursor-pointer"
             onClick={() => navigate('/')}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
-            <Home className="h-5 w-5" />
-            Inicio
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <Home className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Inicio</span>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/profesionales')} className="gap-2">
-            <Users className="h-5 w-5" />
-            Profesionales
+          <Button variant="ghost" size="sm" onClick={() => navigate('/profesionales')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Profesionales</span>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/cursos')} className="gap-2">
-            <BookOpen className="h-5 w-5" />
-            Cursos
+          <Button variant="ghost" size="sm" onClick={() => navigate('/cursos')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Cursos</span>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/nosotros')} className="gap-2">
-            <User className="h-5 w-5" />
-            Nosotros
+          <Button variant="ghost" size="sm" onClick={() => navigate('/nosotros')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <User className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Nosotros</span>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/contacto')} className="gap-2">
-            <MessageSquare className="h-5 w-5" />
-            Contacto
+          <Button variant="ghost" size="sm" onClick={() => navigate('/contacto')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Contacto</span>
           </Button>
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
           </Button>
           
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" size="sm">
                   {user.email}
                 </Button>
               </DropdownMenuTrigger>
