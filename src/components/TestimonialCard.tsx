@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -5,16 +6,16 @@ interface TestimonialCardProps {
   name: string;
   role: string;
   content: string;
-  avatar: string;
+  photo_url?: string | null;
 }
 
-export const TestimonialCard = ({ name, role, content, avatar }: TestimonialCardProps) => {
+export const TestimonialCard = ({ name, role, content, photo_url }: TestimonialCardProps) => {
   return (
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center gap-4">
           <Avatar>
-            <AvatarImage src={avatar} alt={name} />
+            <AvatarImage src={photo_url || undefined} alt={name} />
             <AvatarFallback>{name[0]}</AvatarFallback>
           </Avatar>
           <div>
