@@ -1,3 +1,4 @@
+
 import { Monitor, Users, Clock, Award } from "lucide-react";
 import { HeroSection } from "@/components/HeroSection";
 import { CourseCard } from "@/components/CourseCard";
@@ -21,7 +22,7 @@ const features = [
   },
   {
     title: "Profesores Expertos",
-    description: "Aprende de profesionales con amplia experiencia en la industria",
+    description: "Aprende de profesionales con amplia experiencia en educación",
     Icon: Users,
   },
   {
@@ -134,7 +135,7 @@ const Index = () => {
       </section>
 
       {/* Cursos Destacados */}
-      <section className="py-20">
+      <section className="py-20 md:block hidden">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
