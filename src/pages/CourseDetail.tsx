@@ -28,14 +28,20 @@ const CourseDetail = () => {
       if (error) throw error;
       return data;
     },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo cargar el curso",
-      });
-      navigate('/cursos');
+    meta: {
+      errorMessage: "No se pudo cargar el curso"
     },
+    retry: false,
+    onSettled: (data, error) => {
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudo cargar el curso",
+        });
+        navigate('/cursos');
+      }
+    }
   });
 
   if (isLoading) {
