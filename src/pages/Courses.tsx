@@ -23,18 +23,18 @@ const Courses = () => {
   });
 
   return (
-    <div className="container py-12">
-      <div className="flex items-center justify-center mb-8">
+    <div className="container py-6 md:py-12 px-4 md:px-6">
+      <div className="flex items-center justify-center mb-6 md:mb-8">
         <img 
           src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
           alt="Instituto Argentino Excelencia" 
-          className="h-48 object-contain"
+          className="h-32 md:h-48 object-contain"
         />
       </div>
-      <h1 className="text-4xl font-bold text-center mb-12">Nuestros Cursos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12">Nuestros Cursos</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
         {isLoading ? (
-          <p className="text-center col-span-3">Cargando cursos...</p>
+          <p className="text-center col-span-1 md:col-span-3">Cargando cursos...</p>
         ) : courses && courses.length > 0 ? (
           courses.map((course) => (
             <Card 
@@ -42,7 +42,7 @@ const Courses = () => {
               className="cursor-pointer overflow-hidden transition-transform hover:scale-105"
               onClick={() => navigate(`/curso/${course.slug}`)}
             >
-              <div className="h-48 overflow-hidden">
+              <div className="h-40 md:h-48 overflow-hidden">
                 <img 
                   src={course.image} 
                   alt={course.title} 
@@ -50,14 +50,14 @@ const Courses = () => {
                 />
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold">{course.title}</h3>
+                <h3 className="text-lg font-semibold line-clamp-2">{course.title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{course.category}</p>
                 <p className="text-lg font-bold mt-2">${Number(course.price).toLocaleString()}</p>
               </div>
             </Card>
           ))
         ) : (
-          <p className="text-center col-span-3">No hay cursos disponibles en este momento.</p>
+          <p className="text-center col-span-1 md:col-span-3">No hay cursos disponibles en este momento.</p>
         )}
       </div>
       <WhatsAppButton floating={true} />

@@ -12,7 +12,6 @@ const CourseDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Clean up the courseId by removing any duplicate /curso/ patterns
   const cleanCourseId = courseId?.replace(/^\/curso\//, '');
 
   const { data: course, isLoading } = useQuery({
@@ -45,7 +44,7 @@ const CourseDetail = () => {
   });
 
   if (isLoading) {
-    return <div className="container py-12">Cargando...</div>;
+    return <div className="container py-6 md:py-12">Cargando...</div>;
   }
 
   if (!course) {
@@ -54,25 +53,25 @@ const CourseDetail = () => {
   }
 
   return (
-    <div className="container py-12">
+    <div className="container py-6 md:py-12 px-4 md:px-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
-          <p className="text-lg text-muted-foreground">{course.category}</p>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">{course.title}</h1>
+          <p className="text-base md:text-lg text-muted-foreground">{course.category}</p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <img 
             src={course.image} 
             alt={course.title} 
-            className="w-full h-64 object-cover rounded-lg"
+            className="w-full h-48 md:h-64 object-cover rounded-lg"
           />
         </div>
 
         <Card>
           <CardContent className="pt-6">
             <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <CourseInfo label="Precio" value={`$${Number(course.price).toLocaleString()}`} />
                 <CourseInfo label="Inicio" value={course.start_date} />
                 <CourseInfo label="Horario" value={course.schedule} />

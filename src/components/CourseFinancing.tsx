@@ -51,12 +51,13 @@ export const CourseFinancing = ({
   return (
     <div className="mt-4">
       <h3 className="font-semibold mb-2">Opciones de financiación</h3>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {calculateInstallments(price).map(({ months, monthlyAmount }) => (
           <Button
             key={months}
             variant={selectedInstallments === months ? "default" : "outline"}
             onClick={() => handleInstallmentChange(months)}
+            className="flex-1 min-w-[100px] text-sm md:text-base"
           >
             {months} {months === 1 ? 'pago' : 'cuotas'}
           </Button>
