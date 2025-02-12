@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
 }
 
@@ -97,6 +98,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast({
+        title: "Error al enviar el correo",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    } else {
+      toast({
+        title: "Correo enviado",
+        description: "Se ha enviado un enlace para restablecer tu contraseña.",
+      });
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -110,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut, isAdmin }}>
+    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut, resetPassword, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
