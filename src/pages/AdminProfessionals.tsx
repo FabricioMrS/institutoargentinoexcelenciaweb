@@ -6,10 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -17,18 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-
-interface Professional {
-  id: string;
-  name: string;
-  role: string;
-  description: string;
-  image_url?: string;
-  specialties: string[];
-}
+import { Professional, ProfessionalFormData } from "@/types/professional";
+import { ProfessionalForm } from "@/components/professionals/ProfessionalForm";
+import { ProfessionalCard } from "@/components/professionals/ProfessionalCard";
 
 const AdminProfessionals = () => {
   const { isAdmin } = useAuth();
@@ -37,7 +26,7 @@ const AdminProfessionals = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfessionalFormData>({
     name: "",
     role: "",
     description: "",
@@ -209,48 +198,12 @@ const AdminProfessionals = () => {
                 {editingProfessional ? "Editar Profesional" : "Agregar Nuevo Profesional"}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nombre</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="role">Rol</Label>
-                <Input
-                  id="role"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="specialties">Especialidades (separadas por comas)</Label>
-                <Input
-                  id="specialties"
-                  value={formData.specialties}
-                  onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
-                  placeholder="Ej: Anatomía, Fisiología, Biología"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                {editingProfessional ? "Actualizar" : "Crear"}
-              </Button>
-            </form>
+            <ProfessionalForm
+              onSubmit={handleSubmit}
+              formData={formData}
+              setFormData={setFormData}
+              editingProfessional={editingProfessional}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -265,65 +218,13 @@ const AdminProfessionals = () => {
           ) : (
             <div className="space-y-4">
               {professionals?.map((professional) => (
-                <div
+                <ProfessionalCard
                   key={professional.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={professional.image_url} alt={professional.name} />
-                      <AvatarFallback>{professional.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-medium">{professional.name}</h3>
-                      <p className="text-sm text-muted-foreground">{professional.role}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {professional.specialties.map((specialty) => (
-                          <Badge key={specialty} variant="secondary">
-                            {specialty}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="file"
-                      id={`photo-${professional.id}`}
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handlePhotoUpload(professional.id, file);
-                        }
-                      }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => {
-                        document.getElementById(`photo-${professional.id}`)?.click();
-                      }}
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleEdit(professional)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleDelete(professional.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                  professional={professional}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onPhotoUpload={handlePhotoUpload}
+                />
               ))}
             </div>
           )}
