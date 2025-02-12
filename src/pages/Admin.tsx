@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Pencil, Upload } from "lucide-react";
+import { Pencil, Upload, Users } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -121,9 +121,15 @@ const Admin = () => {
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Panel de Administración</h1>
-        <Button onClick={() => navigate('/admin/curso/nuevo')}>
-          Crear Nuevo Curso
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={() => navigate('/admin/profesionales')}>
+            <Users className="w-4 h-4 mr-2" />
+            Gestionar Profesionales
+          </Button>
+          <Button onClick={() => navigate('/admin/curso/nuevo')}>
+            Crear Nuevo Curso
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6">
