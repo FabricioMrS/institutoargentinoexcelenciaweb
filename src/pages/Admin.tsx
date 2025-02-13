@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Pencil, Upload, Users } from "lucide-react";
+import { Pencil, Upload, Users, BellDot, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -16,6 +15,18 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const { data: pendingTestimonialsCount = 0 } = useQuery({
+    queryKey: ['pending-testimonials-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('pending_testimonials')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) throw error;
+      return count || 0;
+    },
+  });
 
   useEffect(() => {
     if (!isAdmin) {
@@ -125,6 +136,19 @@ const Admin = () => {
           <Button onClick={() => navigate('/admin/profesionales')}>
             <Users className="w-4 h-4 mr-2" />
             Gestionar Profesionales
+          </Button>
+          <Button onClick={() => navigate('/admin/testimonials')} variant={pendingTestimonialsCount > 0 ? "destructive" : "default"}>
+            {pendingTestimonialsCount > 0 ? (
+              <>
+                <BellDot className="w-4 h-4 mr-2" />
+                {pendingTestimonialsCount} Testimonios pendientes
+              </>
+            ) : (
+              <>
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Testimonios
+              </>
+            )}
           </Button>
           <Button onClick={() => navigate('/admin/curso/nuevo')}>
             Crear Nuevo Curso
