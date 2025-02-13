@@ -26,7 +26,6 @@ const AdminTestimonials = () => {
       const { data, error } = await supabase
         .from('pending_testimonials')
         .select('*')
-        .eq('approved', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -48,13 +47,13 @@ const AdminTestimonials = () => {
 
       if (insertError) throw insertError;
 
-      // Update pending testimonial
-      const { error: updateError } = await supabase
+      // Delete from pending testimonials
+      const { error: deleteError } = await supabase
         .from('pending_testimonials')
-        .update({ approved: true })
+        .delete()
         .eq('id', testimonial.id);
 
-      if (updateError) throw updateError;
+      if (deleteError) throw deleteError;
 
       toast({
         title: "Testimonio aprobado",

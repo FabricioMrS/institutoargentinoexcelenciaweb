@@ -1,4 +1,3 @@
-
 import { Monitor, Users, Clock, Award } from "lucide-react";
 import { HeroSection } from "@/components/HeroSection";
 import { CourseCard } from "@/components/CourseCard";
@@ -52,7 +51,6 @@ const Index = () => {
   const { toast } = useToast();
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [testimonialForm, setTestimonialForm] = useState({
-    name: "",
     role: "",
     content: "",
   });
@@ -97,7 +95,10 @@ const Index = () => {
     try {
       const { error } = await supabase
         .from('pending_testimonials')
-        .insert([testimonialForm]);
+        .insert([{
+          ...testimonialForm,
+          name: user.email?.split('@')[0] || 'Usuario', // Usamos la parte del email antes del @
+        }]);
 
       if (error) throw error;
 
@@ -106,7 +107,7 @@ const Index = () => {
         description: "Tu testimonio será revisado por nuestro equipo antes de ser publicado.",
       });
       setIsTestimonialDialogOpen(false);
-      setTestimonialForm({ name: "", role: "", content: "" });
+      setTestimonialForm({ role: "", content: "" });
     } catch (error) {
       toast({
         title: "Error",
@@ -190,14 +191,6 @@ const Index = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="name">Nombre completo</Label>
-              <Input
-                id="name"
-                value={testimonialForm.name}
-                onChange={(e) => setTestimonialForm(prev => ({ ...prev, name: e.target.value }))}
-              />
-            </div>
             <div>
               <Label htmlFor="role">Rol o curso realizado</Label>
               <Input
