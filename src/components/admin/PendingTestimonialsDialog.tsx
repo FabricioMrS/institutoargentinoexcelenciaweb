@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -106,6 +107,9 @@ export const PendingTestimonialsDialog = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Testimonios Pendientes</DialogTitle>
+          <DialogDescription>
+            Revisa y gestiona los testimonios pendientes de aprobación
+          </DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <p>Cargando testimonios...</p>
