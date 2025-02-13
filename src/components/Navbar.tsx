@@ -7,6 +7,8 @@ import { AuthDialog } from "./AuthDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { PendingTestimonialsDialog } from "./admin/PendingTestimonialsDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +21,7 @@ export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const { user, signOut, isAdmin } = useAuth();
+  const [isPendingDialogOpen, setIsPendingDialogOpen] = useState(false);
 
   const { data: pendingCount = 0 } = useQuery({
     queryKey: ['pending-testimonials-count'],
@@ -89,15 +92,22 @@ export const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {isAdmin && (
-                  <DropdownMenuItem 
-                    onClick={() => navigate('/admin')} 
-                    className="text-green-600 flex items-center"
-                  >
-                    Admin
-                    {pendingCount > 0 && (
-                      <BellDot className="ml-2 h-4 w-4 text-destructive" />
-                    )}
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem onClick={() => navigate('/admin')}>
+                      Admin
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => setIsPendingDialogOpen(true)}
+                      className="text-green-600 flex items-center"
+                    >
+                      Testimonios Pendientes
+                      {pendingCount > 0 && (
+                        <Badge variant="destructive" className="ml-2">
+                          {pendingCount}
+                        </Badge>
+                      )}
+                    </DropdownMenuItem>
+                  </>
                 )}
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -110,6 +120,13 @@ export const Navbar = () => {
           )}
         </div>
       </div>
+
+      {isAdmin && (
+        <PendingTestimonialsDialog
+          open={isPendingDialogOpen}
+          onOpenChange={setIsPendingDialogOpen}
+        />
+      )}
     </nav>
   );
 };
