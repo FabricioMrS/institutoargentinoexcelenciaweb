@@ -92,6 +92,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_testimonials: {
+        Row: {
+          approved: boolean | null
+          content: string
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean | null
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean | null
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       professionals: {
         Row: {
           created_at: string

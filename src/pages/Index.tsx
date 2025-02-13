@@ -8,6 +8,14 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Carousel,
   CarouselContent,
@@ -118,7 +126,16 @@ const testimonials = [
 ];
 
 const Index = () => {
-  const { data: testimonials = [], isLoading } = useQuery({
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const [testimonialForm, setTestimonialForm] = useState({
+    name: "",
+    role: "",
+    content: "",
+  });
+
+  const { data: testimonials = [], isLoading: isLoadingTestimonials } = useQuery({
     queryKey: ['testimonials'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -130,6 +147,52 @@ const Index = () => {
       return data;
     },
   });
+
+  const { data: courses = [], isLoading: isLoadingCourses } = useQuery({
+    queryKey: ['enabled-courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('enabled', true)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleTestimonialSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión para enviar un testimonio",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('pending_testimonials')
+        .insert([testimonialForm]);
+
+      if (error) throw error;
+
+      toast({
+        title: "¡Gracias por tu testimonio!",
+        description: "Tu testimonio será revisado por nuestro equipo antes de ser publicado.",
+      });
+      setIsTestimonialDialogOpen(false);
+      setTestimonialForm({ name: "", role: "", content: "" });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo enviar el testimonio. Por favor, intenta nuevamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -150,22 +213,30 @@ const Index = () => {
       </section>
 
       {/* Cursos Destacados */}
-      <section className="py-20 md:block hidden">
-        <div className="container">
-          <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
-              <CourseCard key={course.title} {...course} />
-            ))}
+      {!isLoadingCourses && courses.length > 0 && (
+        <section className="py-20 md:block hidden">
+          <div className="container">
+            <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {courses.map((course) => (
+                <CourseCard key={course.id} {...course} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Testimonios Carrusel */}
+      {/* Testimonios */}
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container">
-          <h2 className="text-4xl font-bold text-center mb-12">Lo que dicen nuestros estudiantes</h2>
-          {!isLoading && (
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-4xl font-bold">Lo que dicen nuestros estudiantes</h2>
+            <Button onClick={() => setIsTestimonialDialogOpen(true)}>
+              Compartir mi experiencia
+            </Button>
+          </div>
+          
+          {!isLoadingTestimonials && testimonials.length > 0 && (
             <Carousel className="w-full max-w-6xl mx-auto" opts={{ loop: true, align: "start", duration: 20, slidesToScroll: 3 }}>
               <CarouselContent>
                 {testimonials.map((testimonial) => (
@@ -180,6 +251,47 @@ const Index = () => {
           )}
         </div>
       </section>
+
+      <Dialog open={isTestimonialDialogOpen} onOpenChange={setIsTestimonialDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Comparte tu experiencia</DialogTitle>
+            <DialogDescription>
+              Tu testimonio será revisado por nuestro equipo antes de ser publicado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Nombre completo</Label>
+              <Input
+                id="name"
+                value={testimonialForm.name}
+                onChange={(e) => setTestimonialForm(prev => ({ ...prev, name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="role">Rol o curso realizado</Label>
+              <Input
+                id="role"
+                value={testimonialForm.role}
+                onChange={(e) => setTestimonialForm(prev => ({ ...prev, role: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="content">Tu experiencia</Label>
+              <Textarea
+                id="content"
+                value={testimonialForm.content}
+                onChange={(e) => setTestimonialForm(prev => ({ ...prev, content: e.target.value }))}
+                rows={4}
+              />
+            </div>
+            <Button onClick={handleTestimonialSubmit} className="w-full">
+              Enviar testimonio
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
       <WhatsAppButton floating={true} />
