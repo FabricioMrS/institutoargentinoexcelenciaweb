@@ -1,12 +1,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -105,21 +105,19 @@ export const PendingTestimonialsDialog = ({
     }
   };
 
-  if (!open) return null;
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Testimonios Pendientes</DialogTitle>
-          <DialogDescription>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="max-w-2xl" side="right">
+        <SheetHeader>
+          <SheetTitle>Testimonios Pendientes</SheetTitle>
+          <SheetDescription>
             Revisa y gestiona los testimonios pendientes de aprobación
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
         {isLoading ? (
           <p>Cargando testimonios...</p>
         ) : (
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto mt-4">
             {pendingTestimonials?.map((testimonial) => (
               <div
                 key={testimonial.id}
@@ -159,7 +157,7 @@ export const PendingTestimonialsDialog = ({
             )}
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
