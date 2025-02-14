@@ -6,12 +6,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, X } from "lucide-react";
+import { useState, useCallback } from "react";
 
 interface PendingTestimonialsDialogProps {
   open: boolean;
@@ -24,6 +24,13 @@ export const PendingTestimonialsDialog = ({
 }: PendingTestimonialsDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleClose = useCallback(() => {
+    if (!isProcessing) {
+      onOpenChange(false);
+    }
+  }, [isProcessing, onOpenChange]);
 
   const { data: pendingTestimonials, isLoading } = useQuery({
     queryKey: ['pending-testimonials'],
@@ -40,6 +47,7 @@ export const PendingTestimonialsDialog = ({
 
   const handleApprove = async (testimonial: any) => {
     try {
+      setIsProcessing(true);
       // Insert into public testimonials
       const { error: insertError } = await supabase
         .from('testimonials')
@@ -83,11 +91,14 @@ export const PendingTestimonialsDialog = ({
         description: "No se pudo aprobar el testimonio.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleReject = async (id: string) => {
     try {
+      setIsProcessing(true);
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -115,11 +126,13 @@ export const PendingTestimonialsDialog = ({
         description: "No se pudo rechazar el testimonio.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose} modal={true}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Testimonios Pendientes</DialogTitle>
@@ -147,6 +160,7 @@ export const PendingTestimonialsDialog = ({
                       size="sm"
                       onClick={() => handleApprove(testimonial)}
                       className="gap-2"
+                      disabled={isProcessing}
                     >
                       <Check className="h-4 w-4" />
                       Aprobar
@@ -156,6 +170,7 @@ export const PendingTestimonialsDialog = ({
                       size="sm"
                       onClick={() => handleReject(testimonial.id)}
                       className="gap-2"
+                      disabled={isProcessing}
                     >
                       <X className="h-4 w-4" />
                       Rechazar
