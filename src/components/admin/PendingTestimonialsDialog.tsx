@@ -59,15 +59,23 @@ export const PendingTestimonialsDialog = ({
 
       if (deleteError) throw deleteError;
 
+      // Actualizar el cache local inmediatamente
+      queryClient.setQueryData(['pending-testimonials'], (old: any[]) => 
+        old ? old.filter(t => t.id !== testimonial.id) : []
+      );
+
+      // Actualizar el contador
+      queryClient.setQueryData(['pending-testimonials-count'], (old: number) => 
+        Math.max(0, (old || 0) - 1)
+      );
+
       toast({
         title: "Testimonio aprobado",
         description: "El testimonio ha sido publicado exitosamente.",
       });
 
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      // Refrescar datos en segundo plano
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
     } catch (error) {
       toast({
         title: "Error",
@@ -86,13 +94,20 @@ export const PendingTestimonialsDialog = ({
 
       if (error) throw error;
 
+      // Actualizar el cache local inmediatamente
+      queryClient.setQueryData(['pending-testimonials'], (old: any[]) => 
+        old ? old.filter(t => t.id !== id) : []
+      );
+
+      // Actualizar el contador
+      queryClient.setQueryData(['pending-testimonials-count'], (old: number) => 
+        Math.max(0, (old || 0) - 1)
+      );
+
       toast({
         title: "Testimonio rechazado",
         description: "El testimonio ha sido eliminado.",
       });
-
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
     } catch (error) {
       toast({
         title: "Error",
@@ -104,7 +119,7 @@ export const PendingTestimonialsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Testimonios Pendientes</DialogTitle>
           <DialogDescription>
