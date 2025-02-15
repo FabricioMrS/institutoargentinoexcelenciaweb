@@ -1,16 +1,17 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, X } from "lucide-react";
+import { useEffect } from "react";
 
 interface PendingTestimonialsDialogProps {
   open: boolean;
@@ -23,6 +24,14 @@ export const PendingTestimonialsDialog = ({
 }: PendingTestimonialsDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Limpieza al desmontar
+  useEffect(() => {
+    return () => {
+      // Asegurarse de que el diálogo esté cerrado al desmontar
+      onOpenChange(false);
+    };
+  }, [onOpenChange]);
 
   const { data: pendingTestimonials, isLoading } = useQuery({
     queryKey: ['pending-testimonials'],
@@ -106,58 +115,66 @@ export const PendingTestimonialsDialog = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="max-w-2xl" side="right">
-        <SheetHeader>
-          <SheetTitle>Testimonios Pendientes</SheetTitle>
-          <SheetDescription>
-            Revisa y gestiona los testimonios pendientes de aprobación
-          </SheetDescription>
-        </SheetHeader>
-        {isLoading ? (
-          <p>Cargando testimonios...</p>
-        ) : (
-          <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto mt-4">
-            {pendingTestimonials?.map((testimonial) => (
-              <div
-                key={testimonial.id}
-                className="border rounded-lg p-4 space-y-2"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium">{testimonial.name}</h3>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+    <Drawer
+      open={open}
+      onOpenChange={onOpenChange}
+      onClose={() => onOpenChange(false)}
+    >
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-2xl">
+          <DrawerHeader>
+            <DrawerTitle>Testimonios Pendientes</DrawerTitle>
+            <DrawerDescription>
+              Revisa y gestiona los testimonios pendientes de aprobación
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="p-4">
+            {isLoading ? (
+              <p>Cargando testimonios...</p>
+            ) : (
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                {pendingTestimonials?.map((testimonial) => (
+                  <div
+                    key={testimonial.id}
+                    className="border rounded-lg p-4 space-y-2"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">{testimonial.name}</h3>
+                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleApprove(testimonial)}
+                          className="gap-2"
+                        >
+                          <Check className="h-4 w-4" />
+                          Aprobar
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleReject(testimonial.id)}
+                          className="gap-2"
+                        >
+                          <X className="h-4 w-4" />
+                          Rechazar
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="italic">{testimonial.content}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => handleApprove(testimonial)}
-                      className="gap-2"
-                    >
-                      <Check className="h-4 w-4" />
-                      Aprobar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleReject(testimonial.id)}
-                      className="gap-2"
-                    >
-                      <X className="h-4 w-4" />
-                      Rechazar
-                    </Button>
-                  </div>
-                </div>
-                <p className="italic">{testimonial.content}</p>
+                ))}
+                {pendingTestimonials?.length === 0 && (
+                  <p>No hay testimonios pendientes de aprobación.</p>
+                )}
               </div>
-            ))}
-            {pendingTestimonials?.length === 0 && (
-              <p>No hay testimonios pendientes de aprobación.</p>
             )}
           </div>
-        )}
-      </SheetContent>
-    </Sheet>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
