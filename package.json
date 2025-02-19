@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
+    "postbuild": "cp sitemap.xml dist/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
