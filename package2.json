@@ -1,0 +1,4 @@
+"scripts": {
+  "build": "comando de build de tu proyecto",
+  "postbuild": "cp sitemap.xml dist/"
+}
