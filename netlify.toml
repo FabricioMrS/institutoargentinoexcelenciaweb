@@ -1,0 +1,6 @@
+[build]
+  publish = "dist" # Cambia "dist" por el nombre de tu carpeta de salida (si usas un framework)
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
