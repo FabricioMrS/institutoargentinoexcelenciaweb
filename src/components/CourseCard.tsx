@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export const CourseCard = ({ title, category, image, price, slug }: CourseCardPr
         <div className="flex justify-between items-start">
           <Badge variant="secondary">{category}</Badge>
           <div className="text-right">
-            <span className="font-bold text-lg block">{price}</span>
+            <span className="font-bold text-lg block">$ {price} (ARS)</span>
             <span className="text-xs text-muted-foreground">Financiación disponible</span>
           </div>
         </div>
