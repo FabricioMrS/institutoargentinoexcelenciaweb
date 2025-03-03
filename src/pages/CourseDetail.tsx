@@ -17,6 +17,7 @@ const CourseDetail = () => {
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', cleanCourseId],
     queryFn: async () => {
+      console.log("Fetching course with slug:", cleanCourseId);
       const { data, error } = await supabase
         .from('courses')
         .select('*')
@@ -25,6 +26,7 @@ const CourseDetail = () => {
         .maybeSingle();
 
       if (error) {
+        console.error("Error fetching course:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -35,10 +37,12 @@ const CourseDetail = () => {
       }
       
       if (!data) {
+        console.log("No course found with slug:", cleanCourseId);
         navigate('/cursos');
         return null;
       }
       
+      console.log("Course found:", data);
       return data;
     },
     retry: false,
@@ -83,6 +87,7 @@ const CourseDetail = () => {
                 <CourseFinancing
                   courseTitle={course.title}
                   price={course.price.toString()}
+                  courseId={course.id}
                 />
               </div>
             </CardContent>

@@ -27,20 +27,23 @@ export const CourseFinancing = ({
   const [selectedFinancing, setSelectedFinancing] = useState<string>("");
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
     { installments: 1, interest_rate: 0 },
-    { installments: 3, interest_rate: 15 },
-    { installments: 6, interest_rate: 30 },
   ]);
 
-  const { data: courseFinancingOptions } = useQuery({
+  const { data: courseFinancingOptions, isLoading } = useQuery({
     queryKey: ['financing-options', courseId],
     queryFn: async () => {
       if (!courseId) return null;
+      console.log("Fetching financing options for course:", courseId);
       const { data, error } = await supabase
         .from('course_financing_options')
         .select('*')
         .eq('course_id', courseId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching financing options:", error);
+        throw error;
+      }
+      console.log("Financing options retrieved:", data);
       return data;
     },
     enabled: !!courseId,
@@ -48,6 +51,7 @@ export const CourseFinancing = ({
 
   useEffect(() => {
     if (courseFinancingOptions && courseFinancingOptions.length > 0) {
+      console.log("Setting financing options:", courseFinancingOptions);
       setFinancingOptions(courseFinancingOptions.map(option => ({
         installments: option.installments,
         interest_rate: option.interest_rate
@@ -55,6 +59,11 @@ export const CourseFinancing = ({
       // Establecer la primera opción como predeterminada
       setSelectedInstallments(courseFinancingOptions[0].installments);
       calculateInstallment(courseFinancingOptions[0].installments);
+    } else {
+      console.log("No custom financing options found, using default");
+      setFinancingOptions([{ installments: 1, interest_rate: 0 }]);
+      setSelectedInstallments(1);
+      calculateInstallment(1);
     }
   }, [courseFinancingOptions]);
 
@@ -77,6 +86,10 @@ export const CourseFinancing = ({
     calculateInstallment(months);
   };
 
+  if (isLoading) {
+    return <div className="mt-4">Cargando opciones de financiación...</div>;
+  }
+
   return (
     <div className="mt-4">
       <h3 className="font-semibold mb-2">Opciones de financiación</h3>
@@ -90,6 +103,7 @@ export const CourseFinancing = ({
               className="flex-1 min-w-[100px] text-sm md:text-base"
             >
               {installments} {installments === 1 ? 'pago' : 'cuotas'}
+              {interest_rate > 0 && ` (+${interest_rate}%)`}
             </Button>
           ))}
         </div>
