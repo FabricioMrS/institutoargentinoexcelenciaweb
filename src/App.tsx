@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
 import Professionals from "./pages/Professionals";
+import Nosotros from "./pages/Nosotros";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import NewCourse from "./pages/NewCourse";
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                   <Route path="/cursos" element={<Courses />} />
                   <Route path="/curso/:courseId" element={<CourseDetail />} />
                   <Route path="/profesionales" element={<Professionals />} />
+                  <Route path="/nosotros" element={<Nosotros />} />
                   <Route path="/contacto" element={<Contact />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin/curso/nuevo" element={<NewCourse />} />
