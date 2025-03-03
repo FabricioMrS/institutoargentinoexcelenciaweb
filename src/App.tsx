@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
@@ -40,12 +41,13 @@ const App: React.FC = () => {
                   <Route path="/admin/curso/nuevo" element={<NewCourse />} />
                   <Route path="/admin/curso/:courseId" element={<NewCourse />} />
                   <Route path="/admin/profesionales" element={<AdminProfessionals />} />
-                  <Route path="/admin/testimonios" element={<AdminTestimonials />} />
+                  <Route path="/admin/testimoniales" element={<AdminTestimonials />} />
                 </Routes>
               </div>
             </BrowserRouter>
           </AuthProvider>
         </TooltipProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </React.StrictMode>
   );

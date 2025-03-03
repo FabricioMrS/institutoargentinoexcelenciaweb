@@ -18,19 +18,6 @@ export const AdminHeader = ({ pendingTestimonialsCount }: AdminHeaderProps) => {
           <Users className="w-4 h-4 mr-2" />
           Gestionar Profesionales
         </Button>
-        <Button onClick={() => navigate('/admin/testimonials')} variant={pendingTestimonialsCount > 0 ? "destructive" : "default"}>
-          {pendingTestimonialsCount > 0 ? (
-            <>
-              <BellDot className="w-4 h-4 mr-2" />
-              {pendingTestimonialsCount} Testimonios pendientes
-            </>
-          ) : (
-            <>
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Testimonios
-            </>
-          )}
-        </Button>
         <Button onClick={() => navigate('/admin/curso/nuevo')}>
           Crear Nuevo Curso
         </Button>
