@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -98,7 +97,6 @@ const NewCourse = () => {
 
   useEffect(() => {
     if (existingFinancingOptions && existingFinancingOptions.length > 0) {
-      // Actualizar las opciones de financiación con los datos existentes
       const updatedOptions = [...financingOptions];
       existingFinancingOptions.forEach(option => {
         const index = updatedOptions.findIndex(o => o.installments === option.installments);
@@ -136,7 +134,7 @@ const NewCourse = () => {
     };
 
     try {
-      let courseId;
+      let newCourseId = courseId;
       
       if (isEditing) {
         const { error } = await supabase
@@ -146,7 +144,6 @@ const NewCourse = () => {
 
         if (error) throw error;
         
-        // Delete existing financing options
         const { error: deleteError } = await supabase
           .from('course_financing_options')
           .delete()
@@ -166,7 +163,7 @@ const NewCourse = () => {
 
         if (error) throw error;
         
-        courseId = data[0].id;
+        newCourseId = data[0].id;
         
         toast({
           title: "Curso creado",
@@ -174,11 +171,10 @@ const NewCourse = () => {
         });
       }
       
-      // Insert financing options
       const enabledOptions = financingOptions.filter(option => option.enabled);
-      if (enabledOptions.length > 0) {
+      if (enabledOptions.length > 0 && newCourseId) {
         const financingData = enabledOptions.map(option => ({
-          course_id: courseId || courseData.id,
+          course_id: newCourseId,
           installments: option.installments,
           interest_rate: option.interest_rate
         }));
