@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,12 +9,18 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PlusCircle, X } from "lucide-react";
 
 interface FinancingOption {
   installments: number;
   interest_rate: number;
-  enabled: boolean;
 }
 
 const NewCourse = () => {
@@ -36,11 +43,13 @@ const NewCourse = () => {
   });
 
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
-    { installments: 1, interest_rate: 0, enabled: true },
-    { installments: 3, interest_rate: 15, enabled: false },
-    { installments: 6, interest_rate: 30, enabled: false },
-    { installments: 12, interest_rate: 60, enabled: false },
+    { installments: 1, interest_rate: 0 },
   ]);
+
+  const [newOption, setNewOption] = useState({
+    installments: "3",
+    interest_rate: "0",
+  });
 
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', courseId],
@@ -97,24 +106,10 @@ const NewCourse = () => {
 
   useEffect(() => {
     if (existingFinancingOptions && existingFinancingOptions.length > 0) {
-      const updatedOptions = [...financingOptions];
-      existingFinancingOptions.forEach(option => {
-        const index = updatedOptions.findIndex(o => o.installments === option.installments);
-        if (index !== -1) {
-          updatedOptions[index] = {
-            installments: option.installments,
-            interest_rate: option.interest_rate,
-            enabled: true
-          };
-        } else {
-          updatedOptions.push({
-            installments: option.installments,
-            interest_rate: option.interest_rate,
-            enabled: true
-          });
-        }
-      });
-      setFinancingOptions(updatedOptions);
+      setFinancingOptions(existingFinancingOptions.map(option => ({
+        installments: option.installments,
+        interest_rate: option.interest_rate
+      })));
     }
   }, [existingFinancingOptions]);
 
@@ -171,9 +166,8 @@ const NewCourse = () => {
         });
       }
       
-      const enabledOptions = financingOptions.filter(option => option.enabled);
-      if (enabledOptions.length > 0 && newCourseId) {
-        const financingData = enabledOptions.map(option => ({
+      if (financingOptions.length > 0 && newCourseId) {
+        const financingData = financingOptions.map(option => ({
           course_id: newCourseId,
           installments: option.installments,
           interest_rate: option.interest_rate
@@ -202,10 +196,34 @@ const NewCourse = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFinancingChange = (index: number, enabled: boolean) => {
-    const updatedOptions = [...financingOptions];
-    updatedOptions[index].enabled = enabled;
-    setFinancingOptions(updatedOptions);
+  const handleAddFinancingOption = () => {
+    const installments = parseInt(newOption.installments);
+    const interest_rate = parseFloat(newOption.interest_rate);
+    
+    // Check if this installment option already exists
+    const exists = financingOptions.some(option => option.installments === installments);
+    
+    if (!exists) {
+      setFinancingOptions([...financingOptions, { 
+        installments, 
+        interest_rate 
+      }]);
+      
+      setNewOption({
+        installments: "",
+        interest_rate: "0"
+      });
+    } else {
+      toast({
+        title: "Opción duplicada",
+        description: `Ya existe una opción para ${installments} cuotas`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveOption = (indexToRemove: number) => {
+    setFinancingOptions(financingOptions.filter((_, index) => index !== indexToRemove));
   };
 
   if (!isAdmin) return null;
@@ -320,25 +338,72 @@ const NewCourse = () => {
 
             <div className="mt-6">
               <Label>Opciones de financiación</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              
+              <div className="grid grid-cols-1 gap-4 mt-2">
                 {financingOptions.map((option, index) => (
                   <div key={index} className="flex items-center space-x-2 border p-3 rounded-md">
-                    <Checkbox 
-                      id={`financing-${option.installments}`}
-                      checked={option.enabled}
-                      onCheckedChange={(checked) => handleFinancingChange(index, !!checked)}
-                    />
-                    <label
-                      htmlFor={`financing-${option.installments}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
-                    >
+                    <div className="flex-1">
                       {option.installments === 1 
                         ? '1 pago (sin interés)' 
                         : `${option.installments} cuotas (+${option.interest_rate}% interés)`
                       }
-                    </label>
+                    </div>
+                    {option.installments !== 1 && (
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleRemoveOption(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
+                
+                <div className="flex items-end gap-4 p-3 border rounded-md">
+                  <div className="flex-1">
+                    <Label htmlFor="installments">Número de cuotas</Label>
+                    <Select
+                      value={newOption.installments}
+                      onValueChange={(value) => setNewOption({...newOption, installments: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona número de cuotas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[3, 6, 9, 12, 18, 24].map((num) => (
+                          <SelectItem key={num} value={num.toString()}>
+                            {num} cuotas
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <Label htmlFor="interest_rate">Interés (%)</Label>
+                    <Input
+                      id="interest_rate"
+                      name="interest_rate"
+                      value={newOption.interest_rate}
+                      onChange={(e) => setNewOption({...newOption, interest_rate: e.target.value})}
+                      type="number"
+                      min="0"
+                      step="0.1"
+                    />
+                  </div>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleAddFinancingOption}
+                    disabled={!newOption.installments}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Agregar
+                  </Button>
+                </div>
               </div>
             </div>
 

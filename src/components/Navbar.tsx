@@ -24,7 +24,7 @@ export const Navbar = () => {
           <img
             src="/lovable-uploads/332a7955-3409-4607-9f07-dc6d9556d6dc.png"
             alt="Logo"
-            className="h-10 sm:h-12 cursor-pointer"
+            className="h-15 sm:h-18 cursor-pointer" // Increased size by 50% (from h-10 sm:h-12)
             onClick={() => navigate('/')}
           />
         </div>
