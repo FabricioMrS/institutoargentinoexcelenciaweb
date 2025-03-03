@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TestimonialsList } from "@/components/admin/TestimonialsList";
 
 const AdminTestimonials = () => {
   const { isAdmin } = useAuth();
@@ -20,11 +21,24 @@ const AdminTestimonials = () => {
     }
   }, [isAdmin, navigate]);
 
-  const { data: pendingTestimonials, isLoading } = useQuery({
+  const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPending } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('pending_testimonials')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: testimonials, isLoading: isLoadingTestimonials } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -55,14 +69,15 @@ const AdminTestimonials = () => {
 
       if (deleteError) throw deleteError;
 
+      // Refresh data
+      await refetchPending();
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+
       toast({
         title: "Testimonio aprobado",
         description: "El testimonio ha sido publicado exitosamente.",
       });
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
     } catch (error) {
       toast({
         title: "Error",
@@ -81,12 +96,14 @@ const AdminTestimonials = () => {
 
       if (error) throw error;
 
+      // Refresh data
+      await refetchPending();
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+
       toast({
         title: "Testimonio rechazado",
         description: "El testimonio ha sido eliminado.",
       });
-
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
     } catch (error) {
       toast({
         title: "Error",
@@ -100,12 +117,12 @@ const AdminTestimonials = () => {
 
   return (
     <div className="container py-8">
-      <Card>
+      <Card className="mb-6">
         <CardHeader>
           <CardTitle>Testimonios Pendientes</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoadingPending ? (
             <p>Cargando testimonios...</p>
           ) : (
             <div className="space-y-4">
@@ -142,6 +159,18 @@ const AdminTestimonials = () => {
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Testimonios Aprobados</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TestimonialsList 
+            testimonials={testimonials || []} 
+            isLoading={isLoadingTestimonials} 
+          />
         </CardContent>
       </Card>
     </div>

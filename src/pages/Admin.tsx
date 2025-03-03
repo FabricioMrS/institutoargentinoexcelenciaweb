@@ -18,7 +18,7 @@ const Admin = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: pendingTestimonialsCount = 0 } = useQuery({
+  const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-testimonials-count'],
     queryFn: async () => {
       const { count, error } = await supabase
@@ -30,7 +30,7 @@ const Admin = () => {
     },
   });
 
-  const { data: pendingTestimonials, isLoading: isLoadingPending } = useQuery({
+  const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPendingTestimonials } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -97,8 +97,9 @@ const Admin = () => {
 
       if (deleteError) throw deleteError;
 
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      // Refresh data
+      await refetchPendingTestimonials();
+      await refetchPendingCount();
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
 
       toast({
@@ -123,8 +124,9 @@ const Admin = () => {
 
       if (error) throw error;
 
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      // Refresh data
+      await refetchPendingTestimonials();
+      await refetchPendingCount();
 
       toast({
         title: "Testimonio rechazado",
