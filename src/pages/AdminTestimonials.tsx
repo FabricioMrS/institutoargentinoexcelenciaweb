@@ -84,6 +84,7 @@ const AdminTestimonials = () => {
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
 
       toast({
         title: "Testimonio aprobado",

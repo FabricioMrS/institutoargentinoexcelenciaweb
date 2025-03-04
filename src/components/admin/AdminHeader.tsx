@@ -5,16 +5,26 @@ import { useNavigate } from "react-router-dom";
 
 interface AdminHeaderProps {
   pendingTestimonialsCount: number;
+  onTestimonialsClick?: () => void;
 }
 
-export const AdminHeader = ({ pendingTestimonialsCount }: AdminHeaderProps) => {
+export const AdminHeader = ({ pendingTestimonialsCount, onTestimonialsClick }: AdminHeaderProps) => {
   const navigate = useNavigate();
+
+  const handleTestimonialsClick = (e: React.MouseEvent) => {
+    if (onTestimonialsClick) {
+      e.preventDefault();
+      onTestimonialsClick();
+    } else {
+      navigate('/admin/testimoniales');
+    }
+  };
 
   return (
     <div className="flex justify-between items-center mb-8">
       <h1 className="text-3xl font-bold">Panel de Administración</h1>
       <div className="flex gap-4">
-        <Button onClick={() => navigate('/admin/testimoniales')} variant="outline">
+        <Button onClick={handleTestimonialsClick} variant="outline">
           <MessageSquare className="w-4 h-4 mr-2" />
           Testimonios 
           {pendingTestimonialsCount > 0 && (

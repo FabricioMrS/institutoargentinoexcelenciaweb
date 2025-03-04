@@ -17,6 +17,8 @@ const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showPendingTestimonials, setShowPendingTestimonials] = useState(false);
+  const [localPendingTestimonials, setLocalPendingTestimonials] = useState<any[]>([]);
 
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-testimonials-count'],
@@ -42,6 +44,13 @@ const Admin = () => {
       return data;
     },
   });
+
+  // Initialize local state when data is fetched
+  useEffect(() => {
+    if (pendingTestimonials) {
+      setLocalPendingTestimonials(pendingTestimonials);
+    }
+  }, [pendingTestimonials]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -77,6 +86,9 @@ const Admin = () => {
 
   const handleApprove = async (testimonial: any) => {
     try {
+      // Remove from local state immediately
+      setLocalPendingTestimonials(prev => prev.filter(item => item.id !== testimonial.id));
+      
       // Insert into public testimonials
       const { error: insertError } = await supabase
         .from('testimonials')
@@ -100,13 +112,18 @@ const Admin = () => {
       // Refresh data
       await refetchPendingTestimonials();
       await refetchPendingCount();
-      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
 
       toast({
         title: "Testimonio aprobado",
         description: "El testimonio ha sido publicado exitosamente.",
       });
     } catch (error) {
+      // Restore the testimonial in local state if there was an error
+      if (pendingTestimonials) {
+        setLocalPendingTestimonials(pendingTestimonials);
+      }
+      
       toast({
         title: "Error",
         description: "No se pudo aprobar el testimonio.",
@@ -117,6 +134,9 @@ const Admin = () => {
 
   const handleReject = async (id: string) => {
     try {
+      // Remove from local state immediately
+      setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
+      
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -133,6 +153,11 @@ const Admin = () => {
         description: "El testimonio ha sido eliminado.",
       });
     } catch (error) {
+      // Restore the testimonial in local state if there was an error
+      if (pendingTestimonials) {
+        setLocalPendingTestimonials(pendingTestimonials);
+      }
+      
       toast({
         title: "Error",
         description: "No se pudo rechazar el testimonio.",
@@ -141,14 +166,22 @@ const Admin = () => {
     }
   };
 
+  // Toggle pending testimonials visibility
+  const handleTogglePendingTestimonials = () => {
+    setShowPendingTestimonials(!showPendingTestimonials);
+  };
+
   if (!isAdmin) return null;
 
   return (
     <div className="container py-8">
-      <AdminHeader pendingTestimonialsCount={pendingTestimonialsCount} />
+      <AdminHeader 
+        pendingTestimonialsCount={pendingTestimonialsCount} 
+        onTestimonialsClick={handleTogglePendingTestimonials}
+      />
 
       <div className="grid gap-6">
-        {pendingTestimonialsCount > 0 && (
+        {showPendingTestimonials && pendingTestimonialsCount > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Testimonios Pendientes ({pendingTestimonialsCount})</CardTitle>
@@ -158,7 +191,7 @@ const Admin = () => {
                 <p>Cargando testimonios pendientes...</p>
               ) : (
                 <div className="space-y-4">
-                  {pendingTestimonials?.map((testimonial) => (
+                  {localPendingTestimonials?.map((testimonial) => (
                     <div
                       key={testimonial.id}
                       className="border rounded-lg p-4 space-y-2"
@@ -192,6 +225,9 @@ const Admin = () => {
                       <p className="italic">{testimonial.content}</p>
                     </div>
                   ))}
+                  {localPendingTestimonials.length === 0 && (
+                    <p>No hay testimonios pendientes de aprobación.</p>
+                  )}
                 </div>
               )}
             </CardContent>
