@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,7 +27,11 @@ const Admin = () => {
         .from('pending_testimonials')
         .select('*', { count: 'exact', head: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching pending testimonials count:", error);
+        throw error;
+      }
+      console.log("Fetched pending testimonials count:", count);
       return count || 0;
     },
   });
@@ -39,7 +44,11 @@ const Admin = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching pending testimonials:", error);
+        throw error;
+      }
+      console.log("Fetched pending testimonials:", data);
       return data;
     },
   });
@@ -86,6 +95,8 @@ const Admin = () => {
     try {
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== testimonial.id));
       
+      console.log(`Approving testimonial with ID: ${testimonial.id}`);
+      
       const { error: insertError } = await supabase
         .from('testimonials')
         .insert([{
@@ -100,6 +111,8 @@ const Admin = () => {
         throw insertError;
       }
 
+      console.log("Successfully inserted to testimonials table");
+
       const { error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -110,12 +123,17 @@ const Admin = () => {
         throw deleteError;
       }
 
-      await refetchPendingTestimonials();
-      await refetchPendingCount();
-      await queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
-      await queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      console.log("Successfully deleted from pending_testimonials table");
+
+      // Use Promise.all to ensure all invalidations are complete
+      await Promise.all([
+        refetchPendingTestimonials(),
+        refetchPendingCount(),
+        queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
 
       toast({
         title: "Testimonio aprobado",
@@ -140,6 +158,8 @@ const Admin = () => {
     try {
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
       
+      console.log(`Rejecting testimonial with ID: ${id}`);
+      
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -150,10 +170,15 @@ const Admin = () => {
         throw error;
       }
 
-      await refetchPendingTestimonials();
-      await refetchPendingCount();
-      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      console.log("Successfully deleted from pending_testimonials table");
+
+      // Use Promise.all to ensure all invalidations are complete
+      await Promise.all([
+        refetchPendingTestimonials(),
+        refetchPendingCount(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
 
       toast({
         title: "Testimonio rechazado",
