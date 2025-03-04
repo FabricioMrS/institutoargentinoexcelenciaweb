@@ -70,7 +70,10 @@ const AdminTestimonials = () => {
           photo_url: testimonial.photo_url,
         }]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw insertError;
+      }
 
       // Delete from pending testimonials
       const { error: deleteError } = await supabase
@@ -78,19 +81,24 @@ const AdminTestimonials = () => {
         .delete()
         .eq('id', testimonial.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error("Delete error:", deleteError);
+        throw deleteError;
+      }
 
-      // Refresh data in the background
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      // Refresh data completely to ensure UI and database are in sync
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      await queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
 
       toast({
         title: "Testimonio aprobado",
         description: "El testimonio ha sido publicado exitosamente.",
       });
     } catch (error) {
+      console.error("Complete error:", error);
+      
       // Restore the testimonial in local state if there was an error
       if (pendingTestimonials) {
         setLocalPendingTestimonials(pendingTestimonials);
@@ -109,22 +117,28 @@ const AdminTestimonials = () => {
       // Remove from local state immediately
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
       
+      // Delete from pending testimonials
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Delete error:", error);
+        throw error;
+      }
 
-      // Refresh data in the background
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      // Refresh data completely to ensure UI and database are in sync
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
         title: "Testimonio rechazado",
         description: "El testimonio ha sido eliminado.",
       });
     } catch (error) {
+      console.error("Complete error:", error);
+      
       // Restore the testimonial in local state if there was an error
       if (pendingTestimonials) {
         setLocalPendingTestimonials(pendingTestimonials);
@@ -151,35 +165,36 @@ const AdminTestimonials = () => {
             <p>Cargando testimonios...</p>
           ) : (
             <div className="space-y-4">
-              {localPendingTestimonials.map((testimonial) => (
-                <div
-                  key={testimonial.id}
-                  className="border rounded-lg p-4 space-y-2"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">{testimonial.name}</h3>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+              {localPendingTestimonials.length > 0 ? (
+                localPendingTestimonials.map((testimonial) => (
+                  <div
+                    key={testimonial.id}
+                    className="border rounded-lg p-4 space-y-2"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">{testimonial.name}</h3>
+                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="default"
+                          onClick={() => handleApprove(testimonial)}
+                        >
+                          Aprobar
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleReject(testimonial.id)}
+                        >
+                          Rechazar
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="default"
-                        onClick={() => handleApprove(testimonial)}
-                      >
-                        Aprobar
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleReject(testimonial.id)}
-                      >
-                        Rechazar
-                      </Button>
-                    </div>
+                    <p className="italic">{testimonial.content}</p>
                   </div>
-                  <p className="italic">{testimonial.content}</p>
-                </div>
-              ))}
-              {localPendingTestimonials.length === 0 && (
+                ))
+              ) : (
                 <p>No hay testimonios pendientes de aprobación.</p>
               )}
             </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,7 +44,6 @@ const Admin = () => {
     },
   });
 
-  // Initialize local state when data is fetched
   useEffect(() => {
     if (pendingTestimonials) {
       setLocalPendingTestimonials(pendingTestimonials);
@@ -86,10 +84,8 @@ const Admin = () => {
 
   const handleApprove = async (testimonial: any) => {
     try {
-      // Remove from local state immediately
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== testimonial.id));
       
-      // Insert into public testimonials
       const { error: insertError } = await supabase
         .from('testimonials')
         .insert([{
@@ -99,27 +95,35 @@ const Admin = () => {
           photo_url: testimonial.photo_url,
         }]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw insertError;
+      }
 
-      // Delete from pending testimonials
       const { error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
         .eq('id', testimonial.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error("Delete error:", deleteError); 
+        throw deleteError;
+      }
 
-      // Refresh data
       await refetchPendingTestimonials();
       await refetchPendingCount();
-      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
         title: "Testimonio aprobado",
         description: "El testimonio ha sido publicado exitosamente.",
       });
     } catch (error) {
-      // Restore the testimonial in local state if there was an error
+      console.error("Complete error:", error);
+      
       if (pendingTestimonials) {
         setLocalPendingTestimonials(pendingTestimonials);
       }
@@ -134,7 +138,6 @@ const Admin = () => {
 
   const handleReject = async (id: string) => {
     try {
-      // Remove from local state immediately
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
       
       const { error } = await supabase
@@ -142,18 +145,23 @@ const Admin = () => {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Delete error:", error);
+        throw error;
+      }
 
-      // Refresh data
       await refetchPendingTestimonials();
       await refetchPendingCount();
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      await queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
         title: "Testimonio rechazado",
         description: "El testimonio ha sido eliminado.",
       });
     } catch (error) {
-      // Restore the testimonial in local state if there was an error
+      console.error("Complete error:", error);
+      
       if (pendingTestimonials) {
         setLocalPendingTestimonials(pendingTestimonials);
       }
@@ -166,7 +174,6 @@ const Admin = () => {
     }
   };
 
-  // Toggle pending testimonials visibility
   const handleTogglePendingTestimonials = () => {
     setShowPendingTestimonials(!showPendingTestimonials);
   };
@@ -191,41 +198,42 @@ const Admin = () => {
                 <p>Cargando testimonios pendientes...</p>
               ) : (
                 <div className="space-y-4">
-                  {localPendingTestimonials?.map((testimonial) => (
-                    <div
-                      key={testimonial.id}
-                      className="border rounded-lg p-4 space-y-2"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium">{testimonial.name}</h3>
-                          <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  {localPendingTestimonials?.length > 0 ? (
+                    localPendingTestimonials.map((testimonial) => (
+                      <div
+                        key={testimonial.id}
+                        className="border rounded-lg p-4 space-y-2"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-medium">{testimonial.name}</h3>
+                            <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleApprove(testimonial)}
+                              className="gap-2"
+                            >
+                              <Check className="h-4 w-4" />
+                              Aprobar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleReject(testimonial.id)}
+                              className="gap-2"
+                            >
+                              <X className="h-4 w-4" />
+                              Rechazar
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleApprove(testimonial)}
-                            className="gap-2"
-                          >
-                            <Check className="h-4 w-4" />
-                            Aprobar
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleReject(testimonial.id)}
-                            className="gap-2"
-                          >
-                            <X className="h-4 w-4" />
-                            Rechazar
-                          </Button>
-                        </div>
+                        <p className="italic">{testimonial.content}</p>
                       </div>
-                      <p className="italic">{testimonial.content}</p>
-                    </div>
-                  ))}
-                  {localPendingTestimonials.length === 0 && (
+                    ))
+                  ) : (
                     <p>No hay testimonios pendientes de aprobación.</p>
                   )}
                 </div>
