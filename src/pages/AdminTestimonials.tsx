@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ const AdminTestimonials = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [localPendingTestimonials, setLocalPendingTestimonials] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -34,6 +35,13 @@ const AdminTestimonials = () => {
     },
   });
 
+  // Initialize local state when data is fetched
+  useEffect(() => {
+    if (pendingTestimonials) {
+      setLocalPendingTestimonials(pendingTestimonials);
+    }
+  }, [pendingTestimonials]);
+
   const { data: testimonials, isLoading: isLoadingTestimonials } = useQuery({
     queryKey: ['testimonials'],
     queryFn: async () => {
@@ -49,6 +57,9 @@ const AdminTestimonials = () => {
 
   const handleApprove = async (testimonial: any) => {
     try {
+      // Remove from local state immediately
+      setLocalPendingTestimonials(prev => prev.filter(item => item.id !== testimonial.id));
+
       // Insert into public testimonials
       const { error: insertError } = await supabase
         .from('testimonials')
@@ -69,7 +80,7 @@ const AdminTestimonials = () => {
 
       if (deleteError) throw deleteError;
 
-      // Refresh data
+      // Refresh data in the background
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
@@ -79,6 +90,11 @@ const AdminTestimonials = () => {
         description: "El testimonio ha sido publicado exitosamente.",
       });
     } catch (error) {
+      // Restore the testimonial in local state if there was an error
+      if (pendingTestimonials) {
+        setLocalPendingTestimonials(pendingTestimonials);
+      }
+      
       toast({
         title: "Error",
         description: "No se pudo aprobar el testimonio.",
@@ -89,6 +105,9 @@ const AdminTestimonials = () => {
 
   const handleReject = async (id: string) => {
     try {
+      // Remove from local state immediately
+      setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
+      
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -96,7 +115,7 @@ const AdminTestimonials = () => {
 
       if (error) throw error;
 
-      // Refresh data
+      // Refresh data in the background
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
@@ -105,6 +124,11 @@ const AdminTestimonials = () => {
         description: "El testimonio ha sido eliminado.",
       });
     } catch (error) {
+      // Restore the testimonial in local state if there was an error
+      if (pendingTestimonials) {
+        setLocalPendingTestimonials(pendingTestimonials);
+      }
+      
       toast({
         title: "Error",
         description: "No se pudo rechazar el testimonio.",
@@ -126,7 +150,7 @@ const AdminTestimonials = () => {
             <p>Cargando testimonios...</p>
           ) : (
             <div className="space-y-4">
-              {pendingTestimonials?.map((testimonial) => (
+              {localPendingTestimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
                   className="border rounded-lg p-4 space-y-2"
@@ -154,7 +178,7 @@ const AdminTestimonials = () => {
                   <p className="italic">{testimonial.content}</p>
                 </div>
               ))}
-              {pendingTestimonials?.length === 0 && (
+              {localPendingTestimonials.length === 0 && (
                 <p>No hay testimonios pendientes de aprobación.</p>
               )}
             </div>

@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+
+import { Facebook, Instagram, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -46,7 +47,7 @@ export const Footer = () => {
                 <Facebook />
               </a>
               <a href="#" className="hover:text-secondary-hover transition-colors">
-                <Twitter />
+                <X />
               </a>
               <a href="#" className="hover:text-secondary-hover transition-colors">
                 <Instagram />
