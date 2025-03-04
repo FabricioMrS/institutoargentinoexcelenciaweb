@@ -22,7 +22,7 @@ export const Navbar = () => {
       <div className="w-full px-2 sm:px-4 md:container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-6">
           <img
-            src="/lovable-uploads/332a7955-3409-4607-9f07-dc6d9556d6dc.png"
+            src="/lovable-uploads/f3cc75a2-3cce-4f6f-8a34-968ce9777ff6.png"
             alt="Logo"
             className="h-8 sm:h-10 md:h-12 cursor-pointer"
             onClick={() => navigate('/')}

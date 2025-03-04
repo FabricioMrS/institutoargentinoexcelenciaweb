@@ -21,7 +21,7 @@ const AdminTestimonials = () => {
     }
   }, [isAdmin, navigate]);
 
-  const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPending } = useQuery({
+  const { data: pendingTestimonials, isLoading: isLoadingPending } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -70,9 +70,9 @@ const AdminTestimonials = () => {
       if (deleteError) throw deleteError;
 
       // Refresh data
-      await refetchPending();
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
         title: "Testimonio aprobado",
@@ -97,7 +97,7 @@ const AdminTestimonials = () => {
       if (error) throw error;
 
       // Refresh data
-      await refetchPending();
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
       queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
