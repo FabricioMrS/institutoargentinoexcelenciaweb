@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { TestimonialsList } from "@/components/admin/TestimonialsList";
@@ -14,8 +14,9 @@ const Admin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showPendingTestimonials, setShowPendingTestimonials] = useState(false);
+  const queryClient = useQueryClient();
   
-  // Query for pending testimonials count
+  // Query for pending testimonials count with no caching
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-testimonials-count'],
     queryFn: async () => {
@@ -31,24 +32,26 @@ const Admin = () => {
       console.log("Fetched pending testimonials count:", count);
       return count || 0;
     },
-    // Disable cache to always fetch fresh data
+    // Disable cache completely to always fetch fresh data
     staleTime: 0,
     gcTime: 0,
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   // Force a refresh when the component mounts or becomes visible again
   useEffect(() => {
     const refreshData = async () => {
+      await queryClient.resetQueries({ queryKey: ['pending-testimonials-count'] });
       await refetchPendingCount();
     };
     
     refreshData();
     
     // Set up a refresh interval
-    const interval = setInterval(refreshData, 10000); // Refresh every 10 seconds
+    const interval = setInterval(refreshData, 5000); // Refresh every 5 seconds
     
     return () => clearInterval(interval);
-  }, [refetchPendingCount]);
+  }, [refetchPendingCount, queryClient]);
 
   // Queries for other data
   const { data: courses, isLoading: isLoadingCourses } = useQuery({
@@ -85,6 +88,8 @@ const Admin = () => {
 
   const handleTogglePendingTestimonials = () => {
     setShowPendingTestimonials(!showPendingTestimonials);
+    // Force refresh when testimonials panel is toggled
+    refetchPendingCount();
   };
 
   if (!isAdmin) return null;

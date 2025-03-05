@@ -35,34 +35,25 @@ export const useApproveTestimonial = () => {
       console.log("Successfully inserted to testimonials table");
 
       // DELETE from pending testimonials - make sure we get confirmation with return
-      const { error: deleteError } = await supabase
+      const { data: deleteData, error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonial.id);
+        .eq('id', testimonial.id)
+        .select();
 
       if (deleteError) {
         console.error("Delete error:", deleteError);
         throw deleteError;
       }
 
-      // Verify deletion by checking if the record still exists
-      const { data: checkData, error: checkError } = await supabase
-        .from('pending_testimonials')
-        .select()
-        .eq('id', testimonial.id);
+      console.log("Delete operation result:", deleteData);
 
-      if (checkError) {
-        console.error("Error verifying deletion:", checkError);
-      } else {
-        console.log("Verification check - remaining records with this ID:", checkData?.length || 0);
-      }
-
-      // Invalidate all related queries, making sure to refetch them
+      // Explicitly refetch all related queries immediately
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] }),
-        queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['testimonials'] })
+        queryClient.refetchQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] }),
+        queryClient.refetchQueries({ queryKey: ['admin-testimonials'] }),
+        queryClient.refetchQueries({ queryKey: ['testimonials'] })
       ]);
 
       toast({
@@ -79,6 +70,10 @@ export const useApproveTestimonial = () => {
         description: "No se pudo aprobar el testimonio.",
         variant: "destructive",
       });
+
+      // Force refetch on error to ensure UI is in sync with database
+      queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
+      queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
 
       return false;
     }
@@ -101,56 +96,25 @@ export const useRejectTestimonial = () => {
       
       console.log(`Rejecting testimonial with ID: ${id}`);
       
-      // First, check if the record exists
-      const { data: existingData, error: existingError } = await supabase
-        .from('pending_testimonials')
-        .select()
-        .eq('id', id);
-
-      if (existingError) {
-        console.error("Error checking record existence:", existingError);
-        throw existingError;
-      }
-
-      console.log("Record exists check:", existingData);
-      
-      if (!existingData || existingData.length === 0) {
-        console.log("Record does not exist, no need to delete");
-        return true;
-      }
-      
-      // DELETE from pending testimonials with explicit return
-      const { error: deleteError } = await supabase
+      // DELETE with explicit return for confirmation
+      const { data: deleteData, error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (deleteError) {
         console.error("Delete error:", deleteError);
         throw deleteError;
       }
+
+      console.log("Delete operation result:", deleteData);
       
-      // Verify deletion by checking if the record still exists
-      const { data: checkData, error: checkError } = await supabase
-        .from('pending_testimonials')
-        .select()
-        .eq('id', id);
-
-      if (checkError) {
-        console.error("Error verifying deletion:", checkError);
-      } else {
-        console.log("Verification check - remaining records with this ID:", checkData?.length || 0);
-      }
-
-      // Force refresh all related queries
+      // Explicitly refetch all related queries immediately
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+        queryClient.refetchQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
-
-      // Force refetch
-      await queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
-      await queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
 
       toast({
         title: "Testimonio rechazado",
@@ -166,6 +130,10 @@ export const useRejectTestimonial = () => {
         description: "No se pudo rechazar el testimonio.",
         variant: "destructive",
       });
+
+      // Force refetch on error to ensure UI is in sync with database
+      queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
+      queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
 
       return false;
     }

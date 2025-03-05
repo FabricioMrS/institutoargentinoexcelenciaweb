@@ -19,7 +19,7 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
   const rejectTestimonial = useRejectTestimonial();
   const queryClient = useQueryClient();
 
-  // Query for pending testimonials data
+  // Query for pending testimonials data with no caching
   const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPendingTestimonials } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
@@ -34,11 +34,12 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
         throw error;
       }
       console.log("Fetched pending testimonials:", data);
-      return data;
+      return data || [];
     },
     // Disable cache to always fetch fresh data
     staleTime: 0,
     gcTime: 0,
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   // Initialize local state when data is fetched
@@ -48,43 +49,44 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     }
   }, [pendingTestimonials]);
   
-  // Force refresh data when component becomes visible
+  // Force refresh data when component becomes visible or mounts
   useEffect(() => {
-    if (visible) {
-      const refreshData = async () => {
-        await refetchPendingTestimonials();
-        if (onRefetch) onRefetch();
-      };
-      
-      refreshData();
-    }
+    const refreshData = async () => {
+      await refetchPendingTestimonials();
+      if (onRefetch) onRefetch();
+    };
+    
+    refreshData();
+    
+    // Set up a refresh interval
+    const interval = setInterval(refreshData, 5000); // Refresh every 5 seconds
+    
+    return () => clearInterval(interval);
   }, [visible, refetchPendingTestimonials, onRefetch]);
 
   const handleApprove = async (testimonial: any) => {
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
-      await refetchPendingTestimonials();
-      if (onRefetch) onRefetch();
+      // Force immediate refresh of both queries
+      await Promise.all([
+        refetchPendingTestimonials(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
       
-      // Force refresh after a short delay
-      setTimeout(async () => {
-        await queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
-        await queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
-      }, 500);
+      if (onRefetch) await onRefetch();
     }
   };
 
   const handleReject = async (id: string) => {
     const success = await rejectTestimonial(id, setLocalPendingTestimonials);
     if (success) {
-      await refetchPendingTestimonials();
-      if (onRefetch) onRefetch();
+      // Force immediate refresh of both queries
+      await Promise.all([
+        refetchPendingTestimonials(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
       
-      // Force refresh after a short delay
-      setTimeout(async () => {
-        await queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
-        await queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
-      }, 500);
+      if (onRefetch) await onRefetch();
     }
   };
 
