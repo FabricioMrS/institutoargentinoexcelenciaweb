@@ -25,16 +25,17 @@ const AdminTestimonials = () => {
   const { data: pendingTestimonials, isLoading: isLoadingPending } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
+      console.log("AdminTestimonials: Fetching pending testimonials");
       const { data, error } = await supabase
         .from('pending_testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching pending testimonials:", error);
+        console.error("AdminTestimonials: Error fetching pending testimonials:", error);
         throw error;
       }
-      console.log("Fetched pending testimonials:", data);
+      console.log("AdminTestimonials: Fetched pending testimonials:", data);
       return data;
     },
   });
@@ -61,10 +62,10 @@ const AdminTestimonials = () => {
 
   const handleApprove = async (testimonial: any) => {
     try {
-      // Remove from local state immediately
+      // Remove from local state immediately for UI feedback
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== testimonial.id));
 
-      console.log(`Approving testimonial with ID: ${testimonial.id}`);
+      console.log(`AdminTestimonials: Approving testimonial with ID: ${testimonial.id}`);
       
       // Insert into public testimonials
       const { error: insertError } = await supabase
@@ -77,26 +78,27 @@ const AdminTestimonials = () => {
         }]);
 
       if (insertError) {
-        console.error("Insert error:", insertError);
+        console.error("AdminTestimonials: Insert error:", insertError);
         throw insertError;
       }
 
-      console.log("Successfully inserted to testimonials table");
+      console.log("AdminTestimonials: Successfully inserted to testimonials table");
 
-      // Delete from pending testimonials
-      const { error: deleteError } = await supabase
+      // Delete from pending testimonials WITH return data to confirm deletion
+      const { error: deleteError, data: deleteData } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonial.id);
+        .eq('id', testimonial.id)
+        .select();
 
       if (deleteError) {
-        console.error("Delete error:", deleteError);
+        console.error("AdminTestimonials: Delete error:", deleteError);
         throw deleteError;
       }
 
-      console.log("Successfully deleted from pending_testimonials table");
+      console.log("AdminTestimonials: Successfully deleted from pending_testimonials table. Deleted data:", deleteData);
 
-      // Refresh data completely to ensure UI and database are in sync
+      // Invalidate all relevant queries and force refetch
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
@@ -109,7 +111,7 @@ const AdminTestimonials = () => {
         description: "El testimonio ha sido publicado exitosamente.",
       });
     } catch (error) {
-      console.error("Complete error:", error);
+      console.error("AdminTestimonials: Complete error:", error);
       
       // Restore the testimonial in local state if there was an error
       if (pendingTestimonials) {
@@ -126,25 +128,26 @@ const AdminTestimonials = () => {
 
   const handleReject = async (id: string) => {
     try {
-      // Remove from local state immediately
+      // Remove from local state immediately for UI feedback
       setLocalPendingTestimonials(prev => prev.filter(item => item.id !== id));
       
-      console.log(`Rejecting testimonial with ID: ${id}`);
+      console.log(`AdminTestimonials: Rejecting testimonial with ID: ${id}`);
       
-      // Delete from pending testimonials
-      const { error } = await supabase
+      // Delete from pending testimonials WITH return data to confirm deletion
+      const { error, data: deleteData } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
-        console.error("Delete error:", error);
+        console.error("AdminTestimonials: Delete error:", error);
         throw error;
       }
 
-      console.log("Successfully deleted from pending_testimonials table");
+      console.log("AdminTestimonials: Successfully deleted from pending_testimonials table. Deleted data:", deleteData);
 
-      // Refresh data completely to ensure UI and database are in sync
+      // Invalidate all relevant queries and force refetch
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
@@ -155,7 +158,7 @@ const AdminTestimonials = () => {
         description: "El testimonio ha sido eliminado.",
       });
     } catch (error) {
-      console.error("Complete error:", error);
+      console.error("AdminTestimonials: Complete error:", error);
       
       // Restore the testimonial in local state if there was an error
       if (pendingTestimonials) {
