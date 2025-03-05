@@ -38,6 +38,9 @@ const AdminTestimonials = () => {
       console.log("AdminTestimonials: Fetched pending testimonials:", data);
       return data;
     },
+    // Disable cache to always fetch fresh data
+    staleTime: 0,
+    gcTime: 0,
   });
 
   // Initialize local state when data is fetched
@@ -46,6 +49,18 @@ const AdminTestimonials = () => {
       setLocalPendingTestimonials(pendingTestimonials);
     }
   }, [pendingTestimonials]);
+
+  // Force refresh on mount
+  useEffect(() => {
+    refetchPendingTestimonials();
+    
+    // Set up a refresh interval
+    const interval = setInterval(() => {
+      refetchPendingTestimonials();
+    }, 10000); // Refresh every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [refetchPendingTestimonials]);
 
   const { data: testimonials, isLoading: isLoadingTestimonials } = useQuery({
     queryKey: ['testimonials'],

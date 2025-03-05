@@ -36,6 +36,9 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
       console.log("Fetched pending testimonials:", data);
       return data;
     },
+    // Disable cache to always fetch fresh data
+    staleTime: 0,
+    gcTime: 0,
   });
 
   // Initialize local state when data is fetched
@@ -44,12 +47,30 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
       setLocalPendingTestimonials(pendingTestimonials);
     }
   }, [pendingTestimonials]);
+  
+  // Force refresh data when component becomes visible
+  useEffect(() => {
+    if (visible) {
+      const refreshData = async () => {
+        await refetchPendingTestimonials();
+        if (onRefetch) onRefetch();
+      };
+      
+      refreshData();
+    }
+  }, [visible, refetchPendingTestimonials, onRefetch]);
 
   const handleApprove = async (testimonial: any) => {
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
       await refetchPendingTestimonials();
       if (onRefetch) onRefetch();
+      
+      // Force refresh after a short delay
+      setTimeout(async () => {
+        await queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
+        await queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
+      }, 500);
     }
   };
 
@@ -58,6 +79,12 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     if (success) {
       await refetchPendingTestimonials();
       if (onRefetch) onRefetch();
+      
+      // Force refresh after a short delay
+      setTimeout(async () => {
+        await queryClient.refetchQueries({ queryKey: ['pending-testimonials'] });
+        await queryClient.refetchQueries({ queryKey: ['pending-testimonials-count'] });
+      }, 500);
     }
   };
 

@@ -31,7 +31,24 @@ const Admin = () => {
       console.log("Fetched pending testimonials count:", count);
       return count || 0;
     },
+    // Disable cache to always fetch fresh data
+    staleTime: 0,
+    gcTime: 0,
   });
+
+  // Force a refresh when the component mounts or becomes visible again
+  useEffect(() => {
+    const refreshData = async () => {
+      await refetchPendingCount();
+    };
+    
+    refreshData();
+    
+    // Set up a refresh interval
+    const interval = setInterval(refreshData, 10000); // Refresh every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [refetchPendingCount]);
 
   // Queries for other data
   const { data: courses, isLoading: isLoadingCourses } = useQuery({
