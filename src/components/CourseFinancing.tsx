@@ -49,6 +49,7 @@ export const CourseFinancing = ({
     enabled: !!courseId,
   });
 
+  // Fetch the default financing option from the course
   const { data: courseData } = useQuery({
     queryKey: ['course-default-financing', courseId],
     queryFn: async () => {

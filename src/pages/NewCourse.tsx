@@ -22,6 +22,23 @@ interface FinancingOption {
   interest_rate: number;
 }
 
+interface CourseData {
+  id: string;
+  title: string;
+  category: string;
+  image: string;
+  price: number;
+  start_date: string;
+  schedule: string;
+  modality: string;
+  duration: number;
+  slug: string;
+  default_financing_option: number | null;
+  created_at: string;
+  updated_at: string;
+  enabled: boolean;
+}
+
 const NewCourse = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +79,7 @@ const NewCourse = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as CourseData;
     },
     enabled: !!courseId,
   });
