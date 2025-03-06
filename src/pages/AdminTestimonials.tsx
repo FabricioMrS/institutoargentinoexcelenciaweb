@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TestimonialsList } from "@/components/admin/TestimonialsList";
@@ -15,6 +15,7 @@ const AdminTestimonials = () => {
   const [localPendingTestimonials, setLocalPendingTestimonials] = useState<any[]>([]);
   const approveTestimonial = useApproveTestimonial();
   const rejectTestimonial = useRejectTestimonial();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isAdmin) {
@@ -22,45 +23,28 @@ const AdminTestimonials = () => {
     }
   }, [isAdmin, navigate]);
 
-  const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPendingTestimonials } = useQuery({
+  const { data: pendingTestimonials, isLoading: isLoadingPending } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
-      console.log("AdminTestimonials: Fetching pending testimonials");
       const { data, error } = await supabase
         .from('pending_testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error("AdminTestimonials: Error fetching pending testimonials:", error);
-        throw error;
-      }
-      console.log("AdminTestimonials: Fetched pending testimonials:", data);
-      return data;
+      if (error) throw error;
+      return data || [];
     },
-    // Disable cache to always fetch fresh data
     staleTime: 0,
     gcTime: 0,
+    refetchInterval: 5000,
   });
 
-  // Initialize local state when data is fetched
+  // Inicializamos el estado local cuando se obtienen los datos
   useEffect(() => {
     if (pendingTestimonials) {
       setLocalPendingTestimonials(pendingTestimonials);
     }
   }, [pendingTestimonials]);
-
-  // Force refresh on mount
-  useEffect(() => {
-    refetchPendingTestimonials();
-    
-    // Set up a refresh interval
-    const interval = setInterval(() => {
-      refetchPendingTestimonials();
-    }, 10000); // Refresh every 10 seconds
-    
-    return () => clearInterval(interval);
-  }, [refetchPendingTestimonials]);
 
   const { data: testimonials, isLoading: isLoadingTestimonials } = useQuery({
     queryKey: ['testimonials'],
@@ -71,21 +55,30 @@ const AdminTestimonials = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   const handleApprove = async (testimonial: any) => {
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
-      await refetchPendingTestimonials();
+      // Forzamos la actualización de ambas queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
     }
   };
 
   const handleReject = async (id: string) => {
     const success = await rejectTestimonial(id, setLocalPendingTestimonials);
     if (success) {
-      await refetchPendingTestimonials();
+      // Forzamos la actualización de ambas queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
+      ]);
     }
   };
 

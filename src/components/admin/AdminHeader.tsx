@@ -1,15 +1,32 @@
 
 import { Button } from "@/components/ui/button";
-import { Users, BellDot, MessageSquare } from "lucide-react";
+import { Users, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminHeaderProps {
-  pendingTestimonialsCount: number;
   onTestimonialsClick?: () => void;
 }
 
-export const AdminHeader = ({ pendingTestimonialsCount, onTestimonialsClick }: AdminHeaderProps) => {
+export const AdminHeader = ({ onTestimonialsClick }: AdminHeaderProps) => {
   const navigate = useNavigate();
+
+  const { data: pendingTestimonialsCount = 0 } = useQuery({
+    queryKey: ['pending-testimonials-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('pending_testimonials')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) throw error;
+      return count || 0;
+    },
+    // Deshabilitamos el caché para siempre obtener datos frescos
+    staleTime: 0,
+    gcTime: 0,
+    refetchInterval: 5000, // Refrescar cada 5 segundos
+  });
 
   const handleTestimonialsClick = (e: React.MouseEvent) => {
     if (onTestimonialsClick) {
