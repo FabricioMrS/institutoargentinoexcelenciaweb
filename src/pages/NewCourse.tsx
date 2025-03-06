@@ -40,6 +40,7 @@ const NewCourse = () => {
     modality: "",
     duration: "",
     slug: "",
+    defaultFinancingOption: "",
   });
 
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
@@ -100,6 +101,7 @@ const NewCourse = () => {
         modality: course.modality,
         duration: course.duration.toString(),
         slug: course.slug,
+        defaultFinancingOption: course.default_financing_option?.toString() || "",
       });
     }
   }, [course]);
@@ -126,6 +128,7 @@ const NewCourse = () => {
       modality: formData.modality,
       duration: parseInt(formData.duration),
       slug: formData.slug,
+      default_financing_option: formData.defaultFinancingOption ? parseInt(formData.defaultFinancingOption) : null,
     };
 
     try {
@@ -196,6 +199,10 @@ const NewCourse = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleAddFinancingOption = () => {
     const installments = parseInt(newOption.installments);
     const interest_rate = parseFloat(newOption.interest_rate);
@@ -224,6 +231,12 @@ const NewCourse = () => {
 
   const handleRemoveOption = (indexToRemove: number) => {
     setFinancingOptions(financingOptions.filter((_, index) => index !== indexToRemove));
+    
+    // If we're removing the default financing option, reset it
+    if (formData.defaultFinancingOption && 
+        parseInt(formData.defaultFinancingOption) === financingOptions[indexToRemove].installments) {
+      setFormData(prev => ({ ...prev, defaultFinancingOption: "" }));
+    }
   };
 
   if (!isAdmin) return null;
@@ -348,16 +361,30 @@ const NewCourse = () => {
                         : `${option.installments} cuotas (+${option.interest_rate}% interés)`
                       }
                     </div>
-                    {option.installments !== 1 && (
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleRemoveOption(index)}
+                    <div className="flex items-center">
+                      <Select
+                        value={formData.defaultFinancingOption === option.installments.toString() ? "true" : ""}
+                        onValueChange={(value) => handleSelectChange('defaultFinancingOption', value === "true" ? option.installments.toString() : "")}
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
+                        <SelectTrigger className="w-[180px] mr-2">
+                          <SelectValue placeholder="Mostrar en tapa" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">No mostrar en tapa</SelectItem>
+                          <SelectItem value="true">Mostrar en tapa</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {option.installments !== 1 && (
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleRemoveOption(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))}
                 

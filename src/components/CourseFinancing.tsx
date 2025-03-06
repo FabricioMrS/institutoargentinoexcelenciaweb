@@ -49,6 +49,25 @@ export const CourseFinancing = ({
     enabled: !!courseId,
   });
 
+  const { data: courseData } = useQuery({
+    queryKey: ['course-default-financing', courseId],
+    queryFn: async () => {
+      if (!courseId) return null;
+      const { data, error } = await supabase
+        .from('courses')
+        .select('default_financing_option')
+        .eq('id', courseId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching course default financing:", error);
+        throw error;
+      }
+      return data;
+    },
+    enabled: !!courseId,
+  });
+
   useEffect(() => {
     if (courseFinancingOptions && courseFinancingOptions.length > 0) {
       console.log("Setting financing options:", courseFinancingOptions);
@@ -56,22 +75,27 @@ export const CourseFinancing = ({
         installments: option.installments,
         interest_rate: option.interest_rate
       })));
-      // Set default option
-      setSelectedInstallments(courseFinancingOptions[0].installments);
-      calculateInstallment(courseFinancingOptions[0].installments);
+      
+      // If there's a default financing option set, use that, otherwise use first option
+      if (courseData?.default_financing_option) {
+        setSelectedInstallments(courseData.default_financing_option);
+        calculateInstallment(courseData.default_financing_option);
+      } else {
+        setSelectedInstallments(courseFinancingOptions[0].installments);
+        calculateInstallment(courseFinancingOptions[0].installments);
+      }
     } else {
       console.log("No custom financing options found, using defaults");
       setFinancingOptions([
         { installments: 1, interest_rate: 0 },
-        { installments: 2, interest_rate: 0 },
       ]);
       setSelectedInstallments(1);
       calculateInstallment(1);
     }
-  }, [courseFinancingOptions]);
+  }, [courseFinancingOptions, courseData]);
 
   const calculateInstallment = (months: number) => {
-    const numericPrice = Number(price.replace(/[^0-9]/g, ''));
+    const numericPrice = Number(price);
     const option = financingOptions.find(o => o.installments === months);
     
     if (option) {

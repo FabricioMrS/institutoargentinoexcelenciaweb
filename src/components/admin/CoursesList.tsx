@@ -45,34 +45,51 @@ export const CoursesList = ({ courses, isLoading }: CoursesListProps) => {
 
   return (
     <div className="space-y-4">
-      {courses?.map((course) => (
-        <div
-          key={course.id}
-          className="flex items-center justify-between p-4 border rounded-lg"
-        >
-          <div>
-            <h3 className="font-medium">{course.title}</h3>
-            <p className="text-sm text-muted-foreground">
-              {course.category} - ${course.price}
-            </p>
+      {courses?.map((course) => {
+        // Find default financing option if any
+        let financingInfo = "";
+        if (course.default_financing_option) {
+          const defaultOption = course.course_financing_options?.find(
+            (option: any) => option.installments === course.default_financing_option
+          );
+          
+          if (defaultOption) {
+            financingInfo = ` - ${defaultOption.installments} cuotas`;
+            if (defaultOption.interest_rate > 0) {
+              financingInfo += ` (+${defaultOption.interest_rate}%)`;
+            }
+          }
+        }
+        
+        return (
+          <div
+            key={course.id}
+            className="flex items-center justify-between p-4 border rounded-lg"
+          >
+            <div>
+              <h3 className="font-medium">{course.title}</h3>
+              <p className="text-sm text-muted-foreground">
+                {course.category} - ${course.price}{financingInfo}
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Toggle
+                pressed={course.enabled}
+                onPressedChange={() => toggleCourseStatus(course.id, course.enabled)}
+              >
+                {course.enabled ? 'Habilitado' : 'Deshabilitado'}
+              </Toggle>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate(`/admin/curso/${course.id}`)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Toggle
-              pressed={course.enabled}
-              onPressedChange={() => toggleCourseStatus(course.id, course.enabled)}
-            >
-              {course.enabled ? 'Habilitado' : 'Deshabilitado'}
-            </Toggle>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate(`/admin/curso/${course.id}`)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

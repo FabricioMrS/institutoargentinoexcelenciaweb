@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,7 +18,6 @@ const AdminTestimonials = () => {
     }
   }, [isAdmin, navigate]);
 
-  // Query for approved testimonials
   const { data: testimonials, isLoading: isLoadingTestimonials } = useQuery({
     queryKey: ['admin-testimonials'],
     queryFn: async () => {
@@ -35,9 +33,7 @@ const AdminTestimonials = () => {
     refetchOnWindowFocus: true,
   });
 
-  // Handle count updates from the pending testimonials panel
   const handleCountChange = () => {
-    // Force refresh approved testimonials and count
     queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
     queryClient.invalidateQueries({ queryKey: ['pending-count'] });
     queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });

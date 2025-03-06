@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,36 +18,31 @@ const Admin = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const fetchPendingCount = usePendingTestimonialsCount();
   
-  // Query for pending testimonials count with frequent refresh
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-count'],
     queryFn: fetchPendingCount,
-    refetchInterval: 3000, // Refresh every 3 seconds
-    staleTime: 0,          // Always consider data stale
+    refetchInterval: 3000,
+    staleTime: 0,
     refetchOnWindowFocus: true,
   });
 
-  // Update local state when count changes
   useEffect(() => {
     setPendingCount(pendingTestimonialsCount);
   }, [pendingTestimonialsCount]);
 
-  // Handle count updates from the pending testimonials panel
   const handleCountChange = (count: number) => {
     setPendingCount(count);
-    // Force refresh all testimonial data
     queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
     queryClient.invalidateQueries({ queryKey: ['pending-count'] });
     queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
   };
 
-  // Queries for other data
   const { data: courses, isLoading: isLoadingCourses } = useQuery({
     queryKey: ['admin-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
-        .select('*')
+        .select('*, course_financing_options(*)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -67,7 +61,7 @@ const Admin = () => {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: 5000,
   });
 
   useEffect(() => {
@@ -79,7 +73,6 @@ const Admin = () => {
   const handleTogglePendingTestimonials = () => {
     setShowPendingTestimonials(!showPendingTestimonials);
     refetchPendingCount();
-    // Force refresh all testimonial data
     queryClient.invalidateQueries();
   };
 
