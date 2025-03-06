@@ -20,34 +20,30 @@ export const useTestimonialApproval = () => {
           role: testimonial.role,
           content: testimonial.content,
           photo_url: testimonial.photo_url || null,
-        }])
-        .select('*')
-        .single();
+        }]);
 
       if (insertError) {
         console.error("[Approval] Insert error:", insertError);
         throw new Error(`Failed to insert testimonial: ${insertError.message}`);
       }
 
-      console.log("[Approval] Successfully inserted to testimonials table:", insertedItem);
+      console.log("[Approval] Successfully inserted to testimonials table");
 
-      // Then delete from pending testimonials with explicit verification
-      const { data: deletedItem, error: deleteError } = await supabase
+      // Then delete from pending testimonials
+      const { error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonial.id)
-        .select('*')
-        .single();
+        .eq('id', testimonial.id);
 
       if (deleteError) {
         console.error("[Approval] Delete error:", deleteError);
         throw new Error(`Failed to delete pending testimonial: ${deleteError.message}`);
       }
 
-      console.log("[Approval] Deleted from pending testimonials:", deletedItem);
+      console.log("[Approval] Deleted from pending testimonials");
       
-      // Force update all relevant queries with aggressive cache invalidation
-      await queryClient.resetQueries();
+      // Force refresh all queries to ensure UI updates
+      queryClient.invalidateQueries();
       
       toast({
         title: "Testimonio aprobado",
@@ -78,23 +74,20 @@ export const useTestimonialRejection = () => {
     try {
       console.log(`[Rejection] Starting rejection for testimonial ID: ${id}`);
       
-      // Delete with explicit verification
-      const { data: deletedItem, error: deleteError } = await supabase
+      const { error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', id)
-        .select('*')
-        .single();
+        .eq('id', id);
 
       if (deleteError) {
         console.error("[Rejection] Delete error:", deleteError);
         throw new Error(`Failed to delete pending testimonial: ${deleteError.message}`);
       }
 
-      console.log("[Rejection] Deleted item:", deletedItem);
+      console.log("[Rejection] Successfully deleted testimonial");
       
-      // Force reset all queries to ensure fresh data
-      await queryClient.resetQueries();
+      // Force refresh all queries to ensure UI updates
+      queryClient.invalidateQueries();
 
       toast({
         title: "Testimonio rechazado",
@@ -145,23 +138,20 @@ export const useTestimonialDeletion = () => {
     try {
       console.log(`[Deletion] Starting deletion for testimonial ID: ${id}`);
       
-      // Delete with explicit verification
-      const { data: deletedItem, error: deleteError } = await supabase
+      const { error: deleteError } = await supabase
         .from('testimonials')
         .delete()
-        .eq('id', id)
-        .select('*')
-        .single();
+        .eq('id', id);
 
       if (deleteError) {
         console.error("[Deletion] Delete error:", deleteError);
         throw new Error(`Failed to delete testimonial: ${deleteError.message}`);
       }
 
-      console.log("[Deletion] Deleted item:", deletedItem);
+      console.log("[Deletion] Successfully deleted testimonial");
       
-      // Force reset all queries to ensure fresh data
-      await queryClient.resetQueries();
+      // Force refresh all queries
+      queryClient.invalidateQueries();
 
       toast({
         title: "Testimonio eliminado",

@@ -147,7 +147,7 @@ const Index = () => {
                   title={course.title}
                   category={course.category}
                   image={course.image}
-                  price={course.price.toString()}
+                  price={undefined} // No mostramos el precio en la página de inicio
                   slug={course.slug}
                 />
               ))}

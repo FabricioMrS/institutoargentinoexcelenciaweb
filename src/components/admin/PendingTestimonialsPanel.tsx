@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTestimonialApproval, useTestimonialRejection } from "@/utils/testimonialManager";
 
@@ -16,8 +16,9 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
   const approveTestimonial = useTestimonialApproval();
   const rejectTestimonial = useTestimonialRejection();
   const [processingIds, setProcessingIds] = useState<string[]>([]);
+  const queryClient = useQueryClient();
   
-  // Fetch pending testimonials with no caching and frequent refetching
+  // Fetch pending testimonials with frequent refetching
   const { 
     data: pendingTestimonials = [], 
     isLoading, 
@@ -44,8 +45,8 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
       console.log("[Panel] Fetched testimonials:", data?.length || 0);
       return data || [];
     },
-    staleTime: 0, // Always consider data stale
-    refetchInterval: 2000, // Refetch every 2 seconds for quicker updates
+    staleTime: 1000, // Consider data stale after 1 second
+    refetchInterval: 5000, // Refetch every 5 seconds
     gcTime: 0, // Don't cache data
   });
 
@@ -62,7 +63,15 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
       setProcessingIds(prev => [...prev, testimonial.id]);
       const success = await approveTestimonial(testimonial);
       if (success) {
+        // Force refresh all relevant data
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+        queryClient.invalidateQueries({ queryKey: ['pending-count'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
         await refetch();
+        // Update count
+        if (onCountChange) {
+          onCountChange(pendingTestimonials.length - 1);
+        }
       }
     } finally {
       setProcessingIds(prev => prev.filter(id => id !== testimonial.id));
@@ -75,7 +84,14 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
       setProcessingIds(prev => [...prev, id]);
       const success = await rejectTestimonial(id);
       if (success) {
+        // Force refresh all relevant data
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+        queryClient.invalidateQueries({ queryKey: ['pending-count'] });
         await refetch();
+        // Update count
+        if (onCountChange) {
+          onCountChange(pendingTestimonials.length - 1);
+        }
       }
     } finally {
       setProcessingIds(prev => prev.filter(existingId => existingId !== id));

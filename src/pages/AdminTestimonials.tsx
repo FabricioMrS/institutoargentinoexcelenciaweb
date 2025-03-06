@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +12,6 @@ const AdminTestimonials = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -32,14 +31,16 @@ const AdminTestimonials = () => {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 3000, // Refresh every 3 seconds
+    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchOnWindowFocus: true,
   });
 
   // Handle count updates from the pending testimonials panel
-  const handleCountChange = (count: number) => {
-    setPendingCount(count);
-    // Force refresh approved testimonials
+  const handleCountChange = () => {
+    // Force refresh approved testimonials and count
     queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
+    queryClient.invalidateQueries({ queryKey: ['pending-count'] });
+    queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
   };
 
   if (!isAdmin) return null;
