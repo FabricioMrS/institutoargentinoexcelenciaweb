@@ -1,10 +1,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useTestimonialDeletion } from "@/utils/testimonialManager";
 
 interface ApprovedTestimonialsListProps {
   testimonials: any[];
@@ -14,9 +16,12 @@ interface ApprovedTestimonialsListProps {
 export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTestimonialsListProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const deleteTestimonial = useTestimonialDeletion();
+  const [processingIds, setProcessingIds] = useState<string[]>([]);
 
   const handlePhotoUpload = async (testimonialId: string, file: File) => {
     try {
+      setProcessingIds(prev => [...prev, testimonialId]);
       console.log(`[Photo] Uploading photo for testimonial ID: ${testimonialId}`);
       
       const fileExt = file.name.split('.').pop();
@@ -47,9 +52,8 @@ export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTe
 
       console.log("[Photo] Successfully updated photo URL:", publicUrl);
       
-      // Invalidate queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
-      await queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      // Reset queries to ensure fresh data
+      await queryClient.resetQueries();
 
       toast({
         title: "Éxito",
@@ -62,6 +66,17 @@ export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTe
         title: "Error",
         description: "No se pudo subir la foto",
       });
+    } finally {
+      setProcessingIds(prev => prev.filter(id => id !== testimonialId));
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setProcessingIds(prev => [...prev, id]);
+      await deleteTestimonial(id);
+    } finally {
+      setProcessingIds(prev => prev.filter(existingId => existingId !== id));
     }
   };
 
@@ -83,9 +98,10 @@ export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTe
               <div>
                 <h3 className="font-medium">{testimonial.name}</h3>
                 <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                <p className="mt-1 text-sm italic">{testimonial.content}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <input
                 type="file"
                 id={`photo-${testimonial.id}`}
@@ -97,6 +113,7 @@ export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTe
                     handlePhotoUpload(testimonial.id, file);
                   }
                 }}
+                disabled={processingIds.includes(testimonial.id)}
               />
               <Button
                 variant="outline"
@@ -104,8 +121,17 @@ export const ApprovedTestimonialsList = ({ testimonials, isLoading }: ApprovedTe
                 onClick={() => {
                   document.getElementById(`photo-${testimonial.id}`)?.click();
                 }}
+                disabled={processingIds.includes(testimonial.id)}
               >
                 <Upload className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => handleDelete(testimonial.id)}
+                disabled={processingIds.includes(testimonial.id)}
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           </div>

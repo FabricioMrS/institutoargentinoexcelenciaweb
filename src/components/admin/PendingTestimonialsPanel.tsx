@@ -15,6 +15,7 @@ interface PendingTestimonialsPanelProps {
 export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTestimonialsPanelProps) => {
   const approveTestimonial = useTestimonialApproval();
   const rejectTestimonial = useTestimonialRejection();
+  const [processingIds, setProcessingIds] = useState<string[]>([]);
   
   // Fetch pending testimonials with no caching and frequent refetching
   const { 
@@ -44,7 +45,8 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
       return data || [];
     },
     staleTime: 0, // Always consider data stale
-    refetchInterval: 3000, // Refetch every 3 seconds
+    refetchInterval: 2000, // Refetch every 2 seconds for quicker updates
+    gcTime: 0, // Don't cache data
   });
 
   // Force refresh on visibility change
@@ -56,17 +58,27 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
 
   // Handle approval of a testimonial
   const handleApprove = async (testimonial: any) => {
-    const success = await approveTestimonial(testimonial);
-    if (success) {
-      await refetch();
+    try {
+      setProcessingIds(prev => [...prev, testimonial.id]);
+      const success = await approveTestimonial(testimonial);
+      if (success) {
+        await refetch();
+      }
+    } finally {
+      setProcessingIds(prev => prev.filter(id => id !== testimonial.id));
     }
   };
 
   // Handle rejection of a testimonial
   const handleReject = async (id: string) => {
-    const success = await rejectTestimonial(id);
-    if (success) {
-      await refetch();
+    try {
+      setProcessingIds(prev => [...prev, id]);
+      const success = await rejectTestimonial(id);
+      if (success) {
+        await refetch();
+      }
+    } finally {
+      setProcessingIds(prev => prev.filter(existingId => existingId !== id));
     }
   };
 
@@ -98,19 +110,21 @@ export const PendingTestimonialsPanel = ({ visible, onCountChange }: PendingTest
                         variant="default"
                         size="sm"
                         onClick={() => handleApprove(testimonial)}
+                        disabled={processingIds.includes(testimonial.id)}
                         className="gap-2"
                       >
                         <Check className="h-4 w-4" />
-                        Aprobar
+                        {processingIds.includes(testimonial.id) ? 'Procesando...' : 'Aprobar'}
                       </Button>
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleReject(testimonial.id)}
+                        disabled={processingIds.includes(testimonial.id)}
                         className="gap-2"
                       >
                         <X className="h-4 w-4" />
-                        Rechazar
+                        {processingIds.includes(testimonial.id) ? 'Procesando...' : 'Rechazar'}
                       </Button>
                     </div>
                   </div>

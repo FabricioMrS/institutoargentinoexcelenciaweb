@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { ApprovedTestimonialsList } from "@/components/admin/ApprovedTestimonialsList";
@@ -14,6 +14,7 @@ import { usePendingTestimonialsCount } from "@/utils/testimonialManager";
 const Admin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [showPendingTestimonials, setShowPendingTestimonials] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const fetchPendingCount = usePendingTestimonialsCount();
@@ -22,7 +23,7 @@ const Admin = () => {
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-count'],
     queryFn: fetchPendingCount,
-    refetchInterval: 3000, // Refresh every 3 seconds
+    refetchInterval: 2000, // Refresh every 2 seconds
     staleTime: 0,          // Always consider data stale
     gcTime: 0,             // Don't cache
   });
@@ -35,6 +36,8 @@ const Admin = () => {
   // Handle count updates from the pending testimonials panel
   const handleCountChange = (count: number) => {
     setPendingCount(count);
+    // Force refresh of testimonials data
+    queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
   };
 
   // Queries for other data
@@ -62,6 +65,7 @@ const Admin = () => {
       if (error) throw error;
       return data;
     },
+    refetchInterval: 3000, // Refresh every 3 seconds
   });
 
   useEffect(() => {
@@ -73,6 +77,9 @@ const Admin = () => {
   const handleTogglePendingTestimonials = () => {
     setShowPendingTestimonials(!showPendingTestimonials);
     refetchPendingCount();
+    // Force refresh all testimonial data
+    queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
   };
 
   if (!isAdmin) return null;
