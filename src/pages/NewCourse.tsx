@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -207,7 +206,6 @@ const NewCourse = () => {
     const installments = parseInt(newOption.installments);
     const interest_rate = parseFloat(newOption.interest_rate);
     
-    // Check if this installment option already exists
     const exists = financingOptions.some(option => option.installments === installments);
     
     if (!exists) {
@@ -232,7 +230,6 @@ const NewCourse = () => {
   const handleRemoveOption = (indexToRemove: number) => {
     setFinancingOptions(financingOptions.filter((_, index) => index !== indexToRemove));
     
-    // If we're removing the default financing option, reset it
     if (formData.defaultFinancingOption && 
         parseInt(formData.defaultFinancingOption) === financingOptions[indexToRemove].installments) {
       setFormData(prev => ({ ...prev, defaultFinancingOption: "" }));

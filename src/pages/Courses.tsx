@@ -14,7 +14,7 @@ const Courses = () => {
     queryFn: async () => {
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
-        .select('*')
+        .select('*, default_financing_option')
         .eq('enabled', true)
         .order('created_at', { ascending: false });
 
