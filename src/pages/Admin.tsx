@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -5,44 +6,60 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminHeader } from "@/components/admin/AdminHeader";
-import { ApprovedTestimonialsList } from "@/components/admin/ApprovedTestimonialsList";
+import { TestimonialsList } from "@/components/admin/TestimonialsList";
 import { CoursesList } from "@/components/admin/CoursesList";
-import { PendingTestimonialsPanel } from "@/components/admin/PendingTestimonialsPanel";
-import { usePendingTestimonialsCount } from "@/utils/testimonialManager";
+import { PendingTestimonials } from "@/components/admin/PendingTestimonials";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [showPendingTestimonials, setShowPendingTestimonials] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-  const fetchPendingCount = usePendingTestimonialsCount();
+  const queryClient = useQueryClient();
   
+  // Query for pending testimonials count with no caching
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
-    queryKey: ['pending-count'],
-    queryFn: fetchPendingCount,
-    refetchInterval: 3000,
+    queryKey: ['pending-testimonials-count'],
+    queryFn: async () => {
+      console.log("Fetching pending testimonials count");
+      const { count, error } = await supabase
+        .from('pending_testimonials')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) {
+        console.error("Error fetching pending testimonials count:", error);
+        throw error;
+      }
+      console.log("Fetched pending testimonials count:", count);
+      return count || 0;
+    },
+    // Disable cache completely to always fetch fresh data
     staleTime: 0,
-    refetchOnWindowFocus: true,
+    gcTime: 0,
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
+  // Force a refresh when the component mounts or becomes visible again
   useEffect(() => {
-    setPendingCount(pendingTestimonialsCount);
-  }, [pendingTestimonialsCount]);
+    const refreshData = async () => {
+      await queryClient.resetQueries({ queryKey: ['pending-testimonials-count'] });
+      await refetchPendingCount();
+    };
+    
+    refreshData();
+    
+    // Set up a refresh interval
+    const interval = setInterval(refreshData, 5000); // Refresh every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, [refetchPendingCount, queryClient]);
 
-  const handleCountChange = (count: number) => {
-    setPendingCount(count);
-    queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
-    queryClient.invalidateQueries({ queryKey: ['pending-count'] });
-    queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-  };
-
+  // Queries for other data
   const { data: courses, isLoading: isLoadingCourses } = useQuery({
     queryKey: ['admin-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
-        .select('*, course_financing_options(*)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -61,7 +78,6 @@ const Admin = () => {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 5000,
   });
 
   useEffect(() => {
@@ -72,8 +88,8 @@ const Admin = () => {
 
   const handleTogglePendingTestimonials = () => {
     setShowPendingTestimonials(!showPendingTestimonials);
+    // Force refresh when testimonials panel is toggled
     refetchPendingCount();
-    queryClient.invalidateQueries();
   };
 
   if (!isAdmin) return null;
@@ -81,14 +97,15 @@ const Admin = () => {
   return (
     <div className="container py-8">
       <AdminHeader 
-        pendingTestimonialsCount={pendingCount} 
+        pendingTestimonialsCount={pendingTestimonialsCount} 
         onTestimonialsClick={handleTogglePendingTestimonials}
       />
 
       <div className="grid gap-6">
-        <PendingTestimonialsPanel 
-          visible={showPendingTestimonials} 
-          onCountChange={handleCountChange}
+        <PendingTestimonials 
+          visible={showPendingTestimonials && pendingTestimonialsCount > 0} 
+          pendingCount={pendingTestimonialsCount}
+          onRefetch={refetchPendingCount}
         />
 
         <Card>
@@ -96,7 +113,7 @@ const Admin = () => {
             <CardTitle>Testimonios</CardTitle>
           </CardHeader>
           <CardContent>
-            <ApprovedTestimonialsList 
+            <TestimonialsList 
               testimonials={testimonials || []} 
               isLoading={isLoadingTestimonials} 
             />

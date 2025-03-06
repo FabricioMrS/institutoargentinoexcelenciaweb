@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,23 +23,6 @@ interface FinancingOption {
   interest_rate: number;
 }
 
-interface CourseData {
-  id: string;
-  title: string;
-  category: string;
-  image: string;
-  price: number;
-  start_date: string;
-  schedule: string;
-  modality: string;
-  duration: number;
-  slug: string;
-  default_financing_option: number | null;
-  created_at: string;
-  updated_at: string;
-  enabled: boolean;
-}
-
 const NewCourse = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -56,7 +40,6 @@ const NewCourse = () => {
     modality: "",
     duration: "",
     slug: "",
-    defaultFinancingOption: "",
   });
 
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
@@ -79,7 +62,7 @@ const NewCourse = () => {
         .single();
 
       if (error) throw error;
-      return data as CourseData;
+      return data;
     },
     enabled: !!courseId,
   });
@@ -117,7 +100,6 @@ const NewCourse = () => {
         modality: course.modality,
         duration: course.duration.toString(),
         slug: course.slug,
-        defaultFinancingOption: course.default_financing_option?.toString() || "",
       });
     }
   }, [course]);
@@ -144,7 +126,6 @@ const NewCourse = () => {
       modality: formData.modality,
       duration: parseInt(formData.duration),
       slug: formData.slug,
-      default_financing_option: formData.defaultFinancingOption ? parseInt(formData.defaultFinancingOption) : null,
     };
 
     try {
@@ -215,14 +196,11 @@ const NewCourse = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleAddFinancingOption = () => {
     const installments = parseInt(newOption.installments);
     const interest_rate = parseFloat(newOption.interest_rate);
     
+    // Check if this installment option already exists
     const exists = financingOptions.some(option => option.installments === installments);
     
     if (!exists) {
@@ -246,11 +224,6 @@ const NewCourse = () => {
 
   const handleRemoveOption = (indexToRemove: number) => {
     setFinancingOptions(financingOptions.filter((_, index) => index !== indexToRemove));
-    
-    if (formData.defaultFinancingOption && 
-        parseInt(formData.defaultFinancingOption) === financingOptions[indexToRemove].installments) {
-      setFormData(prev => ({ ...prev, defaultFinancingOption: "" }));
-    }
   };
 
   if (!isAdmin) return null;
@@ -375,30 +348,16 @@ const NewCourse = () => {
                         : `${option.installments} cuotas (+${option.interest_rate}% interés)`
                       }
                     </div>
-                    <div className="flex items-center">
-                      <Select
-                        value={formData.defaultFinancingOption === option.installments.toString() ? "true" : ""}
-                        onValueChange={(value) => handleSelectChange('defaultFinancingOption', value === "true" ? option.installments.toString() : "")}
+                    {option.installments !== 1 && (
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleRemoveOption(index)}
                       >
-                        <SelectTrigger className="w-[180px] mr-2">
-                          <SelectValue placeholder="Mostrar en tapa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="">No mostrar en tapa</SelectItem>
-                          <SelectItem value="true">Mostrar en tapa</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {option.installments !== 1 && (
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleRemoveOption(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 

@@ -10,10 +10,9 @@ interface CourseCardProps {
   image: string;
   price: string;
   slug: string;
-  installments?: number | null;
 }
 
-export const CourseCard = ({ title, category, image, price, slug, installments }: CourseCardProps) => {
+export const CourseCard = ({ title, category, image, price, slug }: CourseCardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -25,11 +24,7 @@ export const CourseCard = ({ title, category, image, price, slug, installments }
         <div className="flex justify-between items-start">
           <Badge variant="secondary">{category}</Badge>
           <div className="text-right">
-            {installments ? (
-              <span className="font-bold text-lg block">$ {price} x {installments}</span>
-            ) : (
-              <span className="font-bold text-lg block">$ {price}</span>
-            )}
+            <span className="font-bold text-lg block">$ {price} (ARS)</span>
             <span className="text-xs text-muted-foreground">Financiación disponible</span>
           </div>
         </div>
