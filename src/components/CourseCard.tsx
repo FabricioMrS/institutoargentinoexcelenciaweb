@@ -23,10 +23,7 @@ export const CourseCard = ({ title, category, image, price, slug }: CourseCardPr
       <CardHeader>
         <div className="flex justify-between items-start">
           <Badge variant="secondary">{category}</Badge>
-          <div className="text-right">
-            <span className="font-bold text-lg block">$ {price} (ARS)</span>
-            <span className="text-xs text-muted-foreground">Financiación disponible</span>
-          </div>
+          {/* Price display was removed from here */}
         </div>
         <CardTitle className="text-lg mt-2">{title}</CardTitle>
       </CardHeader>
