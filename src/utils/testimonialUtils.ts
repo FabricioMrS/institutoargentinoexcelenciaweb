@@ -43,12 +43,17 @@ export const useApproveTestimonial = () => {
 export const useRejectTestimonial = () => {
   return async (id: string, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
+      console.log("Rejecting testimonial with ID:", id);
+      
       // Delete directly from pending_testimonials
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
+      console.log("Delete response:", { error, data });
+      
       if (error) throw error;
 
       // Update local state

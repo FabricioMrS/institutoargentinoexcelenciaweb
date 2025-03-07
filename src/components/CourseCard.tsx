@@ -12,7 +12,7 @@ interface CourseCardProps {
   slug: string;
 }
 
-export const CourseCard = ({ title, category, image, price, slug }: CourseCardProps) => {
+export const CourseCard = ({ title, category, image, slug }: CourseCardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -23,7 +23,6 @@ export const CourseCard = ({ title, category, image, price, slug }: CourseCardPr
       <CardHeader>
         <div className="flex justify-between items-start">
           <Badge variant="secondary">{category}</Badge>
-          {/* Price display was removed from here */}
         </div>
         <CardTitle className="text-lg mt-2">{title}</CardTitle>
       </CardHeader>

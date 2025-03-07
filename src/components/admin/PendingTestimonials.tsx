@@ -69,7 +69,8 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     if (success) {
       // Force immediate refresh of both queries
       await Promise.all([
-        refetchPendingTestimonials(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
       
@@ -82,7 +83,7 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     if (success) {
       // Force immediate refresh of both queries
       await Promise.all([
-        refetchPendingTestimonials(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
       

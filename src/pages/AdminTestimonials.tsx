@@ -23,7 +23,7 @@ const AdminTestimonials = () => {
     }
   }, [isAdmin, navigate]);
 
-  const { data: pendingTestimonials, isLoading: isLoadingPending } = useQuery({
+  const { data: pendingTestimonials, isLoading: isLoadingPending, refetch } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,7 +39,7 @@ const AdminTestimonials = () => {
     refetchInterval: 5000,
   });
 
-  // Inicializamos el estado local cuando se obtienen los datos
+  // Initialize local state when data is fetched
   useEffect(() => {
     if (pendingTestimonials) {
       setLocalPendingTestimonials(pendingTestimonials);
@@ -62,9 +62,9 @@ const AdminTestimonials = () => {
   const handleApprove = async (testimonial: any) => {
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
-      // Forzamos la actualización de ambas queries
+      // Force immediate refresh of all related queries
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        refetch(),
         queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
@@ -74,9 +74,9 @@ const AdminTestimonials = () => {
   const handleReject = async (id: string) => {
     const success = await rejectTestimonial(id, setLocalPendingTestimonials);
     if (success) {
-      // Forzamos la actualización de ambas queries
+      // Force immediate refresh of all related queries
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
+        refetch(),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
     }
