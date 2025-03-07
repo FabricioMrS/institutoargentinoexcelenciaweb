@@ -66,10 +66,10 @@ export const CourseFinancing = ({
       setSelectedInstallments(sortedOptions[0].installments);
       calculateInstallment(sortedOptions[0].installments);
     } else {
-      console.log("No custom financing options found, using defaults");
+      // Make sure we always have at least the 1 payment option
+      console.log("No custom financing options found, using default single payment option");
       setFinancingOptions([
         { installments: 1, interest_rate: 0 },
-        { installments: 2, interest_rate: 0 },
       ]);
       setSelectedInstallments(1);
       calculateInstallment(1);
