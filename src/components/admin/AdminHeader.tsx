@@ -22,10 +22,10 @@ export const AdminHeader = ({ onTestimonialsClick }: AdminHeaderProps) => {
       if (error) throw error;
       return count || 0;
     },
-    // Deshabilitamos el caché para siempre obtener datos frescos
+    // Disable cache to always get fresh data
     staleTime: 0,
     gcTime: 0,
-    refetchInterval: 5000, // Refrescar cada 5 segundos
+    refetchInterval: 5000, // Refresh every 5 seconds
   });
 
   const handleTestimonialsClick = (e: React.MouseEvent) => {

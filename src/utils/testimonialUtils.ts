@@ -3,9 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const useApproveTestimonial = () => {
-  return async (testimonial: any, setLocalPendingTestimonials: (testimonials: any[]) => void) => {
+  return async (testimonial: any, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
-      // Primero insertamos en la tabla de testimonios aprobados
+      // First insert into approved testimonials table
       const { error: insertError } = await supabase
         .from('testimonials')
         .insert({
@@ -17,7 +17,7 @@ export const useApproveTestimonial = () => {
 
       if (insertError) throw insertError;
 
-      // Luego eliminamos de pending_testimonials
+      // Then delete from pending_testimonials
       const { error: deleteError } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -25,8 +25,8 @@ export const useApproveTestimonial = () => {
 
       if (deleteError) throw deleteError;
 
-      // Actualizamos el estado local
-      setLocalPendingTestimonials(prev => 
+      // Update local state
+      setLocalPendingTestimonials((prev: any[]) => 
         prev.filter(t => t.id !== testimonial.id)
       );
 
@@ -41,9 +41,9 @@ export const useApproveTestimonial = () => {
 };
 
 export const useRejectTestimonial = () => {
-  return async (id: string, setLocalPendingTestimonials: (testimonials: any[]) => void) => {
+  return async (id: string, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
-      // Eliminamos directamente de pending_testimonials
+      // Delete directly from pending_testimonials
       const { error } = await supabase
         .from('pending_testimonials')
         .delete()
@@ -51,8 +51,8 @@ export const useRejectTestimonial = () => {
 
       if (error) throw error;
 
-      // Actualizamos el estado local
-      setLocalPendingTestimonials(prev => 
+      // Update local state
+      setLocalPendingTestimonials((prev: any[]) => 
         prev.filter(t => t.id !== id)
       );
 

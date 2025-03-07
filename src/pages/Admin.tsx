@@ -97,7 +97,6 @@ const Admin = () => {
   return (
     <div className="container py-8">
       <AdminHeader 
-        pendingTestimonialsCount={pendingTestimonialsCount} 
         onTestimonialsClick={handleTogglePendingTestimonials}
       />
 
