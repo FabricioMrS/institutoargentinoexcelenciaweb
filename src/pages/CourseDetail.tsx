@@ -14,6 +14,7 @@ const CourseDetail = () => {
   
   const cleanCourseId = courseId?.replace(/^\/curso\//, '');
 
+  // Query to fetch the course details
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', cleanCourseId],
     queryFn: async () => {
@@ -78,7 +79,6 @@ const CourseDetail = () => {
             <CardContent className="pt-4 sm:pt-6">
               <div className="grid gap-3 sm:gap-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <CourseInfo label="Precio" value={`$${Number(course.price).toLocaleString()}`} />
                   <CourseInfo label="Inicio" value={course.start_date} />
                   <CourseInfo label="Horario" value={course.schedule} />
                   <CourseInfo label="Modalidad" value={course.modality} />

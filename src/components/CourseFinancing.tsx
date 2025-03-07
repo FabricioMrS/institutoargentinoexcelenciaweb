@@ -52,13 +52,19 @@ export const CourseFinancing = ({
   useEffect(() => {
     if (courseFinancingOptions && courseFinancingOptions.length > 0) {
       console.log("Setting financing options:", courseFinancingOptions);
-      setFinancingOptions(courseFinancingOptions.map(option => ({
+      // Sort financing options by installments to ensure consistent display order
+      const sortedOptions = [...courseFinancingOptions].sort((a, b) => 
+        a.installments - b.installments
+      );
+      
+      setFinancingOptions(sortedOptions.map(option => ({
         installments: option.installments,
         interest_rate: option.interest_rate
       })));
+      
       // Set default option
-      setSelectedInstallments(courseFinancingOptions[0].installments);
-      calculateInstallment(courseFinancingOptions[0].installments);
+      setSelectedInstallments(sortedOptions[0].installments);
+      calculateInstallment(sortedOptions[0].installments);
     } else {
       console.log("No custom financing options found, using defaults");
       setFinancingOptions([
