@@ -5,6 +5,8 @@ import { toast } from "sonner";
 export const useApproveTestimonial = () => {
   return async (testimonial: any, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
+      console.log("Approving testimonial with ID:", testimonial.id);
+      
       // First insert into approved testimonials table
       const { error: insertError } = await supabase
         .from('testimonials')
@@ -15,15 +17,24 @@ export const useApproveTestimonial = () => {
           photo_url: testimonial.photo_url
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Error inserting testimonial:', insertError);
+        throw insertError;
+      }
 
       // Then delete from pending_testimonials
-      const { error: deleteError } = await supabase
+      const { error: deleteError, data: deleteData } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonial.id);
+        .eq('id', testimonial.id)
+        .select();
 
-      if (deleteError) throw deleteError;
+      console.log("Delete response after approval:", { deleteError, deleteData });
+      
+      if (deleteError) {
+        console.error('Error deleting pending testimonial:', deleteError);
+        throw deleteError;
+      }
 
       // Update local state
       setLocalPendingTestimonials((prev: any[]) => 
@@ -52,9 +63,12 @@ export const useRejectTestimonial = () => {
         .eq('id', id)
         .select();
 
-      console.log("Delete response:", { error, data });
+      console.log("Delete response after rejection:", { error, data });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting rejected testimonial:', error);
+        throw error;
+      }
 
       // Update local state
       setLocalPendingTestimonials((prev: any[]) => 

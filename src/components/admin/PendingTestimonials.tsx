@@ -23,7 +23,7 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
   const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPendingTestimonials } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
-      console.log("Fetching pending testimonials");
+      console.log("Fetching pending testimonials from PendingTestimonials component");
       const { data, error } = await supabase
         .from('pending_testimonials')
         .select('*')
@@ -39,12 +39,13 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     // Disable cache to always fetch fresh data
     staleTime: 0,
     gcTime: 0,
-    refetchInterval: 5000, // Refetch every 5 seconds
+    enabled: visible, // Only run this query when component is visible
   });
 
   // Initialize local state when data is fetched
   useEffect(() => {
     if (pendingTestimonials) {
+      console.log("Updating local state with pending testimonials in PendingTestimonials:", pendingTestimonials);
       setLocalPendingTestimonials(pendingTestimonials);
     }
   }, [pendingTestimonials]);
@@ -52,40 +53,58 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
   // Force refresh data when component becomes visible or mounts
   useEffect(() => {
     const refreshData = async () => {
-      await refetchPendingTestimonials();
-      if (onRefetch) onRefetch();
+      if (visible) {
+        console.log("PendingTestimonials component is visible, refreshing data");
+        await refetchPendingTestimonials();
+        if (onRefetch) onRefetch();
+      }
     };
     
     refreshData();
     
-    // Set up a refresh interval
-    const interval = setInterval(refreshData, 5000); // Refresh every 5 seconds
+    // Set up a refresh interval only when visible
+    let interval: number | undefined;
+    if (visible) {
+      interval = window.setInterval(refreshData, 5000); // Refresh every 5 seconds
+    }
     
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) window.clearInterval(interval);
+    };
   }, [visible, refetchPendingTestimonials, onRefetch]);
 
   const handleApprove = async (testimonial: any) => {
+    console.log("Starting approval process from PendingTestimonials component");
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
-      // Force immediate refresh of both queries
+      console.log("Testimonial approved successfully from PendingTestimonials, refreshing data");
+      // Force immediate refresh of all related queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
       
+      // Explicitly refetch pending testimonials
+      await refetchPendingTestimonials();
+      
       if (onRefetch) await onRefetch();
     }
   };
 
   const handleReject = async (id: string) => {
+    console.log("Starting rejection process from PendingTestimonials component");
     const success = await rejectTestimonial(id, setLocalPendingTestimonials);
     if (success) {
-      // Force immediate refresh of both queries
+      console.log("Testimonial rejected successfully from PendingTestimonials, refreshing data");
+      // Force immediate refresh of all related queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
+      
+      // Explicitly refetch pending testimonials
+      await refetchPendingTestimonials();
       
       if (onRefetch) await onRefetch();
     }

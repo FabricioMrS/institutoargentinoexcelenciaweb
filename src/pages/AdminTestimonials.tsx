@@ -26,22 +26,27 @@ const AdminTestimonials = () => {
   const { data: pendingTestimonials, isLoading: isLoadingPending, refetch } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
+      console.log("Fetching pending testimonials from AdminTestimonials");
       const { data, error } = await supabase
         .from('pending_testimonials')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching pending testimonials:", error);
+        throw error;
+      }
+      console.log("Fetched pending testimonials:", data);
       return data || [];
     },
-    staleTime: 0,
-    gcTime: 0,
-    refetchInterval: 5000,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0,    // Don't cache
   });
 
   // Initialize local state when data is fetched
   useEffect(() => {
     if (pendingTestimonials) {
+      console.log("Updating local state with pending testimonials:", pendingTestimonials);
       setLocalPendingTestimonials(pendingTestimonials);
     }
   }, [pendingTestimonials]);
@@ -60,25 +65,35 @@ const AdminTestimonials = () => {
   });
 
   const handleApprove = async (testimonial: any) => {
+    console.log("Starting approval process for testimonial:", testimonial.id);
     const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
     if (success) {
+      console.log("Testimonial approved successfully, refreshing data");
       // Force immediate refresh of all related queries
       await Promise.all([
-        refetch(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
+      
+      // Explicitly refetch to update the UI immediately
+      await refetch();
     }
   };
 
   const handleReject = async (id: string) => {
+    console.log("Starting rejection process for testimonial:", id);
     const success = await rejectTestimonial(id, setLocalPendingTestimonials);
     if (success) {
+      console.log("Testimonial rejected successfully, refreshing data");
       // Force immediate refresh of all related queries
       await Promise.all([
-        refetch(),
+        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
         queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
       ]);
+      
+      // Explicitly refetch to update the UI immediately
+      await refetch();
     }
   };
 
