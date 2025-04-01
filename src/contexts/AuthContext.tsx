@@ -114,15 +114,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (supabaseError) throw supabaseError;
       
-      // Segundo paso: enviar un correo personalizado usando nuestra función edge
-      const { error } = await supabase.functions.invoke('custom-reset-password', {
-        body: {
-          email,
-          resetUrl: `${resetUrl}?type=recovery`,
-        },
-      });
-      
-      if (error) throw error;
+      // Segundo paso: intentar enviar un correo personalizado, pero continuar si falla
+      try {
+        await supabase.functions.invoke('custom-reset-password', {
+          body: {
+            email,
+            resetUrl: `${resetUrl}?type=recovery`,
+          },
+        });
+      } catch (edgeFunctionError) {
+        console.warn("Error al enviar el correo personalizado:", edgeFunctionError);
+        // Continuamos con el flujo ya que el correo de Supabase ya fue enviado
+      }
       
       toast({
         title: "Correo enviado",
