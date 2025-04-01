@@ -21,9 +21,10 @@ const ResetPassword: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
+    console.log("URL parameters:", Object.fromEntries(searchParams.entries()));
     // Checking if we have a hash parameter from the URL
     // This indicates the user came from a password reset email
-    if (searchParams.get("type") === "recovery") {
+    if (searchParams.get("type") === "recovery" || searchParams.has("token")) {
       console.log("Valid recovery flow detected");
       setValidResetFlow(true);
     } else {

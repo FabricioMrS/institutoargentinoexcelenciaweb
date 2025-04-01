@@ -112,6 +112,8 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
+    console.log("Email response:", emailResponse);
+    
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
       headers: {
