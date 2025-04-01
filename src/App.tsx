@@ -15,6 +15,7 @@ import Nosotros from "./pages/Nosotros";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import NewCourse from "./pages/NewCourse";
+import ResetPassword from "./pages/ResetPassword";
 import AdminProfessionals from "./pages/AdminProfessionals";
 import AdminTestimonials from "./pages/AdminTestimonials";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -39,6 +40,7 @@ const App: React.FC = () => {
                   <Route path="/profesionales" element={<Professionals />} />
                   <Route path="/nosotros" element={<Nosotros />} />
                   <Route path="/contacto" element={<Contact />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin/curso/nuevo" element={<NewCourse />} />
                   <Route path="/admin/curso/:courseId" element={<NewCourse />} />

@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const AuthDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +23,7 @@ export const AuthDialog = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const { signIn, signUp, resetPassword } = useAuth();
 
   const handleSubmit = async (action: "login" | "register" | "reset") => {
@@ -28,21 +31,30 @@ export const AuthDialog = () => {
     try {
       if (action === "login") {
         await signIn(email, password);
+        setIsOpen(false);
       } else if (action === "register") {
         if (password !== confirmPassword) {
           throw new Error("Las contraseñas no coinciden");
         }
         await signUp(email, password);
+        setIsOpen(false);
       } else if (action === "reset") {
         await resetPassword(email);
-        setShowResetPassword(false);
+        setResetEmailSent(true);
       }
-      setIsOpen(false);
     } catch (error) {
       console.error("Authentication error:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setShowResetPassword(false);
+    setResetEmailSent(false);
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   if (showResetPassword) {
@@ -55,36 +67,60 @@ export const AuthDialog = () => {
           <DialogHeader>
             <DialogTitle>Recuperar contraseña</DialogTitle>
             <DialogDescription>
-              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+              {resetEmailSent 
+                ? "Te hemos enviado un correo electrónico con un enlace para restablecer tu contraseña."
+                : "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña"}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email-reset">Email</Label>
-              <Input
-                id="email-reset"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+          {resetEmailSent ? (
+            <div className="space-y-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Revisa tu bandeja de entrada y sigue las instrucciones enviadas a {email}
+                </AlertDescription>
+              </Alert>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    resetForm();
+                  }}
+                >
+                  Volver al inicio de sesión
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                className="w-full"
-                onClick={() => handleSubmit("reset")}
-                disabled={loading}
-              >
-                {loading ? "Enviando..." : "Enviar enlace"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowResetPassword(false)}
-                disabled={loading}
-              >
-                Volver
-              </Button>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email-reset">Email</Label>
+                <Input
+                  id="email-reset"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  className="w-full"
+                  onClick={() => handleSubmit("reset")}
+                  disabled={loading}
+                >
+                  {loading ? "Enviando..." : "Enviar enlace"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowResetPassword(false)}
+                  disabled={loading}
+                >
+                  Volver
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     );
