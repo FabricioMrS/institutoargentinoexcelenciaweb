@@ -28,6 +28,7 @@ export const CourseFinancing = ({
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
     { installments: 1, interest_rate: 0 },
   ]);
+  const [selectedInterestRate, setSelectedInterestRate] = useState(0);
 
   const { data: courseFinancingOptions, isLoading } = useQuery({
     queryKey: ['financing-options', courseId],
@@ -64,7 +65,8 @@ export const CourseFinancing = ({
       
       // Set default option
       setSelectedInstallments(sortedOptions[0].installments);
-      calculateInstallment(sortedOptions[0].installments);
+      setSelectedInterestRate(sortedOptions[0].interest_rate);
+      calculateInstallment(sortedOptions[0].installments, sortedOptions[0].interest_rate);
     } else {
       // Make sure we always have at least the 1 payment option
       console.log("No custom financing options found, using default single payment option");
@@ -72,27 +74,28 @@ export const CourseFinancing = ({
         { installments: 1, interest_rate: 0 },
       ]);
       setSelectedInstallments(1);
-      calculateInstallment(1);
+      setSelectedInterestRate(0);
+      calculateInstallment(1, 0);
     }
   }, [courseFinancingOptions]);
 
-  const calculateInstallment = (months: number) => {
+  const calculateInstallment = (months: number, interestRate: number) => {
     const numericPrice = Number(price.replace(/[^0-9]/g, ''));
-    const option = financingOptions.find(o => o.installments === months);
+    const totalAmount = numericPrice * (1 + interestRate / 100);
+    const monthlyAmount = totalAmount / months;
     
-    if (option) {
-      const totalAmount = numericPrice * (1 + option.interest_rate / 100);
-      const monthlyAmount = totalAmount / option.installments;
-      
-      setSelectedFinancing(
-        `${months} cuota${months > 1 ? 's' : ''} de $${monthlyAmount.toFixed(2)}`
-      );
-    }
+    setSelectedFinancing(
+      `${months} cuota${months > 1 ? 's' : ''} de $${monthlyAmount.toFixed(2)}`
+    );
   };
 
   const handleInstallmentChange = (months: number) => {
-    setSelectedInstallments(months);
-    calculateInstallment(months);
+    const option = financingOptions.find(o => o.installments === months);
+    if (option) {
+      setSelectedInstallments(months);
+      setSelectedInterestRate(option.interest_rate);
+      calculateInstallment(months, option.interest_rate);
+    }
   };
 
   if (isLoading) {
@@ -150,6 +153,7 @@ export const CourseFinancing = ({
             courseTitle={courseTitle}
             selectedInstallments={selectedInstallments}
             price={price}
+            interestRate={selectedInterestRate}
           />
         </div>
       )}

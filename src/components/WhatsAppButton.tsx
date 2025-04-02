@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 
@@ -7,6 +8,7 @@ interface WhatsAppButtonProps {
   courseTitle?: string;
   selectedInstallments?: number;
   price?: string;
+  interestRate?: number;
 }
 
 export const WhatsAppButton = ({ 
@@ -14,7 +16,8 @@ export const WhatsAppButton = ({
   floating = false,
   courseTitle,
   selectedInstallments,
-  price
+  price,
+  interestRate = 0
 }: WhatsAppButtonProps) => {
   const whatsappNumber = "543518118268";
   
@@ -27,7 +30,9 @@ export const WhatsAppButton = ({
       defaultMessage += ` el curso "${courseTitle}"`;
       if (selectedInstallments && price) {
         const numericPrice = Number(price.replace(/[^0-9]/g, ''));
-        const monthlyAmount = (numericPrice * (selectedInstallments > 1 ? 1.15 : 1)) / selectedInstallments;
+        const totalAmount = numericPrice * (1 + interestRate / 100);
+        const monthlyAmount = totalAmount / selectedInstallments;
+        
         defaultMessage += ` con la financiación de ${selectedInstallments} ${selectedInstallments === 1 ? 'pago' : 'cuotas'} de $${monthlyAmount.toFixed(2)}`;
       }
     } else {
