@@ -22,6 +22,7 @@ interface Course {
   schedule: string;
   start_date: string;
   updated_at: string;
+  featured: boolean | null;
 }
 
 const Courses = () => {
@@ -64,7 +65,7 @@ const Courses = () => {
             onClick={() => navigate('/cursos/medical')}
           >
             <div className="h-40 sm:h-48 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <BookOpen className="h-16 w-16 text-primary" />
+              <BookOpen className="h-16 w-16 text-secondary" />
             </div>
             <div className="p-6 flex-1 flex flex-col">
               <h3 className="text-xl md:text-2xl font-semibold text-center mb-3">Preparación Universitaria - Medicina</h3>

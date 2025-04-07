@@ -1,3 +1,4 @@
+
 import { Monitor, Users, Clock, Award } from "lucide-react";
 import { HeroSection } from "@/components/HeroSection";
 import { CourseCard } from "@/components/CourseCard";
@@ -68,13 +69,14 @@ const Index = () => {
     },
   });
 
-  const { data: courses = [], isLoading: isLoadingCourses } = useQuery({
-    queryKey: ['enabled-courses'],
+  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery({
+    queryKey: ['featured-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
         .eq('enabled', true)
+        .eq('featured', true)
         .order('created_at', { ascending: true });
       
       if (error) throw error;
@@ -136,16 +138,17 @@ const Index = () => {
       </section>
 
       {/* Cursos Destacados */}
-      {!isLoadingCourses && courses.length > 0 && (
-        <section className="py-20 md:block hidden">
+      {!isLoadingCourses && featuredCourses.length > 0 && (
+        <section className="py-20">
           <div className="container">
             <h2 className="text-4xl font-bold text-center mb-12">Cursos Destacados</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
+              {featuredCourses.map((course) => (
                 <CourseCard 
                   key={course.id}
                   title={course.title}
                   category={course.category}
+                  main_category={course.main_category}
                   image={course.image}
                   price={course.price.toString()}
                   slug={course.slug}

@@ -16,6 +16,7 @@ interface Course {
   image: string;
   price: number;
   slug: string;
+  featured: boolean | null;
 }
 
 const CategoryCourses = () => {

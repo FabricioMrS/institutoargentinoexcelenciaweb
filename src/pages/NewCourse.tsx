@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle, X } from "lucide-react";
 
 interface FinancingOption {
@@ -39,6 +40,7 @@ interface Course {
   updated_at: string;
   enabled: boolean | null;
   default_financing_option: number | null;
+  featured: boolean | null;
 }
 
 const NewCourse = () => {
@@ -59,6 +61,7 @@ const NewCourse = () => {
     modality: "",
     duration: "",
     slug: "",
+    featured: false,
   });
 
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
@@ -120,6 +123,7 @@ const NewCourse = () => {
         modality: course.modality,
         duration: course.duration.toString(),
         slug: course.slug,
+        featured: course.featured || false,
       });
     }
   }, [course]);
@@ -147,6 +151,7 @@ const NewCourse = () => {
       modality: formData.modality,
       duration: parseInt(formData.duration),
       slug: formData.slug,
+      featured: formData.featured,
     };
 
     try {
@@ -219,6 +224,10 @@ const NewCourse = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, featured: checked }));
   };
 
   const handleAddFinancingOption = () => {
@@ -374,6 +383,16 @@ const NewCourse = () => {
                   type="number"
                   min="1"
                 />
+              </div>
+              <div className="flex items-center space-x-2 pt-4">
+                <Checkbox 
+                  id="featured" 
+                  checked={formData.featured} 
+                  onCheckedChange={handleCheckboxChange} 
+                />
+                <Label htmlFor="featured" className="cursor-pointer">
+                  Mostrar como curso destacado en la página principal
+                </Label>
               </div>
             </div>
 
