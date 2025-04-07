@@ -1,6 +1,7 @@
 
 import { Monitor, Users, Clock, Award } from "lucide-react";
 import { FeatureCard } from "@/components/FeatureCard";
+import { useTheme } from "@/hooks/useTheme";
 
 const features = [
   {
@@ -26,10 +27,12 @@ const features = [
 ];
 
 export const FeaturesSection = () => {
+  const { theme } = useTheme();
+  
   return (
-    <section className="py-12 bg-white">
+    <section className={`py-12 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
+        <h2 className={`text-3xl font-semibold text-center ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-8`}>
           ¿Por qué elegirnos?
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

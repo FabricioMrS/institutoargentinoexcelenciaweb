@@ -21,13 +21,13 @@ export const FeaturedCourses = () => {
   });
 
   return (
-    <section className="py-12 bg-gray-100">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900">
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-8">
           Nuestros Cursos Destacados
         </h2>
         {isLoadingCourses ? (
-          <p className="text-center">Cargando cursos...</p>
+          <p className="text-center dark:text-gray-300">Cargando cursos...</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredCourses.map((course) => (
