@@ -1,4 +1,3 @@
-
 import { Monitor, Users, Clock, Award } from "lucide-react";
 import { HeroSection } from "@/components/HeroSection";
 import { CourseCard } from "@/components/CourseCard";
@@ -23,6 +22,27 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+
+// Define interfaces to avoid deeply nested type inference
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  content: string;
+  photo_url?: string;
+  created_at: string;
+}
+
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  main_category: string | null;
+  image: string;
+  price: number;
+  slug: string;
+  featured: boolean | null;
+}
 
 const features = [
   {
@@ -65,7 +85,7 @@ const Index = () => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data as Testimonial[];
     },
   });
 
@@ -80,7 +100,7 @@ const Index = () => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data as Course[];
     },
   });
 
