@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +8,17 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { TestimonialsList } from "@/components/admin/TestimonialsList";
 import { CoursesList } from "@/components/admin/CoursesList";
 import { PendingTestimonials } from "@/components/admin/PendingTestimonials";
+
+// Define interface for Course to match what's expected in CoursesList
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  main_category: string | null;
+  price: number;
+  enabled: boolean;
+  featured: boolean | null;
+}
 
 const Admin = () => {
   const { isAdmin } = useAuth();
@@ -63,7 +73,7 @@ const Admin = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Course[];
     },
   });
 
