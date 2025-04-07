@@ -8,8 +8,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  main_category: string | null;
+  price: number;
+  enabled: boolean;
+  featured: boolean | null;
+}
+
 interface CoursesListProps {
-  courses: any[];
+  courses: Course[];
   isLoading: boolean;
 }
 
