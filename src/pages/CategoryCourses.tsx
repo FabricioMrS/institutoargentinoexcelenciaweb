@@ -6,6 +6,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CourseCard } from "@/components/CourseCard";
+
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  main_category: string | null;
+  image: string;
+  price: number;
+  slug: string;
+}
 
 const CategoryCourses = () => {
   const navigate = useNavigate();
@@ -26,7 +37,7 @@ const CategoryCourses = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Course[];
     },
   });
 
@@ -61,23 +72,15 @@ const CategoryCourses = () => {
             <p className="text-center col-span-1 md:col-span-3">Cargando cursos...</p>
           ) : courses && courses.length > 0 ? (
             courses.map((course) => (
-              <Card 
+              <CourseCard 
                 key={course.id}
-                className="cursor-pointer overflow-hidden transition-transform hover:scale-105"
-                onClick={() => navigate(`/curso/${course.slug}`)}
-              >
-                <div className="h-32 sm:h-40 md:h-48 overflow-hidden">
-                  <img 
-                    src={course.image} 
-                    alt={course.title} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3 sm:p-4">
-                  <h3 className="text-base sm:text-lg font-semibold line-clamp-2">{course.title}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">{course.category}</p>
-                </div>
-              </Card>
+                title={course.title}
+                category={course.category}
+                main_category={course.main_category}
+                image={course.image}
+                price={course.price.toString()}
+                slug={course.slug}
+              />
             ))
           ) : (
             <p className="text-center col-span-1 md:col-span-3">No hay cursos disponibles en esta categoría.</p>

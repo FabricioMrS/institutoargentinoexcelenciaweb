@@ -6,6 +6,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Briefcase } from "lucide-react";
 
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  main_category: string | null;
+  image: string;
+  price: number;
+  slug: string;
+  created_at: string;
+  enabled: boolean;
+  default_financing_option: number | null;
+  duration: number;
+  modality: string;
+  schedule: string;
+  start_date: string;
+  updated_at: string;
+}
+
 const Courses = () => {
   const navigate = useNavigate();
 
@@ -19,7 +37,7 @@ const Courses = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Course[];
     },
   });
 
