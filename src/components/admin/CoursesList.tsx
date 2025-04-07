@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface CoursesListProps {
   courses: any[];
@@ -41,6 +42,15 @@ export const CoursesList = ({ courses, isLoading }: CoursesListProps) => {
     }
   };
 
+  const getCategoryBadge = (main_category: string) => {
+    if (main_category === 'medical') {
+      return <Badge variant="default" className="bg-blue-600">Medicina</Badge>;
+    } else if (main_category === 'professional') {
+      return <Badge variant="default" className="bg-amber-600">Oficio</Badge>;
+    }
+    return null;
+  };
+
   if (isLoading) return <p>Cargando cursos...</p>;
 
   return (
@@ -51,7 +61,10 @@ export const CoursesList = ({ courses, isLoading }: CoursesListProps) => {
           className="flex items-center justify-between p-4 border rounded-lg"
         >
           <div>
-            <h3 className="font-medium">{course.title}</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-medium">{course.title}</h3>
+              {getCategoryBadge(course.main_category)}
+            </div>
             <p className="text-sm text-muted-foreground">
               {course.category} - ${course.price}
             </p>

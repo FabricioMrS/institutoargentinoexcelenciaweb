@@ -7,13 +7,23 @@ import { useNavigate } from "react-router-dom";
 interface CourseCardProps {
   title: string;
   category: string;
+  main_category?: string;
   image: string;
   price: string;
   slug: string;
 }
 
-export const CourseCard = ({ title, category, image, slug }: CourseCardProps) => {
+export const CourseCard = ({ title, category, main_category, image, slug }: CourseCardProps) => {
   const navigate = useNavigate();
+  
+  const getCategoryBadge = () => {
+    if (main_category === 'medical') {
+      return <Badge variant="default" className="bg-blue-600">Medicina</Badge>;
+    } else if (main_category === 'professional') {
+      return <Badge variant="default" className="bg-amber-600">Oficio</Badge>;
+    }
+    return <Badge variant="secondary">{category}</Badge>;
+  };
 
   return (
     <Card className="overflow-hidden transition-transform hover:scale-105">
@@ -22,7 +32,7 @@ export const CourseCard = ({ title, category, image, slug }: CourseCardProps) =>
       </div>
       <CardHeader>
         <div className="flex justify-between items-start">
-          <Badge variant="secondary">{category}</Badge>
+          {getCategoryBadge()}
         </div>
         <CardTitle className="text-lg mt-2">{title}</CardTitle>
       </CardHeader>

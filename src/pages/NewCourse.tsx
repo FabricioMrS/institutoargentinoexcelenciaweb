@@ -33,6 +33,7 @@ const NewCourse = () => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
+    main_category: "",
     image: "",
     price: "",
     startDate: "",
@@ -93,6 +94,7 @@ const NewCourse = () => {
       setFormData({
         title: course.title,
         category: course.category,
+        main_category: course.main_category || "",
         image: course.image,
         price: course.price.toString(),
         startDate: course.start_date,
@@ -119,6 +121,7 @@ const NewCourse = () => {
     const courseData = {
       title: formData.title,
       category: formData.category,
+      main_category: formData.main_category,
       image: formData.image,
       price: parseFloat(formData.price),
       start_date: formData.startDate,
@@ -196,6 +199,10 @@ const NewCourse = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleAddFinancingOption = () => {
     const installments = parseInt(newOption.installments);
     const interest_rate = parseFloat(newOption.interest_rate);
@@ -256,6 +263,22 @@ const NewCourse = () => {
                   onChange={handleInputChange}
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="main_category">Categoría Principal</Label>
+                <Select
+                  value={formData.main_category}
+                  onValueChange={(value) => handleSelectChange("main_category", value)}
+                  required
+                >
+                  <SelectTrigger id="main_category">
+                    <SelectValue placeholder="Seleccione una categoría principal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="medical">Preparación Universitaria - Medicina</SelectItem>
+                    <SelectItem value="professional">Formación Profesional - Oficio</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="slug">URL amigable</Label>

@@ -10,6 +10,7 @@ import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
 import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
+import CategoryCourses from "./pages/CategoryCourses";
 import Professionals from "./pages/Professionals";
 import Nosotros from "./pages/Nosotros";
 import Contact from "./pages/Contact";
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/cursos" element={<Courses />} />
+                  <Route path="/cursos/:category" element={<CategoryCourses />} />
                   <Route path="/curso/:courseId" element={<CourseDetail />} />
                   <Route path="/profesionales" element={<Professionals />} />
                   <Route path="/nosotros" element={<Nosotros />} />

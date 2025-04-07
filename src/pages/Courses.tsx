@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { BookOpen, Briefcase } from "lucide-react";
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -22,6 +23,10 @@ const Courses = () => {
     },
   });
 
+  // Group courses by main category
+  const medicalCourses = courses?.filter(course => course.main_category === 'medical') || [];
+  const professionalCourses = courses?.filter(course => course.main_category === 'professional') || [];
+
   return (
     <div className="w-full max-w-full overflow-x-hidden">
       <div className="px-2 sm:px-4 md:px-6 py-6 md:py-12">
@@ -33,33 +38,45 @@ const Courses = () => {
           />
         </div>
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12">Nuestros Cursos</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-8">
-          {isLoading ? (
-            <p className="text-center col-span-1 md:col-span-3">Cargando cursos...</p>
-          ) : courses && courses.length > 0 ? (
-            courses.map((course) => (
-              <Card 
-                key={course.id}
-                className="cursor-pointer overflow-hidden transition-transform hover:scale-105"
-                onClick={() => navigate(`/curso/${course.slug}`)}
-              >
-                <div className="h-32 sm:h-40 md:h-48 overflow-hidden">
-                  <img 
-                    src={course.image} 
-                    alt={course.title} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3 sm:p-4">
-                  <h3 className="text-base sm:text-lg font-semibold line-clamp-2">{course.title}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">{course.category}</p>
-                  {/* Price display was removed from here */}
-                </div>
-              </Card>
-            ))
-          ) : (
-            <p className="text-center col-span-1 md:col-span-3">No hay cursos disponibles en este momento.</p>
-          )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-12">
+          {/* Medical courses category */}
+          <Card 
+            className="cursor-pointer overflow-hidden transition-transform hover:scale-105 flex flex-col"
+            onClick={() => navigate('/cursos/medical')}
+          >
+            <div className="h-40 sm:h-48 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <BookOpen className="h-16 w-16 text-primary" />
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="text-xl md:text-2xl font-semibold text-center mb-3">Preparación Universitaria - Medicina</h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Cursos especializados para estudiantes de medicina y profesionales del área de salud.
+              </p>
+              <div className="mt-auto text-center text-sm text-muted-foreground">
+                {medicalCourses.length} curso{medicalCourses.length !== 1 ? 's' : ''} disponible{medicalCourses.length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </Card>
+          
+          {/* Professional courses category */}
+          <Card 
+            className="cursor-pointer overflow-hidden transition-transform hover:scale-105 flex flex-col"
+            onClick={() => navigate('/cursos/professional')}
+          >
+            <div className="h-40 sm:h-48 bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <Briefcase className="h-16 w-16 text-secondary" />
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="text-xl md:text-2xl font-semibold text-center mb-3">Formación Profesional - Oficio</h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Cursos técnicos y de oficios para el desarrollo de habilidades profesionales.
+              </p>
+              <div className="mt-auto text-center text-sm text-muted-foreground">
+                {professionalCourses.length} curso{professionalCourses.length !== 1 ? 's' : ''} disponible{professionalCourses.length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
       <WhatsAppButton floating={true} />
