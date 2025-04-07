@@ -8,17 +8,7 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { TestimonialsList } from "@/components/admin/TestimonialsList";
 import { CoursesList } from "@/components/admin/CoursesList";
 import { PendingTestimonials } from "@/components/admin/PendingTestimonials";
-
-// Define interface for Course to match what's expected in CoursesList
-interface Course {
-  id: string;
-  title: string;
-  category: string;
-  main_category: string | null;
-  price: number;
-  enabled: boolean;
-  featured: boolean | null;
-}
+import { Course } from "@/types/course";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
@@ -48,7 +38,7 @@ const Admin = () => {
     refetchInterval: 5000, // Refresh every 5 seconds
   });
 
-  // Force a refresh when the component mounts or becomes visible again
+  // useEffect for refreshing data
   useEffect(() => {
     const refreshData = async () => {
       await queryClient.resetQueries({ queryKey: ['pending-testimonials-count'] });

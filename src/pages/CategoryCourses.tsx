@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useNavigate, useParams } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -7,25 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseCard } from "@/components/CourseCard";
-
-interface Course {
-  id: string;
-  title: string;
-  category: string;
-  main_category: string | null;
-  image: string;
-  price: number;
-  slug: string;
-  featured: boolean | null;
-  enabled: boolean;
-  duration: number;
-  modality: string;
-  schedule: string;
-  start_date: string;
-  created_at: string;
-  updated_at: string;
-  default_financing_option: number | null;
-}
+import { Course } from "@/types/course";
 
 const CategoryCourses = () => {
   const navigate = useNavigate();
