@@ -46,22 +46,22 @@ interface Course {
 
 const features = [
   {
-    icon: Monitor,
+    Icon: Monitor,
     title: "Clases Online en Vivo",
     description: "Participa en clases interactivas desde cualquier lugar.",
   },
   {
-    icon: Users,
+    Icon: Users,
     title: "Comunidad de Aprendizaje",
     description: "Conecta con estudiantes y profesionales del sector.",
   },
   {
-    icon: Clock,
+    Icon: Clock,
     title: "Flexibilidad Horaria",
     description: "Adapta tu aprendizaje a tu ritmo de vida.",
   },
   {
-    icon: Award,
+    Icon: Award,
     title: "Certificación Oficial",
     description: "Obtén un certificado reconocido al finalizar el curso.",
   },
@@ -187,7 +187,7 @@ const Index = () => {
             {features.map((feature, index) => (
               <FeatureCard
                 key={index}
-                icon={feature.icon}
+                Icon={feature.Icon}
                 title={feature.title}
                 description={feature.description}
               />
