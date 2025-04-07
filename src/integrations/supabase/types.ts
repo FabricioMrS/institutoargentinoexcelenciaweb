@@ -53,6 +53,7 @@ export type Database = {
           enabled: boolean | null
           id: string
           image: string
+          main_category: string | null
           modality: string
           price: number
           schedule: string
@@ -69,6 +70,7 @@ export type Database = {
           enabled?: boolean | null
           id?: string
           image: string
+          main_category?: string | null
           modality: string
           price: number
           schedule: string
@@ -85,6 +87,7 @@ export type Database = {
           enabled?: boolean | null
           id?: string
           image?: string
+          main_category?: string | null
           modality?: string
           price?: number
           schedule?: string

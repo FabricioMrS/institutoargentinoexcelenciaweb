@@ -13,7 +13,7 @@ interface CourseCardProps {
   slug: string;
 }
 
-export const CourseCard = ({ title, category, main_category, image, slug }: CourseCardProps) => {
+export const CourseCard = ({ title, category, main_category, image, price, slug }: CourseCardProps) => {
   const navigate = useNavigate();
   
   const getCategoryBadge = () => {
