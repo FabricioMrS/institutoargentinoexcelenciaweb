@@ -3,8 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CourseCard } from "@/components/CourseCard";
 import { Course } from "@/types/course";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const FeaturedCourses = () => {
+  const navigate = useNavigate();
+  
   const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery({
     queryKey: ['featured-courses'],
     queryFn: async () => {
@@ -16,7 +20,7 @@ export const FeaturedCourses = () => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      return data as Course[];
+      return (data || []) as Course[];
     },
   });
 
@@ -43,6 +47,16 @@ export const FeaturedCourses = () => {
             ))}
           </div>
         )}
+        
+        <div className="flex justify-center mt-8">
+          <Button 
+            onClick={() => navigate("/cursos")} 
+            className="px-6"
+            variant="secondary"
+          >
+            Ver más cursos
+          </Button>
+        </div>
       </div>
     </section>
   );

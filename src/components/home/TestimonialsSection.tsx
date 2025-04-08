@@ -96,9 +96,9 @@ export const TestimonialsSection = () => {
 
   return (
     <>
-      <section className="py-12 bg-gray-100">
+      <section className="py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
+          <h2 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-8">
             Testimonios
           </h2>
           {isLoadingTestimonials ? (
@@ -130,7 +130,7 @@ export const TestimonialsSection = () => {
                 Dejar un Testimonio
               </Button>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Inicia sesión para dejar tu testimonio.
               </p>
             )}
