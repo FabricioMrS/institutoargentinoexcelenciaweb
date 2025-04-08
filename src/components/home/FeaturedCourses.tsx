@@ -35,7 +35,7 @@ export const FeaturedCourses = () => {
                 key={course.id}
                 title={course.title}
                 category={course.category}
-                main_category={course.main_category}
+                main_category={course.main_category || undefined}
                 image={course.image}
                 price={course.price.toString()}
                 slug={course.slug}
