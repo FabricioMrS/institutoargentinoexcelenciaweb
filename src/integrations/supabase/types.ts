@@ -51,6 +51,7 @@ export type Database = {
           default_financing_option: number | null
           duration: number
           enabled: boolean | null
+          featured: boolean | null
           id: string
           image: string
           main_category: string | null
@@ -68,6 +69,7 @@ export type Database = {
           default_financing_option?: number | null
           duration: number
           enabled?: boolean | null
+          featured?: boolean | null
           id?: string
           image: string
           main_category?: string | null
@@ -85,6 +87,7 @@ export type Database = {
           default_financing_option?: number | null
           duration?: number
           enabled?: boolean | null
+          featured?: boolean | null
           id?: string
           image?: string
           main_category?: string | null

@@ -16,7 +16,7 @@ export const FeaturedCourses = () => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      return data ?? [];
+      return data as Course[];
     },
   });
 
