@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 export const FeaturedCourses = () => {
   const navigate = useNavigate();
   
-  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery({
+  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
     queryKey: ['featured-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
