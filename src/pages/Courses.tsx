@@ -43,9 +43,7 @@ const Courses = () => {
       <div className="px-4 sm:px-6 md:px-8 py-10 md:py-16">
         <div className="flex items-center justify-center mb-6 md:mb-8">
           <img 
-            src={theme === 'light' 
-              ? "/lovable-uploads/a56f0a36-7efa-4917-b6e5-a1064f93db33.png" 
-              : "/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png"} 
+            src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
             alt="Instituto Argentino Excelencia" 
             className="h-24 sm:h-32 md:h-48 object-contain"
           />
