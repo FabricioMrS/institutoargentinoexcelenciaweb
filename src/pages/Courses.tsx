@@ -40,10 +40,12 @@ const Courses = () => {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="px-4 sm:px-6 md:px-8 py-10 md:py-16">
+      <div className="px-6 sm:px-10 md:px-16 py-10 md:py-16 max-w-7xl mx-auto">
         <div className="flex items-center justify-center mb-6 md:mb-8">
           <img 
-            src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
+            src={theme === 'dark' 
+              ? "/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png"
+              : "/lovable-uploads/332a7955-3409-4607-9f07-dc6d9556d6dc.png"} 
             alt="Instituto Argentino Excelencia" 
             className="h-24 sm:h-32 md:h-48 object-contain"
           />
@@ -58,7 +60,7 @@ const Courses = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 mb-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 mb-12 max-w-5xl mx-auto">
           {/* Medical courses category */}
           <Card 
             className={`cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}

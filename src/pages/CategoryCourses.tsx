@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useNavigate, useParams } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -33,7 +34,7 @@ const CategoryCourses = () => {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="px-2 sm:px-4 md:px-6 py-6 md:py-12">
+      <div className="px-6 sm:px-10 md:px-16 py-6 md:py-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-center mb-6 md:mb-8">
           <img 
             src="/lovable-uploads/83991cd8-6df5-460f-94c7-18ceefafd352.png" 
@@ -57,7 +58,7 @@ const CategoryCourses = () => {
           {categoryTitle}
         </h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {isLoading ? (
             <p className="text-center col-span-1 md:col-span-3">Cargando cursos...</p>
           ) : courses && courses.length > 0 ? (
