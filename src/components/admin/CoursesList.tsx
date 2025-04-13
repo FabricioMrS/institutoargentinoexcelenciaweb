@@ -31,8 +31,8 @@ export const CoursesList = ({ courses, isLoading }: CoursesListProps) => {
   const toggleCourseStatus = async (courseId: string, currentStatus: boolean) => {
     const { error } = await supabase
       .from('courses')
-      .update({ enabled: !currentStatus } as any)
-      .eq('id', courseId as any);
+      .update({ enabled: !currentStatus })
+      .eq('id', courseId);
 
     if (error) {
       console.error('Error toggling course status:', error);
@@ -73,7 +73,7 @@ export const CoursesList = ({ courses, isLoading }: CoursesListProps) => {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-medium">{course.title}</h3>
-              {course.main_category && getCategoryBadge(course.main_category)}
+              {getCategoryBadge(course.main_category)}
             </div>
             <p className="text-sm text-muted-foreground">
               {course.category} - ${course.price}

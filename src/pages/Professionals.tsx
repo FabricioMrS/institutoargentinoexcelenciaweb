@@ -13,7 +13,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Professional } from "@/types/professional";
+
+interface Professional {
+  id: string;
+  name: string;
+  role: string;
+  specialties: string[];
+  image_url?: string;
+  description: string;
+}
 
 const Professionals = () => {
   const [expandedProfessionals, setExpandedProfessionals] = useState<Record<string, boolean>>({});
@@ -25,7 +33,7 @@ const Professionals = () => {
     }));
   };
 
-  const { data: professionals, isLoading } = useQuery<Professional[]>({
+  const { data: professionals, isLoading } = useQuery({
     queryKey: ['professionals'],
     queryFn: async () => {
       const { data, error } = await supabase

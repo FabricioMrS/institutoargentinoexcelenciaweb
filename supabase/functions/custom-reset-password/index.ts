@@ -27,13 +27,6 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Enviando correo de recuperación a:", email);
     console.log("URL de recuperación:", resetUrl);
 
-    // Ensure resetUrl is using the production domain
-    let finalResetUrl = resetUrl;
-    if (resetUrl.includes("localhost")) {
-      finalResetUrl = resetUrl.replace("http://localhost:3000", "https://institutoargentinoexcelencia.com");
-      console.log("URL corregida:", finalResetUrl);
-    }
-
     const emailResponse = await resend.emails.send({
       from: "Instituto Neurociencias <onboarding@resend.dev>",
       to: [email],
@@ -102,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el botón a continuación para crear una nueva contraseña:</p>
             
             <div style="text-align: center;">
-              <a href="${finalResetUrl}" class="button">Recuperar contraseña</a>
+              <a href="${resetUrl}" class="button">Recuperar contraseña</a>
             </div>
             
             <p>Si no solicitaste cambiar tu contraseña, puedes ignorar este correo electrónico.</p>

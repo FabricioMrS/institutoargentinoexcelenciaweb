@@ -9,18 +9,17 @@ import { useNavigate } from "react-router-dom";
 export const FeaturedCourses = () => {
   const navigate = useNavigate();
   
-  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
+  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery<any>({
     queryKey: ['featured-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .eq('enabled', true as any)
-        .eq('featured', true as any)
+        .eq('enabled', true)
+        .eq('featured', true)
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      // Cast the data to Course[] to fix type errors
       return (data || []) as Course[];
     },
   });

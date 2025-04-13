@@ -16,9 +16,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define base URL for the application, prioritizing production URL
-const BASE_URL = "https://institutoargentinoexcelencia.com";
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -103,8 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      // Use the production domain for reset URLs
-      const resetUrl = `${BASE_URL}/reset-password`;
+      // Get the current site URL from the window location
+      const baseUrl = window.location.origin;
+      const resetUrl = `${baseUrl}/reset-password`;
       
       console.log("Enviando email de recuperación a:", email);
       console.log("URL de redirección:", resetUrl);

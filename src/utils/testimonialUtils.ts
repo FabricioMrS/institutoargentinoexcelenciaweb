@@ -1,16 +1,13 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-// Helper functions for working with testimonials
 export const useApproveTestimonial = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  return async (testimonial: any, setLocalTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
+  return async (testimonial: any, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
-      // Insert into testimonials table
+      console.log("Approving testimonial with ID:", testimonial.id);
+      
+      // First insert into approved testimonials table
       const { error: insertError } = await supabase
         .from('testimonials')
         .insert({
@@ -18,80 +15,71 @@ export const useApproveTestimonial = () => {
           role: testimonial.role,
           content: testimonial.content,
           photo_url: testimonial.photo_url
-        } as any);
+        });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Error inserting testimonial:', insertError);
+        throw insertError;
+      }
 
-      // Delete from pending_testimonials table
-      const { error: deleteError } = await supabase
+      // Then delete from pending_testimonials
+      const { error: deleteError, data: deleteData } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonial.id as any);
+        .eq('id', testimonial.id)
+        .select();
 
-      if (deleteError) throw deleteError;
+      console.log("Delete response after approval:", { deleteError, deleteData });
+      
+      if (deleteError) {
+        console.error('Error deleting pending testimonial:', deleteError);
+        throw deleteError;
+      }
 
-      // Update UI state
-      setLocalTestimonials((prev) => prev.filter((t) => t.id !== testimonial.id));
+      // Update local state
+      setLocalPendingTestimonials((prev: any[]) => 
+        prev.filter(t => t.id !== testimonial.id)
+      );
 
-      // Show success message
-      toast({
-        title: "Éxito",
-        description: "Testimonio aprobado correctamente",
-      });
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
-
+      toast.success("Testimonio aprobado exitosamente");
       return true;
     } catch (error) {
-      console.error("Error approving testimonial:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo aprobar el testimonio",
-      });
+      console.error('Error al aprobar testimonio:', error);
+      toast.error("Error al aprobar testimonio");
       return false;
     }
   };
 };
 
 export const useRejectTestimonial = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  return async (testimonialId: string, setLocalTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
+  return async (id: string, setLocalPendingTestimonials: React.Dispatch<React.SetStateAction<any[]>>) => {
     try {
-      // Delete from pending_testimonials table
-      const { error } = await supabase
+      console.log("Rejecting testimonial with ID:", id);
+      
+      // Delete directly from pending_testimonials
+      const { error, data } = await supabase
         .from('pending_testimonials')
         .delete()
-        .eq('id', testimonialId as any);
+        .eq('id', id)
+        .select();
 
-      if (error) throw error;
+      console.log("Delete response after rejection:", { error, data });
+      
+      if (error) {
+        console.error('Error deleting rejected testimonial:', error);
+        throw error;
+      }
 
-      // Update UI state
-      setLocalTestimonials((prev) => prev.filter((t) => t.id !== testimonialId));
+      // Update local state
+      setLocalPendingTestimonials((prev: any[]) => 
+        prev.filter(t => t.id !== id)
+      );
 
-      // Show success message
-      toast({
-        title: "Éxito",
-        description: "Testimonio rechazado correctamente",
-      });
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
-
+      toast.success("Testimonio rechazado exitosamente");
       return true;
     } catch (error) {
-      console.error("Error rejecting testimonial:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo rechazar el testimonio",
-      });
+      console.error('Error al rechazar testimonio:', error);
+      toast.error("Error al rechazar testimonio");
       return false;
     }
   };

@@ -17,7 +17,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Testimonial } from "@/types/testimonial";
+
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  content: string;
+  photo_url?: string;
+  created_at: string;
+}
 
 export const TestimonialsSection = () => {
   const { user } = useAuth();
@@ -67,7 +75,7 @@ export const TestimonialsSection = () => {
         role: testimonialForm.role,
         content: testimonialForm.content,
         photo_url: user.user_metadata.avatar_url,
-      } as any);
+      });
 
     if (error) {
       toast({
