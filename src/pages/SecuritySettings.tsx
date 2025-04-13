@@ -1,207 +1,271 @@
 
 import { useState, useEffect } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Shield, LockKeyhole, History, AlertCircle } from "lucide-react";
+import MFASetup from "@/components/auth/MFASetup";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { MFASetup } from "@/components/auth/MFASetup";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { AlertCircle, Lock, KeyRound } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "@/components/ui/use-toast";
 
 const SecuritySettings = () => {
-  const { user, session, isMFAEnabled } = useAuth();
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { user, isMFAEnabled, checkMFAStatus } = useAuth();
+  const [showMFASetup, setShowMFASetup] = useState(false);
+  const [sessionData, setSessionData] = useState<{
+    currentSession: string | null;
+    otherSessions: any[];
+    loading: boolean;
+  }>({
+    currentSession: null,
+    otherSessions: [],
+    loading: true,
+  });
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+    fetchSessions();
+  }, [user]);
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Las contraseñas no coinciden",
-        variant: "destructive",
-      });
-      return;
-    }
+  const fetchSessions = async () => {
+    if (!user) return;
 
-    if (newPassword.length < 8) {
-      toast({
-        title: "Error",
-        description: "La contraseña debe tener al menos 8 caracteres",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsChangingPassword(true);
     try {
-      // Primero verificamos la contraseña actual
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user?.email || '',
-        password: currentPassword,
+      const { data, error } = await supabase.auth.admin.listUserSessions(user.id);
+      
+      if (error) throw error;
+      
+      // Get current session
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const currentSessionId = currentSession?.id;
+      
+      const otherSessions = data.sessions.filter(
+        (session) => session.id !== currentSessionId
+      );
+      
+      setSessionData({
+        currentSession: currentSessionId,
+        otherSessions,
+        loading: false,
       });
-
-      if (signInError) {
-        toast({
-          title: "Error",
-          description: "La contraseña actual es incorrecta",
-          variant: "destructive",
-        });
-        throw signInError;
-      }
-
-      // Luego actualizamos la contraseña
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Éxito",
-        description: "Tu contraseña ha sido actualizada correctamente",
-      });
-
-      // Limpiar campos
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "No se pudo actualizar la contraseña",
-        variant: "destructive",
-      });
-    } finally {
-      setIsChangingPassword(false);
+      console.error("Error fetching sessions:", error);
+      setSessionData((prev) => ({
+        ...prev,
+        loading: false,
+      }));
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  const handleRevokeSession = async (sessionId: string) => {
+    try {
+      const { error } = await supabase.auth.admin.deleteUserSession(user?.id || '', sessionId);
+      
+      if (error) throw error;
+      
+      // Recargar sesiones
+      fetchSessions();
+      
+      toast({
+        title: "Sesión cerrada",
+        description: "La sesión ha sido cerrada correctamente",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error al cerrar la sesión",
+        description: error.message || "Ha ocurrido un error inesperado",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRevokeAllSessions = async () => {
+    if (!user) return;
+    
+    try {
+      // Mantener la sesión actual
+      const { error } = await supabase.auth.admin.deleteAllUserSessions(user.id, {
+        exceptSessionIds: [sessionData.currentSession || ''],
+      });
+      
+      if (error) throw error;
+      
+      // Recargar sesiones
+      fetchSessions();
+      
+      toast({
+        title: "Sesiones cerradas",
+        description: "Todas las demás sesiones han sido cerradas correctamente",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error al cerrar las sesiones",
+        description: error.message || "Ha ocurrido un error inesperado",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRefreshMFAStatus = async () => {
+    await checkMFAStatus();
+  };
+
+  const formatDateTime = (timestamp: string | null | undefined) => {
+    if (!timestamp) return "Desconocido";
+    
+    try {
+      return format(new Date(timestamp), "dd MMMM yyyy, HH:mm", { locale: es });
+    } catch (e) {
+      return "Formato inválido";
+    }
+  };
 
   return (
-    <div className="container py-8 space-y-8">
-      <h1 className="text-3xl font-bold">Configuración de Seguridad</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-1 container max-w-5xl mx-auto py-8 px-4">
+        <div className="flex flex-col md:flex-row gap-5 justify-between items-start mb-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Configuración de Seguridad</h1>
+            <p className="text-muted-foreground mt-2">
+              Administra la seguridad de tu cuenta y las sesiones activas
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={handleRefreshMFAStatus}
+          >
+            <History size={16} />
+            Refrescar estado
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Configuración MFA */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Cambiar Contraseña
-              </CardTitle>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  Autenticación de dos factores
+                </CardTitle>
+                <Badge variant={isMFAEnabled ? "default" : "outline"}>
+                  {isMFAEnabled ? "Activado" : "Desactivado"}
+                </Badge>
+              </div>
               <CardDescription>
-                Actualiza tu contraseña regularmente para mantener tu cuenta segura
+                Añade una capa extra de seguridad a tu cuenta requiriendo un código de verificación al iniciar sesión.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Contraseña Actual</Label>
-                  <Input
-                    id="current-password"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    required
-                  />
+              {isMFAEnabled ? (
+                <div className="space-y-4">
+                  <div className="rounded-lg border p-3 bg-muted/50">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">
+                          El 2FA está activado para tu cuenta
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Para desactivarlo, deberás contactar con soporte técnico.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">Nueva Contraseña</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirmar Nueva Contraseña</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Recomendaciones</AlertTitle>
-                  <AlertDescription>
-                    Usa una contraseña fuerte con al menos 8 caracteres, incluyendo letras, números y símbolos.
-                  </AlertDescription>
-                </Alert>
-
-                <Button type="submit" className="w-full" disabled={isChangingPassword}>
-                  {isChangingPassword ? "Actualizando..." : "Actualizar Contraseña"}
+              ) : (
+                <Button onClick={() => setShowMFASetup(true)} className="w-full">
+                  Activar 2FA
                 </Button>
-              </form>
+              )}
             </CardContent>
           </Card>
 
+          {/* Gestión de sesiones */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
-                <KeyRound className="h-5 w-5" />
-                Detalles de la Cuenta
+                <LockKeyhole className="h-5 w-5 text-primary" />
+                Sesiones activas
               </CardTitle>
               <CardDescription>
-                Información sobre tu cuenta y sesión actual
+                Gestiona las sesiones activas en todos tus dispositivos.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Email</Label>
-                <p className="text-sm mt-1">{user.email}</p>
-              </div>
-              <div>
-                <Label>Último inicio de sesión</Label>
-                <p className="text-sm mt-1">
-                  {session?.created_at 
-                    ? new Date(session.created_at).toLocaleString() 
-                    : "No disponible"}
-                </p>
-              </div>
-              <div>
-                <Label>Estado de verificación en dos pasos</Label>
-                <p className="text-sm mt-1 font-medium">
-                  {isMFAEnabled ? (
-                    <span className="text-green-600">Activado</span>
-                  ) : (
-                    <span className="text-amber-600">No activado</span>
-                  )}
-                </p>
+            <CardContent>
+              <div className="space-y-4">
+                {sessionData.loading ? (
+                  <p className="text-sm text-muted-foreground">Cargando sesiones...</p>
+                ) : (
+                  <>
+                    <div className="rounded-lg border p-3">
+                      <p className="text-sm font-medium mb-1">Sesión actual</p>
+                      <p className="text-xs text-muted-foreground">
+                        Último acceso: {formatDateTime(new Date().toISOString())}
+                      </p>
+                    </div>
+
+                    {sessionData.otherSessions.length > 0 && (
+                      <>
+                        <Separator />
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <p className="text-sm font-medium">Otras sesiones ({sessionData.otherSessions.length})</p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleRevokeAllSessions}
+                            >
+                              Cerrar todas
+                            </Button>
+                          </div>
+                          {sessionData.otherSessions.map((session) => (
+                            <div
+                              key={session.id}
+                              className="rounded-lg border p-3 flex justify-between items-center"
+                            >
+                              <div>
+                                <p className="text-xs text-muted-foreground">
+                                  Último acceso: {formatDateTime(session.created_at)}
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleRevokeSession(session.id)}
+                              >
+                                Cerrar
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {sessionData.otherSessions.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        No hay otras sesiones activas
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div>
-          <MFASetup />
-        </div>
-      </div>
+        {/* Modal de configuración MFA */}
+        {showMFASetup && (
+          <MFASetup onClose={() => setShowMFASetup(false)} />
+        )}
+      </main>
+      <Footer />
     </div>
   );
 };
