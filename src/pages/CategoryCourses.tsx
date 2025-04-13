@@ -17,14 +17,14 @@ const CategoryCourses = () => {
     ? 'Preparación Universitaria - Medicina' 
     : 'Formación Profesional - Oficio';
   
-  const { data: courses, isLoading } = useQuery({
+  const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ['courses', category],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .eq('enabled', true)
-        .eq('main_category', category)
+        .eq('enabled', true as any)
+        .eq('main_category', category as any)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

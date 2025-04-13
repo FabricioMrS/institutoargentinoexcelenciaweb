@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,7 +55,7 @@ const Admin = () => {
   }, [refetchPendingCount, queryClient]);
 
   // Queries for other data
-  const { data: courses, isLoading: isLoadingCourses } = useQuery({
+  const { data: courses, isLoading: isLoadingCourses } = useQuery<Course[]>({
     queryKey: ['admin-courses'],
     queryFn: async () => {
       const { data, error } = await supabase

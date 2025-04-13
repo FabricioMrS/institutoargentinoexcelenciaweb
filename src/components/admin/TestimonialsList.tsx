@@ -32,8 +32,8 @@ export const TestimonialsList = ({ testimonials, isLoading }: TestimonialsListPr
 
       const { error: updateError } = await supabase
         .from('testimonials')
-        .update({ photo_url: publicUrl })
-        .eq('id', testimonialId);
+        .update({ photo_url: publicUrl } as any)
+        .eq('id', testimonialId as any);
 
       if (updateError) throw updateError;
 

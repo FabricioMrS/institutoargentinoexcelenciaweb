@@ -6,6 +6,7 @@ import { CourseFinancing } from "@/components/CourseFinancing";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { Course } from "@/types/course";
 
 const CourseDetail = () => {
   const { courseId } = useParams();
@@ -15,15 +16,15 @@ const CourseDetail = () => {
   const cleanCourseId = courseId?.replace(/^\/curso\//, '');
 
   // Query to fetch the course details
-  const { data: course, isLoading } = useQuery({
+  const { data: course, isLoading } = useQuery<Course | null>({
     queryKey: ['course', cleanCourseId],
     queryFn: async () => {
       console.log("Fetching course with slug:", cleanCourseId);
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .eq('slug', cleanCourseId)
-        .eq('enabled', true)
+        .eq('slug', cleanCourseId as any)
+        .eq('enabled', true as any)
         .maybeSingle();
 
       if (error) {
@@ -44,7 +45,7 @@ const CourseDetail = () => {
       }
       
       console.log("Course found:", data);
-      return data;
+      return data as Course;
     },
     retry: false,
   });

@@ -35,10 +35,12 @@ export const CourseFinancing = ({
     queryFn: async () => {
       if (!courseId) return null;
       console.log("Fetching financing options for course:", courseId);
+      
+      // Add type assertions to fix the courseId parameter type
       const { data, error } = await supabase
         .from('course_financing_options')
         .select('*')
-        .eq('course_id', courseId);
+        .eq('course_id', courseId as any);
 
       if (error) {
         console.error("Error fetching financing options:", error);
@@ -55,18 +57,18 @@ export const CourseFinancing = ({
       console.log("Setting financing options:", courseFinancingOptions);
       // Sort financing options by installments to ensure consistent display order
       const sortedOptions = [...courseFinancingOptions].sort((a, b) => 
-        a.installments - b.installments
+        (a as any).installments - (b as any).installments
       );
       
       setFinancingOptions(sortedOptions.map(option => ({
-        installments: option.installments,
-        interest_rate: option.interest_rate
+        installments: (option as any).installments,
+        interest_rate: (option as any).interest_rate
       })));
       
       // Set default option
-      setSelectedInstallments(sortedOptions[0].installments);
-      setSelectedInterestRate(sortedOptions[0].interest_rate);
-      calculateInstallment(sortedOptions[0].installments, sortedOptions[0].interest_rate);
+      setSelectedInstallments((sortedOptions[0] as any).installments);
+      setSelectedInterestRate((sortedOptions[0] as any).interest_rate);
+      calculateInstallment((sortedOptions[0] as any).installments, (sortedOptions[0] as any).interest_rate);
     } else {
       // Make sure we always have at least the 1 payment option
       console.log("No custom financing options found, using default single payment option");
