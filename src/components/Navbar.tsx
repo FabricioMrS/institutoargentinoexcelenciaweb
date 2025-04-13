@@ -1,5 +1,5 @@
 
-import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut, Shield } from "lucide-react";
+import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/useTheme";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
@@ -67,11 +66,6 @@ export const Navbar = () => {
                     Admin
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => navigate('/seguridad')}>
-                  <Shield className="mr-2 h-4 w-4" />
-                  Seguridad
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Cerrar sesión

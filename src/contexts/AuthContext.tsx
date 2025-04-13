@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   session: Session | null;
@@ -13,10 +12,6 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
-  setupMFA: () => Promise<{factorId: string, qrCode: string}>;
-  verifyMFA: (factorId: string, code: string) => Promise<boolean>;
-  isMFAEnabled: boolean;
-  checkMFAStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,18 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isMFAEnabled, setIsMFAEnabled] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user?.id) {
-        checkAdminStatus(session.user.id);
-        checkMFAStatus().catch(console.error);
-      }
+      checkAdminStatus(session?.user?.id);
     });
 
     const {
@@ -44,17 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session?.user?.id) {
-        // Use setTimeout to avoid possible deadlocks with Supabase auth state
-        setTimeout(() => {
-          checkAdminStatus(session.user?.id);
-          checkMFAStatus().catch(console.error);
-        }, 0);
-      } else {
-        setIsAdmin(false);
-        setIsMFAEnabled(false);
-      }
+      checkAdminStatus(session?.user?.id);
     });
 
     return () => subscription.unsubscribe();
@@ -66,137 +46,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
 
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
-        return;
-      }
-
-      setIsAdmin(data?.role === 'admin');
-    } catch (error) {
+    if (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
-    }
-  };
-
-  const checkMFAStatus = async (): Promise<boolean> => {
-    if (!user) {
-      setIsMFAEnabled(false);
-      return false;
+      return;
     }
 
-    try {
-      const { data, error } = await supabase.auth.mfa.listFactors();
-      
-      if (error) {
-        console.error('Error checking MFA status:', error);
-        setIsMFAEnabled(false);
-        return false;
-      }
-      
-      const totp = data.totp.find(factor => factor.status === 'verified');
-      setIsMFAEnabled(!!totp);
-      return !!totp;
-    } catch (error) {
-      console.error('Error checking MFA status:', error);
-      setIsMFAEnabled(false);
-      return false;
-    }
-  };
-
-  const setupMFA = async () => {
-    if (!user) {
-      throw new Error('Usuario no autenticado');
-    }
-    
-    try {
-      const { data, error } = await supabase.auth.mfa.enroll({
-        factorType: 'totp',
-      });
-      
-      if (error) {
-        toast({
-          title: "Error al configurar MFA",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      return {
-        factorId: data.id,
-        qrCode: data.totp.qr_code,
-      };
-    } catch (error: any) {
-      toast({
-        title: "Error al configurar MFA",
-        description: error.message || 'Ha ocurrido un error',
-        variant: "destructive",
-      });
-      throw error;
-    }
-  };
-
-  const verifyMFA = async (factorId: string, code: string): Promise<boolean> => {
-    try {
-      const { error } = await supabase.auth.mfa.challengeAndVerify({
-        factorId,
-        code,
-      });
-      
-      if (error) {
-        toast({
-          title: "Error de verificación",
-          description: error.message,
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      await checkMFAStatus();
-      
-      toast({
-        title: "MFA configurado correctamente",
-        description: "La autenticación de dos factores ha sido activada para tu cuenta",
-      });
-      
-      return true;
-    } catch (error: any) {
-      toast({
-        title: "Error de verificación",
-        description: error.message || 'Ha ocurrido un error',
-        variant: "destructive",
-      });
-      return false;
-    }
+    setIsAdmin(data.role === 'admin');
   };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        toast({
-          title: "Error de inicio de sesión",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      }
-      
-      // Después de iniciar sesión correctamente, verificamos el estado MFA
-      await checkMFAStatus();
-    } catch (error: any) {
+    if (error) {
       toast({
         title: "Error de inicio de sesión",
         description: error.message,
@@ -207,40 +78,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-      if (error) {
-        toast({
-          title: "Error de registro",
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
-      } else {
-        toast({
-          title: "Registro exitoso",
-          description: "Se ha enviado un correo de confirmación a tu email.",
-        });
-        navigate('/');
-      }
-    } catch (error: any) {
+    if (error) {
       toast({
         title: "Error de registro",
         description: error.message,
         variant: "destructive",
       });
       throw error;
+    } else {
+      toast({
+        title: "Registro exitoso",
+        description: "Se ha enviado un correo de confirmación a tu email.",
+      });
     }
   };
 
   const resetPassword = async (email: string) => {
     try {
       // Get the current site URL from the window location
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://institutoargentinoexcelencia.com';
+      const baseUrl = window.location.origin;
       const resetUrl = `${baseUrl}/reset-password`;
       
       console.log("Enviando email de recuperación a:", email);
@@ -294,23 +155,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       throw error;
     }
-    navigate('/');
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      session, 
-      user, 
-      signIn, 
-      signUp, 
-      signOut, 
-      resetPassword, 
-      isAdmin,
-      setupMFA,
-      verifyMFA,
-      isMFAEnabled,
-      checkMFAStatus
-    }}>
+    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut, resetPassword, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
