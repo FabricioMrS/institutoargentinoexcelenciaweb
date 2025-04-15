@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export const AuthDialog = () => {
+interface AuthDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,9 +61,13 @@ export const AuthDialog = () => {
     setConfirmPassword("");
   };
 
+  // Use the controlled open prop if provided, otherwise use local state
+  const finalOpen = open ?? isOpen;
+  const finalSetOpen = onOpenChange ?? setIsOpen;
+
   if (showResetPassword) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={finalOpen} onOpenChange={finalSetOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">Iniciar sesión</Button>
         </DialogTrigger>
@@ -127,7 +135,7 @@ export const AuthDialog = () => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={finalOpen} onOpenChange={finalSetOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Iniciar sesión</Button>
       </DialogTrigger>
