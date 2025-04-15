@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      biblioteca_archivos: {
+        Row: {
+          archivo_nombre: string
+          archivo_path: string
+          categoria: string
+          created_at: string | null
+          descripcion: string | null
+          id: string
+          tamano_bytes: number | null
+          tipo_archivo: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          archivo_nombre: string
+          archivo_path: string
+          categoria: string
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          tamano_bytes?: number | null
+          tipo_archivo?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          archivo_nombre?: string
+          archivo_path?: string
+          categoria?: string
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          tamano_bytes?: number | null
+          tipo_archivo?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       course_financing_options: {
         Row: {
           course_id: string | null

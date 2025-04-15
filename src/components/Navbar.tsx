@@ -1,4 +1,3 @@
-
 import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/useTheme";
@@ -40,6 +39,10 @@ export const Navbar = () => {
           <Button variant="ghost" size="sm" onClick={() => navigate('/cursos')} className="gap-1 sm:gap-2 px-2 sm:px-4">
             <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">Cursos</span>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/biblioteca')} className="gap-1 sm:gap-2 px-2 sm:px-4">
+            <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Biblioteca</span>
           </Button>
           <Button variant="ghost" size="sm" onClick={() => navigate('/nosotros')} className="gap-1 sm:gap-2 px-2 sm:px-4">
             <User className="h-4 w-4 sm:h-5 sm:w-5" />

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +19,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminProfessionals from "./pages/AdminProfessionals";
 import AdminTestimonials from "./pages/AdminTestimonials";
 import { AuthProvider } from "./contexts/AuthContext";
+import Biblioteca from "./pages/Biblioteca";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +48,7 @@ const App: React.FC = () => {
                   <Route path="/admin/curso/:courseId" element={<NewCourse />} />
                   <Route path="/admin/profesionales" element={<AdminProfessionals />} />
                   <Route path="/admin/testimoniales" element={<AdminTestimonials />} />
+                  <Route path="/biblioteca" element={<Biblioteca />} />
                 </Routes>
               </div>
             </BrowserRouter>
