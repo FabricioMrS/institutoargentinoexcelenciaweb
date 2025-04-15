@@ -1,11 +1,12 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Upload } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { FileUploader } from "./FileUploader";
+import { useToast } from "@/components/ui/use-toast";
 
 interface BibliotecaArchivo {
   id: string;
@@ -20,6 +21,8 @@ interface BibliotecaArchivo {
 
 export const FileList = () => {
   const { isAdmin } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: archivos, isLoading } = useQuery({
     queryKey: ['biblioteca-archivos'],
@@ -34,6 +37,45 @@ export const FileList = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (archivo: BibliotecaArchivo) => {
+      // Primero eliminamos el archivo del storage
+      const { error: storageError } = await supabase.storage
+        .from('biblioteca')
+        .remove([archivo.archivo_path]);
+
+      if (storageError) throw storageError;
+
+      // Luego eliminamos el registro de la base de datos
+      const { error: dbError } = await supabase
+        .from('biblioteca_archivos')
+        .delete()
+        .eq('id', archivo.id);
+
+      if (dbError) throw dbError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['biblioteca-archivos'] });
+      toast({
+        title: "Archivo eliminado",
+        description: "El archivo ha sido eliminado correctamente",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error al eliminar el archivo",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = async (archivo: BibliotecaArchivo) => {
+    if (confirm(`¿Estás seguro de que deseas eliminar el archivo "${archivo.titulo}"?`)) {
+      deleteMutation.mutate(archivo);
+    }
+  };
+
   const handleDownload = async (archivo: BibliotecaArchivo) => {
     try {
       const { data, error } = await supabase.storage
@@ -42,7 +84,6 @@ export const FileList = () => {
 
       if (error) throw error;
 
-      // Crear un enlace de descarga
       const url = URL.createObjectURL(data);
       const a = document.createElement('a');
       a.href = url;
@@ -53,6 +94,11 @@ export const FileList = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error al descargar:', error);
+      toast({
+        title: "Error al descargar",
+        description: "No se pudo descargar el archivo",
+        variant: "destructive",
+      });
     }
   };
 
@@ -81,10 +127,22 @@ export const FileList = () => {
                     ? `${Math.round(archivo.tamano_bytes / 1024)} KB` 
                     : 'Tamaño desconocido'}
                 </span>
-                <Button onClick={() => handleDownload(archivo)} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Descargar
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={() => handleDownload(archivo)} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Descargar
+                  </Button>
+                  {isAdmin && (
+                    <Button 
+                      onClick={() => handleDelete(archivo)} 
+                      variant="outline" 
+                      size="sm"
+                      className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
