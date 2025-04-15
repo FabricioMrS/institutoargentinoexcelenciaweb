@@ -24,20 +24,13 @@ const Biblioteca = () => {
       ) : (
         <Card className="max-w-2xl mx-auto bg-gradient-to-br from-primary/10 to-secondary/10">
           <CardHeader>
-            <CardTitle className="text-center text-primary">Biblioteca Digital - Acceso Exclusivo</CardTitle>
+            <CardTitle className="text-center text-[#FFD700] font-bold">Biblioteca Digital - Acceso Exclusivo</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-center">
             <p className="text-muted-foreground">
               La biblioteca es un beneficio exclusivo para usuarios registrados.
               Inicia sesión o regístrate gratuitamente para acceder a todo el contenido.
             </p>
-            <Button 
-              onClick={() => setIsAuthDialogOpen(true)} 
-              className="w-full bg-primary hover:bg-primary/90 text-white"
-            >
-              <LogIn className="mr-2 h-4 w-4" />
-              Iniciar Sesión / Registrarse
-            </Button>
             <AuthDialog 
               open={isAuthDialogOpen} 
               onOpenChange={setIsAuthDialogOpen} 
