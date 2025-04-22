@@ -24,7 +24,7 @@ export const Navbar = () => {
           <img
             src="/lovable-uploads/f3cc75a2-3cce-4f6f-8a34-968ce9777ff6.png"
             alt="Logo"
-            className="h-10 w-auto sm:h-12 md:h-14 cursor-pointer transition-all"
+            className="h-10 sm:h-12 md:h-14 w-auto max-w-[140px] sm:max-w-[180px] md:max-w-[220px] object-contain cursor-pointer transition-all"
             style={{ maxHeight: '3rem', objectFit: 'contain' }}
             onClick={() => navigate('/')}
           />

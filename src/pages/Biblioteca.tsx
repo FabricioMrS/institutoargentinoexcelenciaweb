@@ -5,10 +5,11 @@ import { FileList } from "@/components/biblioteca/FileList";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Folder } from "lucide-react";
 
 const CATEGORIAS = [
-  { label: "Orientada a Oficio", value: "Oficio" },
-  { label: "Preparación Universitaria", value: "Preparacion Universitaria" },
+  { label: "Orientada a Oficio", value: "Oficio", gradient: "from-[#9b87f5] to-[#D6BCFA]" },
+  { label: "Preparación Universitaria", value: "Preparacion Universitaria", gradient: "from-[#7E69AB] to-[#1EAEDB]" },
 ];
 
 const Biblioteca = () => {
@@ -22,18 +23,31 @@ const Biblioteca = () => {
         <div className="space-y-6">
           <h1 className="text-3xl font-bold text-primary">Biblioteca Digital</h1>
           {!selectedCategoria ? (
-            <div className="flex flex-col items-center mt-8 space-y-4">
-              <h2 className="text-lg font-semibold">Elige una carpeta:</h2>
-              <div className="flex gap-4">
+            <div className="flex flex-col items-center mt-8 space-y-6 animate-fadeIn">
+              <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Elige una carpeta:</h2>
+              <div className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center">
                 {CATEGORIAS.map((item) => (
-                  <Button
+                  <button
                     key={item.value}
-                    variant="outline"
-                    className="text-base px-6 py-3 font-medium shadow-sm"
+                    className={`
+                      relative transition-all duration-200 group
+                      rounded-2xl px-8 py-8 w-72 sm:w-80 shadow-xl
+                      bg-gradient-to-br ${item.gradient}
+                      ring-1 ring-secondary/30 hover:scale-105 hover:shadow-2xl focus:outline-none
+                      flex flex-col items-center gap-3
+                    `}
                     onClick={() => setSelectedCategoria(item.value)}
                   >
-                    {item.label}
-                  </Button>
+                    <div className="flex flex-col items-center">
+                      <div className="
+                        bg-white bg-opacity-80 rounded-full p-4 mb-2 shadow
+                        group-hover:bg-opacity-100 transition
+                        ">
+                        <Folder className="w-10 h-10 text-[#9b87f5] group-hover:text-[#7E69AB]" />
+                      </div>
+                      <span className="block text-lg font-semibold text-gray-800 group-hover:text-primary">{item.label}</span>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -75,3 +89,4 @@ const Biblioteca = () => {
 };
 
 export default Biblioteca;
+
