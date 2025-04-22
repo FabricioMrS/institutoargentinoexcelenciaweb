@@ -1,20 +1,23 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileList } from "@/components/biblioteca/FileList";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Folder } from "lucide-react";
+import { Briefcase, BookOpen } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 const CATEGORIAS = [
-  { label: "Preparación Universitaria", value: "Preparacion Universitaria", gradient: "from-[#0EA5E9] to-[#38BDF8]" },
-  { label: "Orientado a Oficio", value: "Oficio", gradient: "from-[#F97316] to-[#FB923C]" },
+  { label: "Preparación Universitaria", value: "Preparacion Universitaria", gradient: "from-[#0EA5E9] to-[#38BDF8]", icon: BookOpen },
+  { label: "Orientado a Oficio", value: "Oficio", gradient: "from-[#F97316] to-[#FB923C]", icon: Briefcase },
 ];
 
 const Biblioteca = () => {
   const { user } = useAuth();
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   return (
     <div className="container py-8">
@@ -25,29 +28,39 @@ const Biblioteca = () => {
             <div className="flex flex-col items-center mt-8 space-y-6 animate-fadeIn">
               <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Elige una carpeta:</h2>
               <div className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center">
-                {CATEGORIAS.map((item) => (
-                  <button
-                    key={item.value}
-                    className={`
-                      relative transition-all duration-200 group
-                      rounded-2xl px-8 py-8 w-72 sm:w-80 shadow-xl
-                      bg-gradient-to-br ${item.gradient}
-                      ring-1 ring-secondary/30 hover:scale-105 hover:shadow-2xl focus:outline-none
-                      flex flex-col items-center gap-3
-                    `}
-                    onClick={() => setSelectedCategoria(item.value)}
-                  >
-                    <div className="flex flex-col items-center">
-                      <div className="
-                        bg-white bg-opacity-80 rounded-full p-4 mb-2 shadow
-                        group-hover:bg-opacity-100 transition
-                        ">
-                        <Folder className="w-10 h-10 text-white group-hover:text-opacity-80" />
+                {CATEGORIAS.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <button
+                      key={item.value}
+                      className={`
+                        relative transition-all duration-200 group
+                        rounded-2xl px-8 py-8 w-72 sm:w-80 shadow-xl
+                        bg-gradient-to-br ${item.gradient}
+                        ring-1 ring-secondary/30 hover:scale-105 hover:shadow-2xl focus:outline-none
+                        flex flex-col items-center gap-3
+                      `}
+                      onClick={() => setSelectedCategoria(item.value)}
+                    >
+                      <div className="flex flex-col items-center">
+                        <div className="
+                          bg-white bg-opacity-80 rounded-full p-4 mb-2 shadow
+                          group-hover:bg-opacity-100 transition
+                          ">
+                          <IconComponent 
+                            className={`w-10 h-10 
+                              ${item.value === 'Preparacion Universitaria' 
+                                ? (theme === 'dark' ? 'text-blue-300' : 'text-blue-600') 
+                                : (theme === 'dark' ? 'text-amber-300' : 'text-amber-600')
+                              }
+                            `} 
+                          />
+                        </div>
+                        <span className="block text-lg font-semibold text-white group-hover:text-opacity-80">{item.label}</span>
                       </div>
-                      <span className="block text-lg font-semibold text-white group-hover:text-opacity-80">{item.label}</span>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : (
