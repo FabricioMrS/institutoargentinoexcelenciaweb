@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileList } from "@/components/biblioteca/FileList";
@@ -8,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Folder } from "lucide-react";
 
 const CATEGORIAS = [
-  { label: "Orientada a Oficio", value: "Oficio", gradient: "from-[#9b87f5] to-[#D6BCFA]" },
-  { label: "Preparación Universitaria", value: "Preparacion Universitaria", gradient: "from-[#7E69AB] to-[#1EAEDB]" },
+  { label: "Preparación Universitaria", value: "Preparacion Universitaria", gradient: "from-[#0EA5E9] to-[#38BDF8]" },
+  { label: "Orientado a Oficio", value: "Oficio", gradient: "from-[#F97316] to-[#FB923C]" },
 ];
 
 const Biblioteca = () => {
@@ -43,9 +42,9 @@ const Biblioteca = () => {
                         bg-white bg-opacity-80 rounded-full p-4 mb-2 shadow
                         group-hover:bg-opacity-100 transition
                         ">
-                        <Folder className="w-10 h-10 text-[#9b87f5] group-hover:text-[#7E69AB]" />
+                        <Folder className="w-10 h-10 text-white group-hover:text-opacity-80" />
                       </div>
-                      <span className="block text-lg font-semibold text-gray-800 group-hover:text-primary">{item.label}</span>
+                      <span className="block text-lg font-semibold text-white group-hover:text-opacity-80">{item.label}</span>
                     </div>
                   </button>
                 ))}
@@ -89,4 +88,3 @@ const Biblioteca = () => {
 };
 
 export default Biblioteca;
-
