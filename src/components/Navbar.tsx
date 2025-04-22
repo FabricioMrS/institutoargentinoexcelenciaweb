@@ -1,3 +1,4 @@
+
 import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/useTheme";
@@ -23,7 +24,8 @@ export const Navbar = () => {
           <img
             src="/lovable-uploads/f3cc75a2-3cce-4f6f-8a34-968ce9777ff6.png"
             alt="Logo"
-            className="h-8 sm:h-10 md:h-12 cursor-pointer"
+            className="h-10 w-auto sm:h-12 md:h-14 cursor-pointer transition-all"
+            style={{ maxHeight: '3rem', objectFit: 'contain' }}
             onClick={() => navigate('/')}
           />
         </div>

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,13 +10,23 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-export const FileUploader = () => {
+interface Props {
+  categoriaSeleccionada?: string;
+}
+
+export const FileUploader = ({ categoriaSeleccionada }: Props) => {
   const [file, setFile] = useState<File | null>(null);
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [categoria, setCategoria] = useState("");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (categoriaSeleccionada) {
+      setCategoria(categoriaSeleccionada);
+    }
+  }, [categoriaSeleccionada]);
 
   const uploadMutation = useMutation({
     mutationFn: async () => {
@@ -50,11 +60,11 @@ export const FileUploader = () => {
       if (dbError) throw dbError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biblioteca-archivos'] });
+      queryClient.invalidateQueries();
       setFile(null);
       setTitulo("");
       setDescripcion("");
-      setCategoria("");
+      if (!categoriaSeleccionada) setCategoria("");
       toast({
         title: "Archivo subido exitosamente",
         description: "El archivo ha sido agregado a la biblioteca",
@@ -108,6 +118,7 @@ export const FileUploader = () => {
               id="categoria"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
+              readOnly={!!categoriaSeleccionada}
               required
             />
           </div>

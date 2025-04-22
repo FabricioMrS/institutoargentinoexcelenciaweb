@@ -19,18 +19,24 @@ interface BibliotecaArchivo {
   tipo_archivo: string | null;
 }
 
-export const FileList = () => {
+export const FileList = ({ categoria }: { categoria?: string }) => {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: archivos, isLoading } = useQuery({
-    queryKey: ['biblioteca-archivos'],
+    queryKey: ["biblioteca-archivos", categoria],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('biblioteca_archivos')
         .select('*')
         .order('created_at', { ascending: false });
+
+      if (categoria) {
+        query = query.eq('categoria', categoria);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data as BibliotecaArchivo[];
@@ -55,7 +61,7 @@ export const FileList = () => {
       if (dbError) throw dbError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['biblioteca-archivos'] });
+      queryClient.invalidateQueries({ queryKey: ['biblioteca-archivos', categoria] });
       toast({
         title: "Archivo eliminado",
         description: "El archivo ha sido eliminado correctamente",
@@ -108,7 +114,7 @@ export const FileList = () => {
 
   return (
     <div className="space-y-6">
-      {isAdmin && <FileUploader />}
+      {isAdmin && <FileUploader categoriaSeleccionada={categoria} />}
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {archivos?.map((archivo) => (
@@ -147,6 +153,11 @@ export const FileList = () => {
             </CardContent>
           </Card>
         ))}
+        {(!archivos || archivos.length === 0) && (
+          <div className="col-span-full text-center text-muted-foreground py-8 text-lg">
+            No hay archivos en esta carpeta aún.
+          </div>
+        )}
       </div>
     </div>
   );
