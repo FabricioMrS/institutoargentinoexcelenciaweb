@@ -1,4 +1,3 @@
-
 import { Moon, Sun, Home, Users, BookOpen, MessageSquare, User, LogOut, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/useTheme";
@@ -56,11 +55,7 @@ export const Navbar = () => {
             <span className="hidden sm:inline">Contacto</span>
           </Button>
           
-          <AcademyVirtualButton 
-            variant="ghost" 
-            size="sm" 
-            className="gap-1 sm:gap-2 px-2 sm:px-4"
-          />
+          <AcademyVirtualButton className="px-2 sm:px-4" />
           
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === 'dark' ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}

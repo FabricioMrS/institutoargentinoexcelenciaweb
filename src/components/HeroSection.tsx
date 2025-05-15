@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { GraduationCap, ExternalLink } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AcademyVirtualButton } from "./AcademyVirtualButton";
 
@@ -35,9 +35,7 @@ export const HeroSection = () => {
           </Button>
           
           <AcademyVirtualButton 
-            size="lg" 
-            variant="secondary"
-            className="bg-secondary hover:bg-secondary-hover text-primary w-full sm:w-auto"
+            className="font-medium text-lg mt-2"
           />
         </div>
       </div>
