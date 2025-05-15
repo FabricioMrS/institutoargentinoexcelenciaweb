@@ -24,10 +24,10 @@ export const HeroSection = () => {
         <p className="text-xl md:text-2xl mb-12 animate-fadeIn" style={{ animationDelay: "0.2s" }}>
           Descubre cursos de calidad que transformarán tu futuro profesional
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeIn" style={{ animationDelay: "0.4s" }}>
+        <div className="flex flex-col gap-4 justify-center items-center animate-fadeIn" style={{ animationDelay: "0.4s" }}>
           <Button 
             size="lg" 
-            className="bg-secondary hover:bg-secondary-hover text-primary"
+            className="bg-secondary hover:bg-secondary-hover text-primary w-full sm:w-auto"
             onClick={() => navigate('/cursos')}
           >
             <GraduationCap className="mr-2" />
@@ -36,8 +36,8 @@ export const HeroSection = () => {
           
           <AcademyVirtualButton 
             size="lg" 
-            variant="outline"
-            className="border-white text-white hover:bg-white/20"
+            variant="secondary"
+            className="bg-secondary hover:bg-secondary-hover text-primary w-full sm:w-auto"
           />
         </div>
       </div>
