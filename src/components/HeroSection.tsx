@@ -1,7 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AcademyVirtualButton } from "./AcademyVirtualButton";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -23,15 +24,22 @@ export const HeroSection = () => {
         <p className="text-xl md:text-2xl mb-12 animate-fadeIn" style={{ animationDelay: "0.2s" }}>
           Descubre cursos de calidad que transformarán tu futuro profesional
         </p>
-        <Button 
-          size="lg" 
-          className="bg-secondary hover:bg-secondary-hover text-primary animate-fadeIn"
-          style={{ animationDelay: "0.4s" }}
-          onClick={() => navigate('/cursos')}
-        >
-          <GraduationCap className="mr-2" />
-          Explorar Cursos
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeIn" style={{ animationDelay: "0.4s" }}>
+          <Button 
+            size="lg" 
+            className="bg-secondary hover:bg-secondary-hover text-primary"
+            onClick={() => navigate('/cursos')}
+          >
+            <GraduationCap className="mr-2" />
+            Explorar Cursos
+          </Button>
+          
+          <AcademyVirtualButton 
+            size="lg" 
+            variant="outline"
+            className="border-white text-white hover:bg-white/20"
+          />
+        </div>
       </div>
     </div>
   );
