@@ -17,7 +17,7 @@ const CategoryCourses = () => {
     ? 'Preparación Universitaria - Medicina' 
     : 'Formación Profesional - Oficio';
   
-  const { data: courses, isLoading } = useQuery({
+  const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ['courses', category],
     queryFn: async () => {
       const { data, error } = await supabase

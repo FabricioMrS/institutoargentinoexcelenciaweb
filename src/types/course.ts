@@ -16,5 +16,5 @@ export interface Course {
   created_at: string;
   updated_at: string;
   default_financing_option: number | null;
-  enrollment_password: string | null;
+  enrollment_password?: string | null; // Made optional with ?
 }

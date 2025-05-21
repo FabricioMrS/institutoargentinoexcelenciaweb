@@ -12,7 +12,7 @@ const Courses = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
-  const { data: courses, isLoading } = useQuery({
+  const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ['courses'],
     queryFn: async () => {
       const { data, error } = await supabase
