@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 export const FeaturedCourses = () => {
   const navigate = useNavigate();
   
-  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery<any>({
+  const { data: featuredCourses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
     queryKey: ['featured-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -20,7 +20,7 @@ export const FeaturedCourses = () => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
-      return (data || []) as Course[];
+      return data as Course[];
     },
   });
 

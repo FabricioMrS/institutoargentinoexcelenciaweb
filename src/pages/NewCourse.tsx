@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,30 +20,11 @@ import { PlusCircle, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
+import { Course } from "@/types/course";
 
 interface FinancingOption {
   installments: number;
   interest_rate: number;
-}
-
-interface Course {
-  id: string;
-  title: string;
-  category: string;
-  main_category: string | null;
-  image: string;
-  price: number;
-  start_date: string;
-  schedule: string;
-  modality: string;
-  duration: number;
-  slug: string;
-  created_at: string;
-  updated_at: string;
-  enabled: boolean | null;
-  default_financing_option: number | null;
-  featured: boolean | null;
-  enrollment_password: string | null;
 }
 
 const NewCourse = () => {
