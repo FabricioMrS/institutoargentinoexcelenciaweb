@@ -8,7 +8,7 @@ export interface Course {
   price: number;
   slug: string;
   featured: boolean | null;
-  enabled: boolean;
+  enabled: boolean | null;
   duration: number;
   modality: string;
   schedule: string;
@@ -16,4 +16,5 @@ export interface Course {
   created_at: string;
   updated_at: string;
   default_financing_option: number | null;
+  enrollment_password: string | null;
 }

@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlusCircle, X } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface FinancingOption {
   installments: number;
@@ -41,6 +44,7 @@ interface Course {
   enabled: boolean | null;
   default_financing_option: number | null;
   featured: boolean | null;
+  enrollment_password: string | null;
 }
 
 const NewCourse = () => {
@@ -62,6 +66,7 @@ const NewCourse = () => {
     duration: "",
     slug: "",
     featured: false,
+    enrollment_password: "",
   });
 
   const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([
@@ -124,6 +129,7 @@ const NewCourse = () => {
         duration: course.duration.toString(),
         slug: course.slug,
         featured: course.featured || false,
+        enrollment_password: course.enrollment_password || "",
       });
     }
   }, [course]);
@@ -152,6 +158,7 @@ const NewCourse = () => {
       duration: parseInt(formData.duration),
       slug: formData.slug,
       featured: formData.featured,
+      enrollment_password: formData.enrollment_password || null,
     };
 
     try {
@@ -396,6 +403,54 @@ const NewCourse = () => {
               </div>
             </div>
 
+            <Separator className="my-6" />
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-medium">Configuración de la Academia Virtual</h3>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">
+                      Esta configuración solo afecta a la Academia Virtual, no a la web comercial.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="enrollment_password" className="flex items-center gap-2">
+                  Contraseña de inscripción
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        Los estudiantes necesitarán esta contraseña para inscribirse en el curso en la Academia Virtual.
+                        Dejar en blanco si no se requiere contraseña.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Input
+                  id="enrollment_password"
+                  name="enrollment_password"
+                  value={formData.enrollment_password}
+                  onChange={handleInputChange}
+                  placeholder="Dejar en blanco si no se requiere contraseña"
+                />
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+            
             <div className="mt-6">
               <Label>Opciones de financiación</Label>
               
