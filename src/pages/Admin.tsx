@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,7 +59,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
-        .select('*')
+        .select('*, enrollment_password')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

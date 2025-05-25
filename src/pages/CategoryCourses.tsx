@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useNavigate, useParams } from "react-router-dom";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -22,7 +21,7 @@ const CategoryCourses = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
-        .select('*')
+        .select('*, enrollment_password')
         .eq('enabled', true)
         .eq('main_category', category)
         .order('created_at', { ascending: false });

@@ -64,7 +64,7 @@ const NewCourse = () => {
       if (!courseId) return null;
       const { data, error } = await supabase
         .from('courses')
-        .select('*')
+        .select('*, enrollment_password')
         .eq('id', courseId)
         .single();
 

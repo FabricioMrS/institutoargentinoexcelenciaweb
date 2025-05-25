@@ -253,6 +253,7 @@ export type Database = {
           description: string | null
           duration: number
           enabled: boolean | null
+          enrollment_password: string | null
           featured: boolean | null
           id: string
           image: string
@@ -272,6 +273,7 @@ export type Database = {
           description?: string | null
           duration: number
           enabled?: boolean | null
+          enrollment_password?: string | null
           featured?: boolean | null
           id?: string
           image: string
@@ -291,6 +293,7 @@ export type Database = {
           description?: string | null
           duration?: number
           enabled?: boolean | null
+          enrollment_password?: string | null
           featured?: boolean | null
           id?: string
           image?: string
