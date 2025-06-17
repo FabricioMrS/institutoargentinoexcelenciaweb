@@ -114,25 +114,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (supabaseError) throw supabaseError;
       
-      // Try to send a personalized email, but continue if it fails
-      try {
-        await supabase.functions.invoke('custom-reset-password', {
-          body: {
-            email,
-            resetUrl: resetUrl,
-          },
-        });
-        console.log("Correo personalizado enviado correctamente");
-      } catch (edgeFunctionError) {
-        console.warn("Error al enviar el correo personalizado:", edgeFunctionError);
-        // We continue with the flow since the Supabase email was already sent
-      }
-      
       toast({
         title: "Correo enviado",
-        description: "Se ha enviado un enlace para restablecer tu contraseña.",
+        description: "Se ha enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.",
       });
     } catch (error: any) {
+      console.error("Error al enviar el correo:", error);
       toast({
         title: "Error al enviar el correo",
         description: error.message || "No se pudo enviar el correo de recuperación",
