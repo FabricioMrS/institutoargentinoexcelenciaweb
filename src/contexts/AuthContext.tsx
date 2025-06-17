@@ -107,16 +107,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Enviando email de recuperación a:", email);
       console.log("URL de redirección:", resetUrl);
       
-      // Request password reset through Supabase with correct redirect URL
-      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: resetUrl,
+      // Use the custom edge function for personalized email
+      const { error: edgeFunctionError } = await supabase.functions.invoke('custom-reset-password', {
+        body: {
+          email,
+          resetUrl: resetUrl,
+        },
       });
       
-      if (supabaseError) throw supabaseError;
+      if (edgeFunctionError) {
+        console.error("Error en función personalizada:", edgeFunctionError);
+        throw edgeFunctionError;
+      }
       
       toast({
         title: "Correo enviado",
-        description: "Se ha enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.",
+        description: "Se ha enviado un enlace personalizado para restablecer tu contraseña. Revisa tu bandeja de entrada.",
       });
     } catch (error: any) {
       console.error("Error al enviar el correo:", error);
