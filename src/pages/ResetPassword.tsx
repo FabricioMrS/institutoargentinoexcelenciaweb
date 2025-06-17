@@ -21,16 +21,56 @@ const ResetPassword: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    console.log("URL parameters:", Object.fromEntries(searchParams.entries()));
-    // Checking if we have a hash parameter from the URL
-    // This indicates the user came from a password reset email
-    if (searchParams.get("type") === "recovery" || searchParams.has("token")) {
-      console.log("Valid recovery flow detected");
-      setValidResetFlow(true);
-    } else {
-      console.log("No recovery parameters found");
-      setValidResetFlow(false);
-    }
+    // Handle hash-based authentication tokens (from email links)
+    const handleHashParams = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        const type = params.get('type');
+        
+        console.log("Hash parameters found:", { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+        
+        if (accessToken && refreshToken && type === 'recovery') {
+          console.log("Valid recovery tokens found in hash");
+          setValidResetFlow(true);
+          
+          // Set the session with the tokens from the URL
+          supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          }).then(({ data, error }) => {
+            if (error) {
+              console.error("Error setting session:", error);
+              setValidResetFlow(false);
+            } else {
+              console.log("Session set successfully:", data);
+              // Clear the hash from URL for security
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }
+          });
+          
+          return;
+        }
+      }
+      
+      // Check URL parameters as fallback
+      const urlType = searchParams.get("type");
+      const token = searchParams.get("token");
+      
+      console.log("URL parameters:", { type: urlType, token: !!token });
+      
+      if (urlType === "recovery" || token) {
+        console.log("Valid recovery flow detected from URL params");
+        setValidResetFlow(true);
+      } else {
+        console.log("No recovery parameters found");
+        setValidResetFlow(false);
+      }
+    };
+
+    handleHashParams();
   }, [searchParams]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -74,6 +114,7 @@ const ResetPassword: React.FC = () => {
       // Redirect to home after successful password update
       setTimeout(() => navigate("/"), 3000);
     } catch (error: any) {
+      console.error("Error updating password:", error);
       toast({
         title: "Error",
         description: error.message || "No se pudo actualizar la contraseña",

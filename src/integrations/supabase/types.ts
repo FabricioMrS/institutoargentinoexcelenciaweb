@@ -48,6 +48,74 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          apellido: string
+          cargo: string | null
+          ciudad: string | null
+          created_at: string | null
+          direccion: string | null
+          email: string
+          empresa: string | null
+          estado: string
+          etiquetas: string[] | null
+          id: string
+          nombre: string
+          notas: string | null
+          pais: string | null
+          telefono: string
+          ultimo_contacto: string | null
+          updated_at: string | null
+          vendedor_id: string | null
+        }
+        Insert: {
+          apellido: string
+          cargo?: string | null
+          ciudad?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          email: string
+          empresa?: string | null
+          estado?: string
+          etiquetas?: string[] | null
+          id?: string
+          nombre: string
+          notas?: string | null
+          pais?: string | null
+          telefono: string
+          ultimo_contacto?: string | null
+          updated_at?: string | null
+          vendedor_id?: string | null
+        }
+        Update: {
+          apellido?: string
+          cargo?: string | null
+          ciudad?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          email?: string
+          empresa?: string | null
+          estado?: string
+          etiquetas?: string[] | null
+          id?: string
+          nombre?: string
+          notas?: string | null
+          pais?: string | null
+          telefono?: string
+          ultimo_contacto?: string | null
+          updated_at?: string | null
+          vendedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "crm_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_enrollments: {
         Row: {
           completed_at: string | null
@@ -308,6 +376,45 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_users: {
+        Row: {
+          activo: boolean | null
+          apellido: string
+          created_at: string | null
+          email: string
+          fecha_creacion: string | null
+          id: string
+          nombre: string
+          role: string
+          updated_at: string | null
+          vendedor_id: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          apellido: string
+          created_at?: string | null
+          email: string
+          fecha_creacion?: string | null
+          id?: string
+          nombre: string
+          role: string
+          updated_at?: string | null
+          vendedor_id?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          apellido?: string
+          created_at?: string | null
+          email?: string
+          fecha_creacion?: string | null
+          id?: string
+          nombre?: string
+          role?: string
+          updated_at?: string | null
+          vendedor_id?: string | null
+        }
+        Relationships: []
+      }
       lesson_comments: {
         Row: {
           comment: string
@@ -432,6 +539,133 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      sales_opportunities: {
+        Row: {
+          cliente_id: string | null
+          created_at: string | null
+          descripcion: string | null
+          etapa: string
+          fecha_cierre_estimada: string | null
+          fecha_cierre_real: string | null
+          id: string
+          notas: string | null
+          probabilidad: number | null
+          titulo: string
+          updated_at: string | null
+          valor: number
+          vendedor_id: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          etapa?: string
+          fecha_cierre_estimada?: string | null
+          fecha_cierre_real?: string | null
+          id?: string
+          notas?: string | null
+          probabilidad?: number | null
+          titulo: string
+          updated_at?: string | null
+          valor: number
+          vendedor_id?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          etapa?: string
+          fecha_cierre_estimada?: string | null
+          fecha_cierre_real?: string | null
+          id?: string
+          notas?: string | null
+          probabilidad?: number | null
+          titulo?: string
+          updated_at?: string | null
+          valor?: number
+          vendedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_opportunities_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_opportunities_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "crm_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          asignado_a: string | null
+          cliente_id: string | null
+          created_at: string | null
+          descripcion: string | null
+          estado: string
+          fecha_vencimiento: string | null
+          id: string
+          oportunidad_id: string | null
+          prioridad: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          asignado_a?: string | null
+          cliente_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          estado?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          oportunidad_id?: string | null
+          prioridad?: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          asignado_a?: string | null
+          cliente_id?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          estado?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          oportunidad_id?: string | null
+          prioridad?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_asignado_a_fkey"
+            columns: ["asignado_a"]
+            isOneToOne: false
+            referencedRelation: "crm_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_oportunidad_id_fkey"
+            columns: ["oportunidad_id"]
+            isOneToOne: false
+            referencedRelation: "sales_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimonials: {
         Row: {

@@ -107,22 +107,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Enviando email de recuperación a:", email);
       console.log("URL de redirección:", resetUrl);
       
-      // First step: Request password reset through Supabase
+      // Request password reset through Supabase with correct redirect URL
       const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: resetUrl,
       });
       
       if (supabaseError) throw supabaseError;
       
-      // Second step: try to send a personalized email, but continue if it fails
+      // Try to send a personalized email, but continue if it fails
       try {
-        // Make sure we use the correct full domain for the edge function
-        const fullResetUrl = `${resetUrl}?type=recovery`;
-        
         await supabase.functions.invoke('custom-reset-password', {
           body: {
             email,
-            resetUrl: fullResetUrl,
+            resetUrl: resetUrl,
           },
         });
         console.log("Correo personalizado enviado correctamente");
