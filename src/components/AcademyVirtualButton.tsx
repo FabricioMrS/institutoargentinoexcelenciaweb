@@ -1,5 +1,5 @@
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AcademyVirtualButtonProps {
@@ -14,7 +14,8 @@ export const AcademyVirtualButton = ({
   variant = "default"
 }: AcademyVirtualButtonProps) => {
   const handleClick = () => {
-    window.open("https://preview--teachwave-academy-hub.lovable.app/", "_blank");
+    // Mostrar mensaje de "en proceso" en lugar de abrir el enlace
+    alert("Academia Virtual - En proceso de desarrollo");
   };
 
   return (
@@ -26,7 +27,7 @@ export const AcademyVirtualButton = ({
       )}
     >
       <span className="border-b border-transparent group-hover:border-secondary-hover transition-all duration-300">Academia Virtual</span>
-      <ExternalLink className="h-4 w-4 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+      <Clock className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
     </button>
   );
 };

@@ -385,6 +385,7 @@ export type Database = {
           fecha_creacion: string | null
           id: string
           nombre: string
+          password_hash: string | null
           role: string
           updated_at: string | null
           vendedor_id: string | null
@@ -397,6 +398,7 @@ export type Database = {
           fecha_creacion?: string | null
           id?: string
           nombre: string
+          password_hash?: string | null
           role: string
           updated_at?: string | null
           vendedor_id?: string | null
@@ -409,6 +411,7 @@ export type Database = {
           fecha_creacion?: string | null
           id?: string
           nombre?: string
+          password_hash?: string | null
           role?: string
           updated_at?: string | null
           vendedor_id?: string | null
@@ -606,12 +609,20 @@ export type Database = {
       tasks: {
         Row: {
           asignado_a: string | null
+          asignado_por: string | null
+          categoria: string | null
           cliente_id: string | null
+          cliente_nombre: string | null
+          creado_por: string | null
+          creado_por_id: string | null
           created_at: string | null
           descripcion: string | null
           estado: string
+          fecha_completada: string | null
+          fecha_creacion: string | null
           fecha_vencimiento: string | null
           id: string
+          notas: string | null
           oportunidad_id: string | null
           prioridad: string
           titulo: string
@@ -619,12 +630,20 @@ export type Database = {
         }
         Insert: {
           asignado_a?: string | null
+          asignado_por?: string | null
+          categoria?: string | null
           cliente_id?: string | null
+          cliente_nombre?: string | null
+          creado_por?: string | null
+          creado_por_id?: string | null
           created_at?: string | null
           descripcion?: string | null
           estado?: string
+          fecha_completada?: string | null
+          fecha_creacion?: string | null
           fecha_vencimiento?: string | null
           id?: string
+          notas?: string | null
           oportunidad_id?: string | null
           prioridad?: string
           titulo: string
@@ -632,12 +651,20 @@ export type Database = {
         }
         Update: {
           asignado_a?: string | null
+          asignado_por?: string | null
+          categoria?: string | null
           cliente_id?: string | null
+          cliente_nombre?: string | null
+          creado_por?: string | null
+          creado_por_id?: string | null
           created_at?: string | null
           descripcion?: string | null
           estado?: string
+          fecha_completada?: string | null
+          fecha_creacion?: string | null
           fecha_vencimiento?: string | null
           id?: string
+          notas?: string | null
           oportunidad_id?: string | null
           prioridad?: string
           titulo?: string
@@ -652,10 +679,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tasks_asignado_por_fkey"
+            columns: ["asignado_por"]
+            isOneToOne: false
+            referencedRelation: "crm_users"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tasks_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_creado_por_id_fkey"
+            columns: ["creado_por_id"]
+            isOneToOne: false
+            referencedRelation: "crm_users"
             referencedColumns: ["id"]
           },
           {
@@ -735,7 +776,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      authenticate_user: {
+        Args: { email_input: string; password_input: string }
+        Returns: {
+          id: string
+          nombre: string
+          apellido: string
+          email: string
+          role: string
+          vendedor_id: string
+          activo: boolean
+        }[]
+      }
+      get_current_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      hash_password: {
+        Args: { password: string }
+        Returns: string
+      }
+      set_current_user_context: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
+      verify_password: {
+        Args: { password: string; hash: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "user" | "admin"
