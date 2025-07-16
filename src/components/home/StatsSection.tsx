@@ -50,8 +50,8 @@ const StatItem = ({ icon: Icon, number, label, suffix = '' }: StatItemProps) => 
       ref={ref}
       className="flex flex-col items-center p-6 bg-white dark:bg-card rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
     >
-      <div className="mb-4 p-3 bg-primary/10 rounded-full">
-        <Icon className="w-8 h-8 text-primary" />
+      <div className="mb-4 p-3 bg-primary/10 dark:bg-secondary/10 rounded-full">
+        <Icon className="w-8 h-8 text-primary dark:text-secondary" />
       </div>
       <div className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
         {currentNumber.toLocaleString()}{suffix}
@@ -67,24 +67,25 @@ export const StatsSection = () => {
   const stats = [
     {
       icon: BookOpen,
-      number: 150,
+      number: 40,
       label: "Cursos Activos",
       suffix: "+"
     },
     {
       icon: Users,
-      number: 45,
-      label: "Profesores Expertos"
+      number: 15,
+      label: "Profesores Expertos",
+      suffix: "+"
     },
     {
       icon: GraduationCap,
-      number: 2800,
+      number: 900,
       label: "Estudiantes Satisfechos",
       suffix: "+"
     },
     {
       icon: Award,
-      number: 320,
+      number: 150,
       label: "Cursos Completados",
       suffix: "+"
     }
@@ -94,11 +95,11 @@ export const StatsSection = () => {
     <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-semibold text-gray-800 dark:text-white mb-4">
+          <h2 className="text-3xl font-semibold text-secondary mb-4">
             Nuestros Logros
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Más de una década formando profesionales de excelencia en diversas áreas del conocimiento
+            Cientos de profesionales comprometidos con la excelencia, preparados en una amplia variedad de áreas del conocimiento
           </p>
         </div>
         
