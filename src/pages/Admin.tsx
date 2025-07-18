@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminHeader } from "@/components/admin/AdminHeader";
@@ -100,37 +101,112 @@ const Admin = () => {
         onTestimonialsClick={handleTogglePendingTestimonials}
       />
 
-      <div className="grid gap-6">
-        <PendingTestimonials 
-          visible={showPendingTestimonials && pendingTestimonialsCount > 0} 
-          pendingCount={pendingTestimonialsCount}
-          onRefetch={refetchPendingCount}
-        />
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="testimonials">
+            Testimonios
+            {pendingTestimonialsCount > 0 && (
+              <span className="ml-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                {pendingTestimonialsCount}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="courses">Cursos</TabsTrigger>
+          <TabsTrigger value="professionals">Profesionales</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Testimonios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TestimonialsList 
-              testimonials={testimonials || []} 
-              isLoading={isLoadingTestimonials} 
-            />
-          </CardContent>
-        </Card>
+        <TabsContent value="dashboard" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Testimonios Pendientes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{pendingTestimonialsCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  Esperando aprobación
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Cursos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{courses?.length || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Cursos disponibles
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Testimonios Publicados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{testimonials?.length || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Testimonios activos
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Cursos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CoursesList 
-              courses={courses || []} 
-              isLoading={isLoadingCourses} 
-            />
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="testimonials" className="space-y-6">
+          <PendingTestimonials 
+            visible={pendingTestimonialsCount > 0} 
+            pendingCount={pendingTestimonialsCount}
+            onRefetch={refetchPendingCount}
+          />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Testimonios Publicados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TestimonialsList 
+                testimonials={testimonials || []} 
+                isLoading={isLoadingTestimonials} 
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="courses" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestión de Cursos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CoursesList 
+                courses={courses || []} 
+                isLoading={isLoadingCourses} 
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="professionals" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestión de Profesionales</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Haz clic en "Gestionar Profesionales" en el header para acceder a esta sección.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
