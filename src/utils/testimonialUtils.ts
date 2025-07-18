@@ -36,11 +36,6 @@ export const useApproveTestimonial = () => {
         throw deleteError;
       }
 
-      // Update local state
-      setLocalPendingTestimonials((prev: any[]) => 
-        prev.filter(t => t.id !== testimonial.id)
-      );
-
       toast.success("Testimonio aprobado exitosamente");
       return true;
     } catch (error) {
@@ -69,11 +64,6 @@ export const useRejectTestimonial = () => {
         console.error('Error deleting rejected testimonial:', error);
         throw error;
       }
-
-      // Update local state
-      setLocalPendingTestimonials((prev: any[]) => 
-        prev.filter(t => t.id !== id)
-      );
 
       toast.success("Testimonio rechazado exitosamente");
       return true;

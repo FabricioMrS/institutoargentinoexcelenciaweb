@@ -19,7 +19,7 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
   const rejectTestimonial = useRejectTestimonial();
   const queryClient = useQueryClient();
 
-  // Query for pending testimonials data with no caching
+  // Query for pending testimonials data with controlled caching
   const { data: pendingTestimonials, isLoading: isLoadingPending, refetch: refetchPendingTestimonials } = useQuery({
     queryKey: ['pending-testimonials'],
     queryFn: async () => {
@@ -36,9 +36,7 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
       console.log("Fetched pending testimonials:", data);
       return data || [];
     },
-    // Disable cache to always fetch fresh data
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 5000, // Cache for 5 seconds
     enabled: visible, // Only run this query when component is visible
   });
 
@@ -50,63 +48,59 @@ export const PendingTestimonials = ({ visible, pendingCount, onRefetch }: Pendin
     }
   }, [pendingTestimonials]);
   
-  // Force refresh data when component becomes visible or mounts
+  // Refetch when component becomes visible
   useEffect(() => {
-    const refreshData = async () => {
-      if (visible) {
-        console.log("PendingTestimonials component is visible, refreshing data");
-        await refetchPendingTestimonials();
-        if (onRefetch) onRefetch();
-      }
-    };
-    
-    refreshData();
-    
-    // Set up a refresh interval only when visible
-    let interval: number | undefined;
     if (visible) {
-      interval = window.setInterval(refreshData, 5000); // Refresh every 5 seconds
+      console.log("PendingTestimonials component is visible, refreshing data");
+      refetchPendingTestimonials();
     }
-    
-    return () => {
-      if (interval) window.clearInterval(interval);
-    };
-  }, [visible, refetchPendingTestimonials, onRefetch]);
+  }, [visible, refetchPendingTestimonials]);
 
   const handleApprove = async (testimonial: any) => {
     console.log("Starting approval process from PendingTestimonials component");
-    const success = await approveTestimonial(testimonial, setLocalPendingTestimonials);
+    
+    // Immediately remove from local state for instant UI feedback
+    setLocalPendingTestimonials(prev => prev.filter(t => t.id !== testimonial.id));
+    
+    const success = await approveTestimonial(testimonial, () => {});
     if (success) {
       console.log("Testimonial approved successfully from PendingTestimonials, refreshing data");
-      // Force immediate refresh of all related queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
-      ]);
+      // Simple invalidation without excessive refetching
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] });
       
-      // Explicitly refetch pending testimonials
-      await refetchPendingTestimonials();
-      
-      if (onRefetch) await onRefetch();
+      if (onRefetch) onRefetch();
+    } else {
+      // Restore testimonial if operation failed
+      if (pendingTestimonials) {
+        setLocalPendingTestimonials(pendingTestimonials);
+      }
     }
   };
 
   const handleReject = async (id: string) => {
     console.log("Starting rejection process from PendingTestimonials component");
-    const success = await rejectTestimonial(id, setLocalPendingTestimonials);
+    
+    // Find the testimonial to potentially restore it if operation fails
+    const testimonialToReject = localPendingTestimonials.find(t => t.id === id);
+    
+    // Immediately remove from local state for instant UI feedback
+    setLocalPendingTestimonials(prev => prev.filter(t => t.id !== id));
+    
+    const success = await rejectTestimonial(id, () => {});
     if (success) {
       console.log("Testimonial rejected successfully from PendingTestimonials, refreshing data");
-      // Force immediate refresh of all related queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] }),
-        queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] })
-      ]);
+      // Simple invalidation without excessive refetching
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-testimonials-count'] });
       
-      // Explicitly refetch pending testimonials
-      await refetchPendingTestimonials();
-      
-      if (onRefetch) await onRefetch();
+      if (onRefetch) onRefetch();
+    } else {
+      // Restore testimonial if operation failed
+      if (testimonialToReject) {
+        setLocalPendingTestimonials(prev => [...prev, testimonialToReject]);
+      }
     }
   };
 

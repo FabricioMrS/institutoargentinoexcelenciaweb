@@ -17,7 +17,7 @@ const Admin = () => {
   const [showPendingTestimonials, setShowPendingTestimonials] = useState(false);
   const queryClient = useQueryClient();
   
-  // Query for pending testimonials count with no caching
+  // Query for pending testimonials count with controlled caching
   const { data: pendingTestimonialsCount = 0, refetch: refetchPendingCount } = useQuery({
     queryKey: ['pending-testimonials-count'],
     queryFn: async () => {
@@ -33,26 +33,9 @@ const Admin = () => {
       console.log("Fetched pending testimonials count:", count);
       return count || 0;
     },
-    // Disable cache completely to always fetch fresh data
-    staleTime: 0,
-    gcTime: 0,
-    refetchInterval: 5000, // Refresh every 5 seconds
+    staleTime: 10000, // Cache for 10 seconds
+    refetchInterval: false, // Remove automatic refetching
   });
-
-  // useEffect for refreshing data
-  useEffect(() => {
-    const refreshData = async () => {
-      await queryClient.resetQueries({ queryKey: ['pending-testimonials-count'] });
-      await refetchPendingCount();
-    };
-    
-    refreshData();
-    
-    // Set up a refresh interval
-    const interval = setInterval(refreshData, 5000); // Refresh every 5 seconds
-    
-    return () => clearInterval(interval);
-  }, [refetchPendingCount, queryClient]);
 
   // Queries for other data
   const { data: courses, isLoading: isLoadingCourses } = useQuery<Course[]>({
