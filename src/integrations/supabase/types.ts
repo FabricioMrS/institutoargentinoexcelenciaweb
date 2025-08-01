@@ -458,6 +458,33 @@ export type Database = {
           },
         ]
       }
+      password_reset_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       pending_testimonials: {
         Row: {
           approved: boolean | null
@@ -793,6 +820,13 @@ export type Database = {
           activo: boolean
         }[]
       }
+      create_password_reset_token: {
+        Args: { email_input: string }
+        Returns: {
+          token: string
+          user_found: boolean
+        }[]
+      }
       get_current_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -805,6 +839,10 @@ export type Database = {
         Args: { password: string }
         Returns: string
       }
+      reset_password_with_token: {
+        Args: { token_input: string; new_password: string }
+        Returns: boolean
+      }
       set_current_user_context: {
         Args: { _user_id: string }
         Returns: undefined
@@ -812,6 +850,13 @@ export type Database = {
       verify_password: {
         Args: { password: string; hash: string }
         Returns: boolean
+      }
+      verify_reset_token: {
+        Args: { token_input: string }
+        Returns: {
+          user_id: string
+          valid: boolean
+        }[]
       }
     }
     Enums: {
