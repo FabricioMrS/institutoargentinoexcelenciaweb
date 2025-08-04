@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { validateEmail, sanitizeText } from "@/utils/security";
 
 interface ResetPasswordFormProps {
   loading: boolean;
@@ -49,7 +50,7 @@ export const ResetPasswordForm = ({
           id="email-reset"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(sanitizeText(e.target.value))}
         />
       </div>
       <div className="flex gap-2">

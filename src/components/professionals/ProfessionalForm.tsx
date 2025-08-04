@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Professional, ProfessionalFormData } from "@/types/professional";
+import { sanitizeText, sanitizeHtml } from "@/utils/security";
 
 interface ProfessionalFormProps {
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -25,7 +26,7 @@ export const ProfessionalForm = ({
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, name: sanitizeText(e.target.value) })}
           required
         />
       </div>
@@ -34,7 +35,7 @@ export const ProfessionalForm = ({
         <Input
           id="role"
           value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, role: sanitizeText(e.target.value) })}
           required
         />
       </div>
@@ -43,7 +44,7 @@ export const ProfessionalForm = ({
         <Textarea
           id="description"
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, description: sanitizeHtml(e.target.value) })}
           required
         />
       </div>
@@ -52,7 +53,7 @@ export const ProfessionalForm = ({
         <Input
           id="specialties"
           value={formData.specialties}
-          onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, specialties: sanitizeText(e.target.value) })}
           placeholder="Ej: Anatomía, Fisiología, Biología"
           required
         />

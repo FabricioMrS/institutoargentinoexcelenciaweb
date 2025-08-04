@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { validateEmail, sanitizeText, securityLogger } from "@/utils/security";
 
 interface LoginFormProps {
   onResetPassword: () => void;
@@ -26,9 +27,16 @@ export const LoginForm = ({
 
   const handleSubmit = async () => {
     try {
-      await signIn(email, password);
+      // Validate inputs
+      if (!validateEmail(email)) {
+        securityLogger.warn("Invalid email format attempted");
+        return;
+      }
+
+      const sanitizedEmail = sanitizeText(email);
+      await signIn(sanitizedEmail, password);
     } catch (error) {
-      console.error("Login error:", error);
+      securityLogger.error("Login error occurred", error);
     }
   };
 
@@ -40,7 +48,7 @@ export const LoginForm = ({
           id="email-login"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(sanitizeText(e.target.value))}
         />
       </div>
       <div className="space-y-2">

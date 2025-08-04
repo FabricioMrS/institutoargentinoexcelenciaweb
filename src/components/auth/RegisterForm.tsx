@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { validateEmail, validatePassword, sanitizeText, securityLogger } from "@/utils/security";
 
 interface RegisterFormProps {
   loading: boolean;
@@ -27,13 +28,28 @@ export const RegisterForm = ({
   const { signUp } = useAuth();
 
   const handleSubmit = async () => {
-    if (password !== confirmPassword) {
-      throw new Error("Las contraseñas no coinciden");
-    }
     try {
-      await signUp(email, password);
+      // Validate email
+      if (!validateEmail(email)) {
+        securityLogger.warn("Invalid email format attempted during registration");
+        throw new Error("Email inválido");
+      }
+
+      // Validate password strength
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        throw new Error(passwordValidation.message);
+      }
+
+      if (password !== confirmPassword) {
+        throw new Error("Las contraseñas no coinciden");
+      }
+
+      const sanitizedEmail = sanitizeText(email);
+      await signUp(sanitizedEmail, password);
     } catch (error) {
-      console.error("Registration error:", error);
+      securityLogger.error("Registration error occurred", error);
+      throw error;
     }
   };
 
@@ -45,7 +61,7 @@ export const RegisterForm = ({
           id="email-register"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(sanitizeText(e.target.value))}
         />
       </div>
       <div className="space-y-2">

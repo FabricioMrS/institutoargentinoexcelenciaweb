@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { validateFileUpload, sanitizeText, sanitizeFilename, securityLogger } from "@/utils/security";
 
 interface Props {
   categoriaSeleccionada?: string;
@@ -34,9 +35,24 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
         throw new Error("Por favor complete todos los campos requeridos");
       }
 
-      // Subir el archivo
+      // Validate file security
+      const fileValidation = validateFileUpload(file);
+      if (!fileValidation.isValid) {
+        securityLogger.warn("File upload validation failed", { filename: file.name, type: file.type, size: file.size });
+        throw new Error(fileValidation.message);
+      }
+
+      // Sanitize inputs
+      const sanitizedTitulo = sanitizeText(titulo);
+      const sanitizedDescripcion = sanitizeText(descripcion);
+      const sanitizedCategoria = sanitizeText(categoria);
+      
+      // Create secure filename
       const fileExt = file.name.split('.').pop();
+      const sanitizedFilename = sanitizeFilename(file.name);
       const filePath = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      securityLogger.info("Uploading file", { originalName: file.name, sanitizedName: sanitizedFilename, path: filePath });
 
       const { error: uploadError } = await supabase.storage
         .from('biblioteca')
@@ -48,11 +64,11 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
       const { error: dbError } = await supabase
         .from('biblioteca_archivos')
         .insert({
-          titulo,
-          descripcion,
-          categoria,
+          titulo: sanitizedTitulo,
+          descripcion: sanitizedDescripcion,
+          categoria: sanitizedCategoria,
           archivo_path: filePath,
-          archivo_nombre: file.name,
+          archivo_nombre: sanitizedFilename,
           tamano_bytes: file.size,
           tipo_archivo: file.type,
         });
@@ -71,6 +87,7 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
       });
     },
     onError: (error) => {
+      securityLogger.error("File upload failed", error);
       toast({
         title: "Error al subir el archivo",
         description: error.message,
@@ -97,8 +114,23 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
             <Input
               id="file"
               type="file"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              accept=".zip,.rar,.7z"
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0] || null;
+                if (selectedFile) {
+                  const validation = validateFileUpload(selectedFile);
+                  if (!validation.isValid) {
+                    toast({
+                      title: "Archivo inválido",
+                      description: validation.message,
+                      variant: "destructive",
+                    });
+                    e.target.value = '';
+                    return;
+                  }
+                }
+                setFile(selectedFile);
+              }}
+              accept=".zip,.rar,.7z,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"
             />
           </div>
           
@@ -107,7 +139,7 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
             <Input
               id="titulo"
               value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              onChange={(e) => setTitulo(sanitizeText(e.target.value))}
               required
             />
           </div>
@@ -117,7 +149,7 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
             <Input
               id="categoria"
               value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
+              onChange={(e) => setCategoria(sanitizeText(e.target.value))}
               readOnly={!!categoriaSeleccionada}
               required
             />
@@ -128,7 +160,7 @@ export const FileUploader = ({ categoriaSeleccionada }: Props) => {
             <Textarea
               id="descripcion"
               value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
+              onChange={(e) => setDescripcion(sanitizeText(e.target.value))}
             />
           </div>
           
