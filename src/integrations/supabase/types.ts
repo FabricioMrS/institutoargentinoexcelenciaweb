@@ -808,6 +808,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      armor: {
+        Args: { "": string }
+        Returns: string
+      }
       authenticate_user: {
         Args: { email_input: string; password_input: string }
         Returns: {
@@ -820,12 +824,32 @@ export type Database = {
           activo: boolean
         }[]
       }
+      check_admin_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       create_password_reset_token: {
         Args: { email_input: string }
         Returns: {
           token: string
           user_found: boolean
         }[]
+      }
+      dearmor: {
+        Args: { "": string }
+        Returns: string
+      }
+      gen_random_bytes: {
+        Args: { "": number }
+        Returns: string
+      }
+      gen_random_uuid: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      gen_salt: {
+        Args: { "": string }
+        Returns: string
       }
       get_current_user_id: {
         Args: Record<PropertyKey, never>
@@ -837,6 +861,14 @@ export type Database = {
       }
       hash_password: {
         Args: { password: string }
+        Returns: string
+      }
+      pgp_armor_headers: {
+        Args: { "": string }
+        Returns: Record<string, unknown>[]
+      }
+      pgp_key_id: {
+        Args: { "": string }
         Returns: string
       }
       reset_password_with_token: {
