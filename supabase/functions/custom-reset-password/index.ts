@@ -23,18 +23,47 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("=== INICIO DE FUNCIÓN ===");
+    
     const { email, resetUrl }: ResetPasswordRequest = await req.json();
     
     console.log("Enviando correo de recuperación a:", email);
     console.log("URL de recuperación:", resetUrl);
 
+    // Validate input
+    if (!email || !resetUrl) {
+      throw new Error("Email y resetUrl son requeridos");
+    }
+
     // Initialize Supabase client for generating reset link
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    console.log("Service key existe:", !!supabaseServiceKey);
+    
+    if (!supabaseServiceKey) {
+      throw new Error("SUPABASE_SERVICE_ROLE_KEY no configurada");
+    }
+
     const supabaseClient = createClient(
       'https://ryfpkossijltgliijani.supabase.co',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+      supabaseServiceKey
     );
 
+    console.log("Cliente de Supabase inicializado");
+
+    // First check if user exists
+    const { data: userData, error: userError } = await supabaseClient.auth.admin.listUsers();
+    console.log("Usuarios encontrados:", userData?.users?.length || 0);
+    
+    const userExists = userData?.users?.some(user => user.email === email);
+    console.log("Usuario existe:", userExists, "para email:", email);
+    
+    if (!userExists) {
+      console.error("Usuario no encontrado:", email);
+      throw new Error(`Usuario con email ${email} no encontrado`);
+    }
+
     // Generate recovery link using admin API
+    console.log("Generando enlace de recuperación...");
     const { data, error } = await supabaseClient.auth.admin.generateLink({
       type: 'recovery',
       email: email,
@@ -43,15 +72,25 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
+    console.log("Resultado de generateLink - data:", !!data, "error:", error);
+
     if (error) {
       console.error("Error generando enlace de recuperación:", error);
       throw error;
     }
 
+    if (!data || !data.properties) {
+      console.error("No se recibió data o properties del generateLink");
+      throw new Error("No se pudo generar el enlace de recuperación");
+    }
+
     // Use the actual recovery link from Supabase
-    const resetLink = data.properties?.action_link || resetUrl;
+    const resetLink = data.properties.action_link || resetUrl;
     
-    console.log("Enlace de recuperación generado:", resetLink);
+    console.log("Enlace de recuperación generado exitosamente");
+    console.log("Link generado:", resetLink?.substring(0, 50) + "...");
+
+    console.log("Enviando email con Resend...");
 
     const emailResponse = await resend.emails.send({
       from: "Instituto Argentino Excelencia <onboarding@resend.dev>",
