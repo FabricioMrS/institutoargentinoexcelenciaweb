@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     );
 
-    // Generate the reset link through Supabase
+    // Generate recovery link using admin API
     const { data, error } = await supabaseClient.auth.admin.generateLink({
       type: 'recovery',
       email: email,
@@ -48,7 +48,10 @@ const handler = async (req: Request): Promise<Response> => {
       throw error;
     }
 
+    // Use the actual recovery link from Supabase
     const resetLink = data.properties?.action_link || resetUrl;
+    
+    console.log("Enlace de recuperación generado:", resetLink);
 
     const emailResponse = await resend.emails.send({
       from: "Instituto Argentino Excelencia <onboarding@resend.dev>",
