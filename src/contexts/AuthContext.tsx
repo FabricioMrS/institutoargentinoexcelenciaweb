@@ -153,31 +153,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/reset-password`;
+      const baseUrl = window.location.origin;
+      const resetUrl = `${baseUrl}/reset-password`;
       
       console.log("Enviando email de recuperación a:", email);
-      console.log("URL de redirección:", redirectUrl);
+      console.log("URL de redirección:", resetUrl);
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
+      // Use the custom edge function for personalized email
+      const { error: edgeFunctionError } = await supabase.functions.invoke('custom-reset-password', {
+        body: {
+          email,
+          resetUrl: resetUrl,
+        },
       });
-
-      if (error) {
-        console.error('Error sending reset email:', error);
-        toast({
-          title: "Error al enviar el correo",
-          description: error.message || "No se pudo enviar el correo de recuperación",
-          variant: "destructive",
-        });
-        throw error;
+      
+      if (edgeFunctionError) {
+        console.error("Error en función personalizada:", edgeFunctionError);
+        throw edgeFunctionError;
       }
-
+      
       toast({
         title: "Correo enviado",
-        description: "Se ha enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada.",
+        description: "Se ha enviado un enlace personalizado para restablecer tu contraseña. Revisa tu bandeja de entrada.",
       });
     } catch (error: any) {
-      console.error('Error resetting password:', error);
+      console.error("Error al enviar el correo:", error);
       toast({
         title: "Error al enviar el correo",
         description: error.message || "No se pudo enviar el correo de recuperación",
