@@ -50,7 +50,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Cliente de Supabase inicializado");
 
-    // Generate recovery link using admin API (Supabase will handle user validation)
+    // Generate recovery link using admin API
     console.log("Generando enlace de recuperación...");
     const { data, error } = await supabaseClient.auth.admin.generateLink({
       type: 'recovery',
@@ -62,18 +62,25 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Resultado de generateLink - data:", !!data, "error:", error);
 
+    let resetLink = resetUrl; // Default fallback link
+
     if (error) {
       console.error("Error generando enlace de recuperación:", error);
-      throw error;
+      
+      // If user doesn't exist, we still send a generic response for security
+      if (error.message?.includes('User with this email not found') || error.status === 404) {
+        console.log("Usuario no encontrado, enviando respuesta genérica por seguridad");
+        // We'll send a generic email that doesn't reveal if the user exists
+        resetLink = resetUrl;
+      } else {
+        // For other errors, we throw
+        throw error;
+      }
+    } else if (data && data.properties && data.properties.action_link) {
+      // Use the actual recovery link from Supabase if available
+      resetLink = data.properties.action_link;
+      console.log("Enlace de recuperación generado exitosamente");
     }
-
-    if (!data || !data.properties) {
-      console.error("No se recibió data o properties del generateLink");
-      throw new Error("No se pudo generar el enlace de recuperación");
-    }
-
-    // Use the actual recovery link from Supabase
-    const resetLink = data.properties.action_link || resetUrl;
     
     console.log("Enlace de recuperación generado exitosamente");
     console.log("Link generado:", resetLink?.substring(0, 50) + "...");
