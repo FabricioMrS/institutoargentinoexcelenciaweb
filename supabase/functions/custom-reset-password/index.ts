@@ -50,19 +50,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Cliente de Supabase inicializado");
 
-    // First check if user exists
-    const { data: userData, error: userError } = await supabaseClient.auth.admin.listUsers();
-    console.log("Usuarios encontrados:", userData?.users?.length || 0);
-    
-    const userExists = userData?.users?.some(user => user.email === email);
-    console.log("Usuario existe:", userExists, "para email:", email);
-    
-    if (!userExists) {
-      console.error("Usuario no encontrado:", email);
-      throw new Error(`Usuario con email ${email} no encontrado`);
-    }
-
-    // Generate recovery link using admin API
+    // Generate recovery link using admin API (Supabase will handle user validation)
     console.log("Generando enlace de recuperación...");
     const { data, error } = await supabaseClient.auth.admin.generateLink({
       type: 'recovery',
