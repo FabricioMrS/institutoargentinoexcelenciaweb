@@ -381,6 +381,42 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_profiles: {
+        Row: {
+          activo: boolean
+          apellido: string
+          created_at: string
+          email: string
+          id: string
+          nombre: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activo?: boolean
+          apellido: string
+          created_at?: string
+          email: string
+          id?: string
+          nombre: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activo?: boolean
+          apellido?: string
+          created_at?: string
+          email?: string
+          id?: string
+          nombre?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       crm_users: {
         Row: {
           activo: boolean | null
@@ -828,6 +864,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      check_crm_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      check_crm_admin_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       create_password_reset_token: {
         Args: { email_input: string }
         Returns: {
@@ -849,6 +893,14 @@ export type Database = {
       }
       gen_salt: {
         Args: { "": string }
+        Returns: string
+      }
+      get_crm_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_crm_user_role: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_current_user_id: {
