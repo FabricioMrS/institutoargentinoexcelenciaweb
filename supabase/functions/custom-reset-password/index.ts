@@ -35,6 +35,13 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email y resetUrl son requeridos");
     }
 
+    // Get client IP for rate limiting
+    const clientIP = req.headers.get('x-forwarded-for') || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+
+    console.log(`Password reset attempt from IP: ${clientIP}, email: ${email}`);
+
     // Initialize Supabase client for generating reset link
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     console.log("Service key existe:", !!supabaseServiceKey);
@@ -49,6 +56,29 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     console.log("Cliente de Supabase inicializado");
+
+    // Check rate limiting
+    const { data: rateLimitCheck, error: rateLimitError } = await supabaseClient
+      .rpc('check_password_reset_rate_limit', {
+        _ip_address: clientIP,
+        _email: email
+      });
+
+    if (rateLimitError) {
+      console.error('Rate limit check error:', rateLimitError);
+      return new Response(
+        JSON.stringify({ message: 'Password reset request received. If this email exists, you will receive instructions shortly.' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!rateLimitCheck) {
+      console.log(`Rate limit exceeded for IP: ${clientIP}, email: ${email}`);
+      return new Response(
+        JSON.stringify({ message: 'Too many password reset attempts. Please wait before trying again.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Generate recovery link using admin API
     console.log("Generando enlace de recuperación...");

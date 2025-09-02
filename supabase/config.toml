@@ -1,2 +1,5 @@
 
 project_id = "ryfpkossijltgliijani"
+
+[functions.custom-reset-password]
+verify_jwt = false

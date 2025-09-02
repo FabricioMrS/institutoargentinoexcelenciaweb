@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -494,6 +494,30 @@ export type Database = {
           },
         ]
       }
+      password_reset_attempts: {
+        Row: {
+          attempted_at: string | null
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: string
+        }
+        Insert: {
+          attempted_at?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address: string
+        }
+        Update: {
+          attempted_at?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string
+        }
+        Relationships: []
+      }
       password_reset_tokens: {
         Row: {
           created_at: string
@@ -851,13 +875,13 @@ export type Database = {
       authenticate_user: {
         Args: { email_input: string; password_input: string }
         Returns: {
-          id: string
-          nombre: string
+          activo: boolean
           apellido: string
           email: string
+          id: string
+          nombre: string
           role: string
           vendedor_id: string
-          activo: boolean
         }[]
       }
       check_admin_access: {
@@ -870,6 +894,10 @@ export type Database = {
       }
       check_crm_admin_access: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      check_password_reset_rate_limit: {
+        Args: { _email: string; _ip_address: string }
         Returns: boolean
       }
       create_password_reset_token: {
@@ -924,7 +952,7 @@ export type Database = {
         Returns: string
       }
       reset_password_with_token: {
-        Args: { token_input: string; new_password: string }
+        Args: { new_password: string; token_input: string }
         Returns: boolean
       }
       set_current_user_context: {
@@ -932,7 +960,7 @@ export type Database = {
         Returns: undefined
       }
       verify_password: {
-        Args: { password: string; hash: string }
+        Args: { hash: string; password: string }
         Returns: boolean
       }
       verify_reset_token: {
