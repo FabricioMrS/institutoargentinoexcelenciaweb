@@ -19,38 +19,10 @@ export const WhatsAppButton = ({
   price,
   interestRate = 0
 }: WhatsAppButtonProps) => {
-  const whatsappNumber = "543518118268";
+  const whatsappLink = "http://bit.ly/4m6QqbS";
   
-  const generateMessage = () => {
-    if (message) return message;
-    
-    let defaultMessage = "¡Hola! Estoy interesado en conocer más sobre";
-    
-    if (courseTitle) {
-      defaultMessage += ` el curso "${courseTitle}"`;
-      if (selectedInstallments && price) {
-        const numericPrice = Number(price.replace(/[^0-9]/g, ''));
-        const totalAmount = numericPrice * (1 + interestRate / 100);
-        const monthlyAmount = totalAmount / selectedInstallments;
-        
-        defaultMessage += ` con la financiación de ${selectedInstallments} ${selectedInstallments === 1 ? 'pago' : 'cuotas'} de $${monthlyAmount.toFixed(2)}`;
-      }
-    } else {
-      defaultMessage += " los cursos";
-    }
-    
-    return defaultMessage;
-  };
-
   const handleWhatsAppClick = () => {
-    const encodedMessage = encodeURIComponent(generateMessage());
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      window.location.href = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
-    } else {
-      window.open(`https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`, '_blank');
-    }
+    window.open(whatsappLink, '_blank');
   };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
