@@ -118,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Enviando email con Resend...");
 
     const emailResponse = await resend.emails.send({
-      from: "Instituto Argentino Excelencia <noreply@tudominio.com>", // Cambia por tu dominio verificado
+      from: "Instituto Argentino Excelencia <onboarding@resend.dev>",
       to: [email],
       subject: "Recuperación de contraseña - Instituto Argentino Excelencia",
       html: `
