@@ -97,10 +97,10 @@ const handler = async (req: Request): Promise<Response> => {
     if (error) {
       console.error("Error generando enlace de recuperación:", error);
       
-      // If user doesn't exist, we still send a generic response for security
+      // If user doesn't exist, we still send a generic email for security
       if (error.message?.includes('User with this email not found') || error.status === 404) {
-        console.log("Usuario no encontrado, enviando respuesta genérica por seguridad");
-        // We'll send a generic email that doesn't reveal if the user exists
+        console.log("Usuario no encontrado, enviando email genérico por seguridad");
+        // Use the default reset URL for non-existent users
         resetLink = resetUrl;
       } else {
         // For other errors, we throw
