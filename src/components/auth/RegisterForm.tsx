@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { validateEmail, validatePassword, sanitizeText, securityLogger } from "@/utils/security";
+import { useToast } from "@/components/ui/use-toast";
 
 interface RegisterFormProps {
   loading: boolean;
@@ -26,30 +27,50 @@ export const RegisterForm = ({
   setConfirmPassword,
 }: RegisterFormProps) => {
   const { signUp } = useAuth();
+  const { toast } = useToast();
 
   const handleSubmit = async () => {
     try {
       // Validate email
       if (!validateEmail(email)) {
         securityLogger.warn("Invalid email format attempted during registration");
-        throw new Error("Email inválido");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Email inválido"
+        });
+        return;
       }
 
       // Validate password strength
       const passwordValidation = validatePassword(password);
       if (!passwordValidation.isValid) {
-        throw new Error(passwordValidation.message);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: passwordValidation.message
+        });
+        return;
       }
 
       if (password !== confirmPassword) {
-        throw new Error("Las contraseñas no coinciden");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Las contraseñas no coinciden"
+        });
+        return;
       }
 
       const sanitizedEmail = sanitizeText(email);
       await signUp(sanitizedEmail, password);
     } catch (error) {
       securityLogger.error("Registration error occurred", error);
-      throw error;
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error desconocido durante el registro"
+      });
     }
   };
 
@@ -71,6 +92,7 @@ export const RegisterForm = ({
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Mínimo 8 caracteres, mayúsculas, minúsculas y números"
         />
       </div>
       <div className="space-y-2">
