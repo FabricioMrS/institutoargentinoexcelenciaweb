@@ -19,10 +19,11 @@ export const WhatsAppButton = ({
   price,
   interestRate = 0
 }: WhatsAppButtonProps) => {
-  const whatsappLink = "http://bit.ly/4m6QqbS";
+  const whatsappLink = "https://bit.ly/4m6QqbS";
   
   const handleWhatsAppClick = () => {
-    window.open(whatsappLink, '_blank');
+    const newWindow = window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
   };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
