@@ -19,7 +19,16 @@ export const WhatsAppButton = ({
   price,
   interestRate = 0
 }: WhatsAppButtonProps) => {
-  const whatsappLink = "https://bit.ly/4m6QqbS";
+  const phoneNumber = "5491123456789"; // Reemplaza con tu número real
+  
+  const getWhatsAppMessage = () => {
+    if (courseTitle && price && selectedInstallments) {
+      return `Hola! Me interesa el curso "${courseTitle}" con precio ${price} en ${selectedInstallments} cuotas${interestRate > 0 ? ` (${interestRate}% interés)` : ''}. ¿Podrían darme más información?`;
+    }
+    return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
+  };
+
+  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getWhatsAppMessage())}`;
   
   const handleWhatsAppClick = () => {
     const newWindow = window.open(whatsappLink, '_blank', 'noopener,noreferrer');
