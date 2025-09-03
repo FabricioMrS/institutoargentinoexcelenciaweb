@@ -153,54 +153,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      const baseUrl = window.location.origin;
-      const resetUrl = `${baseUrl}/reset-password`;
+      // Input validation
+      if (!email || !email.includes("@")) {
+        throw new Error("Por favor, ingresa un email válido");
+      }
+
+      const resetUrl = `${window.location.origin}/reset-password`;
       
       console.log("Enviando email de recuperación a:", email);
       console.log("URL de redirección:", resetUrl);
       
-      // Intentar vía función personalizada (Resend)
-      const { data: edgeData, error: edgeFunctionError } = await supabase.functions.invoke('custom-reset-password', {
-        body: {
-          email,
-          resetUrl,
-        },
+      // Usar solo el email nativo de Supabase por ahora (sin Resend)
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: resetUrl,
       });
-
-      let enviado = false;
-
-      if (edgeFunctionError) {
-        console.error("Error en función personalizada:", edgeFunctionError);
-      } else if (edgeData && typeof edgeData === 'object' && 'id' in (edgeData as any)) {
-        // Resend devuelve un objeto con 'id' cuando el envío fue exitoso
-        enviado = true;
-      } else {
-        // Si la función respondió 200 pero sin 'id' (p.ej. por rate limit), tratamos como no enviado
-        console.warn("Función personalizada no confirmó envío. Respuesta:", edgeData);
-      }
-
-      // Fallback: usar el email nativo de Supabase si no se envió con Resend
-      if (!enviado) {
-        const { error: supaErr } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: resetUrl,
-        });
-        if (supaErr) {
-          console.error("Error en fallback de Supabase:", supaErr);
-          throw supaErr;
-        }
+      
+      if (error) {
+        console.error("Error al enviar email:", error);
+        throw error;
       }
       
       toast({
         title: "Correo enviado",
-        description: "Si el email está registrado, recibirás un enlace para restablecer tu contraseña.",
+        description: "Si el email está registrado, recibirás un enlace para restablecer tu contraseña. Por favor, espera 60 segundos antes de intentar de nuevo.",
       });
     } catch (error: any) {
       console.error("Error al enviar el correo:", error);
-      toast({
-        title: "Error al enviar el correo",
-        description: error.message || "No se pudo enviar el correo de recuperación",
-        variant: "destructive",
-      });
+      
+      // Handle specific Supabase errors
+      if (error.message?.includes('429') || error.message?.includes('rate limit') || error.message?.includes('58 seconds')) {
+        toast({
+          title: "Demasiados intentos",
+          description: "Por seguridad, debes esperar 60 segundos entre intentos de recuperación.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes('invalid_email')) {
+        toast({
+          title: "Email inválido",
+          description: "Por favor, verifica que el email sea correcto.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error al enviar el correo",
+          description: error.message || "No se pudo enviar el correo de recuperación",
+          variant: "destructive",
+        });
+      }
       throw error;
     }
   };
