@@ -30,10 +30,7 @@ export const WhatsAppButton = ({
 
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getWhatsAppMessage())}`;
   
-  const handleWhatsAppClick = () => {
-    // Usar window.location.href directamente para evitar problemas de popup blocker
-    window.location.href = whatsappLink;
-  };
+  // Abrimos en nueva pestaña vía <a target="_blank"> para evitar bloqueo por X-Frame-Options
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
   const floatingClasses = floating ? 
@@ -41,12 +38,11 @@ export const WhatsAppButton = ({
     "w-full";
 
   return (
-    <Button 
-      className={`${baseClasses} ${floatingClasses}`}
-      onClick={handleWhatsAppClick}
-    >
-      <MessageCircle className={floating ? "w-8 h-8" : "mr-2"} />
-      {!floating && "Consultar por WhatsApp"}
+    <Button asChild className={`${baseClasses} ${floatingClasses}`}>
+      <a href={whatsappLink} target="_blank" rel="noopener noreferrer" aria-label={floating ? "Abrir WhatsApp" : "Consultar por WhatsApp"}>
+        <MessageCircle className={floating ? "w-8 h-8" : "mr-2"} />
+        {!floating && "Consultar por WhatsApp"}
+      </a>
     </Button>
   );
 };
