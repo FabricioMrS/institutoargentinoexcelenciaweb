@@ -31,8 +31,8 @@ export const WhatsAppButton = ({
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getWhatsAppMessage())}`;
   
   const handleWhatsAppClick = () => {
-    const newWindow = window.open(whatsappLink, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
+    // Usar window.location.href directamente para evitar problemas de popup blocker
+    window.location.href = whatsappLink;
   };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
