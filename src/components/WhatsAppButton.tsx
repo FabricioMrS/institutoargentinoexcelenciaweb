@@ -28,9 +28,23 @@ export const WhatsAppButton = ({
     return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
   };
 
-  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getWhatsAppMessage())}`;
+  // Usar formato directo de WhatsApp Web para evitar bloqueos
+  const whatsappLink = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(getWhatsAppMessage())}`;
   
-  // Abrimos en nueva pestaña vía <a target="_blank"> para evitar bloqueo por X-Frame-Options
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Intentar abrir en app móvil primero, luego web
+    const mobileLink = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(getWhatsAppMessage())}`;
+    
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      window.location.href = mobileLink;
+    } else {
+      window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const baseClasses = "bg-green-500 hover:bg-green-600 text-white";
   const floatingClasses = floating ? 
@@ -38,11 +52,9 @@ export const WhatsAppButton = ({
     "w-full";
 
   return (
-    <Button asChild className={`${baseClasses} ${floatingClasses}`}>
-      <a href={whatsappLink} target="_blank" rel="noopener noreferrer" aria-label={floating ? "Abrir WhatsApp" : "Consultar por WhatsApp"}>
-        <MessageCircle className={floating ? "w-8 h-8" : "mr-2"} />
-        {!floating && "Consultar por WhatsApp"}
-      </a>
+    <Button className={`${baseClasses} ${floatingClasses}`} onClick={handleClick}>
+      <MessageCircle className={floating ? "w-8 h-8" : "mr-2"} />
+      {!floating && "Consultar por WhatsApp"}
     </Button>
   );
 };
