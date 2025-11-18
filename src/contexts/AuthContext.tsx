@@ -53,11 +53,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Check user_roles table instead of profiles for proper security
     const { data, error } = await supabase
-      .from('profiles')
+      .from('user_roles')
       .select('role')
-      .eq('id', userId)
-      .single();
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
 
     if (error) {
       console.error('Error checking admin status:', error);
@@ -65,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setIsAdmin(data.role === 'admin');
+    setIsAdmin(!!data);
   };
 
   const signIn = async (email: string, password: string) => {
