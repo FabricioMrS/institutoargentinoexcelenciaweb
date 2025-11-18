@@ -868,10 +868,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      armor: {
-        Args: { "": string }
-        Returns: string
-      }
       authenticate_user: {
         Args: { email_input: string; password_input: string }
         Returns: {
@@ -884,18 +880,9 @@ export type Database = {
           vendedor_id: string
         }[]
       }
-      check_admin_access: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      check_crm_access: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      check_crm_admin_access: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      check_admin_access: { Args: never; Returns: boolean }
+      check_crm_access: { Args: never; Returns: boolean }
+      check_crm_admin_access: { Args: never; Returns: boolean }
       check_password_reset_rate_limit: {
         Args: { _email: string; _ip_address: string }
         Returns: boolean
@@ -907,49 +894,17 @@ export type Database = {
           user_found: boolean
         }[]
       }
-      dearmor: {
-        Args: { "": string }
-        Returns: string
-      }
-      gen_random_bytes: {
-        Args: { "": number }
-        Returns: string
-      }
-      gen_random_uuid: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      gen_salt: {
-        Args: { "": string }
-        Returns: string
-      }
-      get_crm_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_crm_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      hash_password: {
-        Args: { password: string }
-        Returns: string
-      }
+      dearmor: { Args: { "": string }; Returns: string }
+      gen_random_uuid: { Args: never; Returns: string }
+      gen_salt: { Args: { "": string }; Returns: string }
+      get_crm_user_id: { Args: never; Returns: string }
+      get_crm_user_role: { Args: never; Returns: string }
+      get_current_user_id: { Args: never; Returns: string }
+      get_current_user_role: { Args: never; Returns: string }
+      hash_password: { Args: { password: string }; Returns: string }
       pgp_armor_headers: {
         Args: { "": string }
         Returns: Record<string, unknown>[]
-      }
-      pgp_key_id: {
-        Args: { "": string }
-        Returns: string
       }
       reset_password_with_token: {
         Args: { new_password: string; token_input: string }
