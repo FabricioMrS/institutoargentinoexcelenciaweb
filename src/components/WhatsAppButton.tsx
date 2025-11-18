@@ -19,7 +19,7 @@ export const WhatsAppButton = ({
   interestRate = 0
 }: WhatsAppButtonProps) => {
   
-  const phoneNumber = "5491123456789"; // reemplazar por tu número real
+  const phoneNumber = "5493512069382"; // reemplazar por tu número real
 
   const getWhatsAppMessage = () => {
     if (courseTitle && price && selectedInstallments) {
