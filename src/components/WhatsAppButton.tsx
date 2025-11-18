@@ -21,12 +21,28 @@ export const WhatsAppButton = ({
   
   const phoneNumber = "5493512069382"; // reemplazar por tu número real
 
-  const getWhatsAppMessage = () => {
-    if (courseTitle && price && selectedInstallments) {
-      return `Hola! Me interesa el curso "${courseTitle}" con precio ${price} en ${selectedInstallments} cuotas${interestRate > 0 ? ` (${interestRate}% interés)` : ''}. ¿Podrían darme más información?`;
-    }
-    return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
-  };
+const getWhatsAppMessage = () => {
+  if (courseTitle && price && selectedInstallments) {
+
+    const basePrice = Number(price); // por si viene como string
+    const finalPrice = interestRate > 0 
+      ? basePrice * (1 + interestRate / 100)
+      : basePrice;
+
+    const installmentValue = finalPrice / selectedInstallments;
+
+    return `Hola! Me interesa el curso "${courseTitle}".
+
+Precio final: $${finalPrice.toFixed(2)}
+En ${selectedInstallments} cuotas de $${installmentValue.toFixed(2)} cada una.
+Interés aplicado: ${interestRate}% 
+
+¿Podrían darme más información?`;
+  }
+
+  return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
+};
+
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
