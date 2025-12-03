@@ -1,10 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 interface CourseFinancingProps {
   courseTitle: string;
@@ -85,7 +85,7 @@ export const CourseFinancing = ({
     const monthlyAmount = totalAmount / months;
     
     setSelectedFinancing(
-      `${months} cuota${months > 1 ? 's' : ''} de $${monthlyAmount.toFixed(2)}`
+      `${months} cuota${months > 1 ? 's' : ''} de $${formatCurrency(monthlyAmount)}`
     );
   };
 

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 interface WhatsAppButtonProps {
   message?: string;
@@ -21,27 +22,26 @@ export const WhatsAppButton = ({
   
   const phoneNumber = "5493512069382"; // reemplazar por tu número real
 
-const getWhatsAppMessage = () => {
-  if (courseTitle && price && selectedInstallments) {
+  const getWhatsAppMessage = () => {
+    if (courseTitle && price && selectedInstallments) {
+      const basePrice = Number(price);
+      const finalPrice = interestRate > 0 
+        ? basePrice * (1 + interestRate / 100)
+        : basePrice;
 
-    const basePrice = Number(price); // por si viene como string
-    const finalPrice = interestRate > 0 
-      ? basePrice * (1 + interestRate / 100)
-      : basePrice;
+      const installmentValue = finalPrice / selectedInstallments;
 
-    const installmentValue = finalPrice / selectedInstallments;
+      return `Hola! Me interesa el curso "${courseTitle}".
 
-    return `Hola! Me interesa el curso "${courseTitle}".
-
-Precio final: $${finalPrice.toFixed(2)}
-En ${selectedInstallments} cuotas de $${installmentValue.toFixed(2)} cada una.
-Interés aplicado: ${interestRate}% 
+Precio final: $${formatCurrency(finalPrice)}
+En ${selectedInstallments} cuotas de $${formatCurrency(installmentValue)} cada una.
+Interés aplicado: ${interestRate}%
 
 ¿Podrían darme más información?`;
-  }
+    }
 
-  return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
-};
+    return message || "Hola! Me gustaría obtener más información sobre sus cursos.";
+  };
 
 
   const handleClick = (e: React.MouseEvent) => {
