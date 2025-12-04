@@ -68,10 +68,11 @@ export const CourseFinancing = ({
       setSelectedInterestRate(sortedOptions[0].interest_rate);
       calculateInstallment(sortedOptions[0].installments, sortedOptions[0].interest_rate);
     } else {
-      // Make sure we always have at least the 1 payment option
-      console.log("No custom financing options found, using default single payment option");
+      // Make sure we always have at least the default payment options
+      console.log("No custom financing options found, using default payment options");
       setFinancingOptions([
         { installments: 1, interest_rate: 0 },
+        { installments: 2, interest_rate: 0 },
       ]);
       setSelectedInstallments(1);
       setSelectedInterestRate(0);
