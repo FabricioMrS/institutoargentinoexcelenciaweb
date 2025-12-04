@@ -467,7 +467,7 @@ const NewCourse = () => {
                         <SelectValue placeholder="Selecciona número de cuotas" />
                       </SelectTrigger>
                       <SelectContent>
-                        {[3, 6, 9, 12, 18, 24].map((num) => (
+                        {[2, 3, 6, 9, 12, 18, 24].map((num) => (
                           <SelectItem key={num} value={num.toString()}>
                             {num} cuotas
                           </SelectItem>
